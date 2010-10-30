@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 //-------------------------  Const section ------------------------------------
 //const int MAX_STR_LEN 5;
@@ -18,12 +19,14 @@
 //------------------------------ Sort By NAME ---------------------------------
 void copy_arr(char **data_new,char **data_old,int len);
 char **alloc_cell(int size);
+int popID(const char *str,const int start);
+int getID(const char *str);
+void sort_by_id(char **data,int size);
+int find_space(const char *str);
 
 
 
 
-
-void sort_by_id();
 
 char **alloc_cell(int size)
 {
@@ -74,8 +77,8 @@ void print_arr(char **data, int size)
 	}
 }
 
-int getID(char *str);
-int cmpName(char *name1,char *name2);
+
+int cmpName(const char *name1,const char *name2);
 
 void sort_by_name(char **data,int size)
 {
@@ -119,12 +122,6 @@ int main(int argc, char *argv[])
 		
 	int ind=0;
 	
-	//int res;
-	
-	//res = strcmp("a","ac");
-	//printf("%d",res);
-	//res = strcmp("acb","ac");
-	//printf("%d",res);
 	if(argc == 3 )
 	{
 
@@ -161,14 +158,15 @@ int main(int argc, char *argv[])
 			}
 		
 		
-		fgets(key,5,stdin);			// TODO Const
+		fgets(key,3,stdin);			// TODO Const
+		
 		print_arr(datap,ind);
 		printf("\n\n");
 		
 		if(!strcmp(key,"name"))
 			sort_by_name(datap,ind);
 		else if(!strcmp(key,"id"))
-			sort_by_id();
+			sort_by_id(datap,ind);
 	
 		print_arr(datap,ind);
 		printf("DATA %s \n", argv[1]);
@@ -185,40 +183,80 @@ int main(int argc, char *argv[])
 }
 
 //------------------------------ Sort By ID -----------------------------------
-void sort_by_id()
+void sort_by_id(char **data,int size)
 {
-	printf("By id\n");
+	int i,x;
+	
+	char *temp;
+	for(i=0;i<size;i++)
+	{
+		//printf("Debuf: %s\n",data[i]);
+		getID(data[i]);
+		for(x=0;x<size;x++)
+		{
+			if(getID(data[i])<getID(data[x]))
+			{
+				//printf("hz 1\n");
+				temp = data[x];
+				data[x]=data[i];
+				data[i]=temp;
+				//break;
+			}			
+		}
+	}
 
 }
 
-int getID(char *str)
+int getID(const char *str)
 {
 	int count;
-	char id[strlen(str)];
+	//char id[strlen(str)];
 	int result;
 	
 	for(count=0;count<strlen(str);count++)
 	{
 		if(str[count] == ' ')
 		{
-			strncpy(id,str,count+1);
+			//printf("start ");
+			result = popID(str,count+1);
+			//printf("%d\n\n",result);
 			break;
 		}
 			
 	}
-	
-	result= atoi(id);
-
-	printf("%d \n",result);
 
 	return(result);
 }
 
-int cmpName(char *name1,char *name2)
+
+int popID(const char *str,const int start)
 {
-	int count;
-	int len;
+	int count,i=0;
+	char temp[strlen(str)];
 	
+	for(count=start;count<strlen(str);count++)
+	{
+		if(isdigit(str[count]))
+		{
+			temp[i]=str[count];
+			i++;
+		}
+		else
+		{
+			temp[i] = '\0';
+			break;
+			
+		}
+	}
+	
+	return(atoi(temp));
+	
+}
+
+int cmpName(const char *name1,const char *name2)
+{
+	
+	int count;
 
 	char name1_str[strlen(name1)];
 	memset(name1_str,'0',strlen(name1));
@@ -226,30 +264,14 @@ int cmpName(char *name1,char *name2)
 	char name2_str[strlen(name2)];
 	memset(name2_str,'0',strlen(name2));
 	
-	len = strlen(name1);
-	for(count=0;count<len;count++)
-	{
-		if(name1[count] == ' ')
-		{
-			strncpy(name1_str,name1,count);
-			name1_str[count] = '\0';
-			break;
-		}
-			
-	}
+	count = find_space(name1);
+	strncpy(name1_str,name1,count);
+	name1_str[count] = '\0';
 	
-	len = strlen(name2);
-	for(count=0;count<len;count++)
-	{
-		if(name2[count] == ' ')
-		{
-			strncpy(name2_str,name2,count);
-			name2_str[count] = '\0';
-			break;
-		}
-			
-	}
-	
+	count = find_space(name2);
+	strncpy(name2_str,name2,count);
+	name2_str[count] = '\0';
+
 	if(strcmp(name1_str,name2_str)<0)
 		return(1);
 
@@ -257,5 +279,19 @@ int cmpName(char *name1,char *name2)
 	return(0);
 
 	
+}
+
+int find_space(const char *str)
+{
+	int count,
+		len;
+	
+	len = strlen(str);
+	
+	for(count=0;count<len;count++)
+		if(str[count] == ' ')
+			return(count);
+	
+	return(0);
 }
 
