@@ -16,124 +16,91 @@
 //const int MAX_STR_LEN 5;
 
 //------------------------------ Sort By NAME ---------------------------------
-void sort_by_name()
-{
-	//int high;
-	
-	//high = sizeof(data);
-	//printf("size: %d \n",high);
-	printf("By name\n");
+void copy_arr(char **data_new,char **data_old,int len);
+char **alloc_cell(int size);
 
-}
 
-char *all_one_arr(int to, char *grades);
+
 
 
 void sort_by_id();
 
-
-char **create_Cell(char **data,int len)
+char **alloc_cell(int size)
 {
+    char **new_cell = NULL;      // create new pointer-pointer
 
-	char **new_data = (char **)malloc(sizeof(char)*len);
-	//int count;
-	
-	if(new_data == NULL)
-		printf("Can`t allocate more memroy");
-		
-	printf("aa: %d",sizeof(char)*len);
-	
-	//for(count=0;count<len-1;count++)
-	//{
-		new_data = data;
-	//}
-	free(data);
-	return(new_data);
-	
-}
+    new_cell = (char**)malloc(sizeof(char*)*size) ;   // alloc memory
 
-//-------------------- ALLOCATE ** ARRAY --------------------------------------
-// Function to allocate memory for pragram data
-// geting lower and upped index to allocate
-// returning new data
-char **all_two_arr(int to, char **stud)
-{
-    char **new_stud = NULL;      // create new pointer-pointer
-
-    new_stud = (char**)malloc(sizeof(char)*to) ;   // alloc memory
-
-    if(new_stud == NULL)        // check if have memory
-    {
-        //cout << "Error: alloc one array\n";
-        //exit(EXIT_FAILURE);     // if not go away
+    if(new_cell == NULL)        // check if have memory
     	printf("Error ----- all\n");
-    }
-
-	int i;
-	int x;
-
-    for(i=0;i<to-1;i++)
-    {
-        //if(i < to-1)
-        //{
-            // start copy data from previous cellsd
-            new_stud[i] = NULL; // set be NULL
-            // try allocate more memory
-            new_stud[i] = all_one_arr(strlen(stud[i])+1,stud[i]);
-            // copy previous data
-            
-            // copy all rows from 2
-
-            //free(stud[i]);                  // free memory
-
-        //}
-        //else
-        //{
-        //    new_stud[i] = NULL;                 // set be NULL
-        //    // allocate more memory for new cells
-        //    new_stud[i] = all_one_arr(,new_stud[i]);
-            
-        //}
-	    
-	    //free(stud);                 // global free memory
-     }   
-    return(new_stud);                           // retun the data
-
+    
+    return(new_cell);
 }
 
-//---------------------- MEMORY ALLOCATE --------------------------------------
-// allocate memory only for rows/
-// function get upper index needed to allocate
-// act it is for if use trying allocate new array
-// return pointer to new data
-char *all_one_arr(int to, char *grades)
+void copy_arr(char **data_new,char **data_old,int len)
 {
-    char *arr ;                          // pointer for new data
-
-    arr = (char*)malloc(sizeof(char)*to);  // try get memory
-
-    if(arr == NULL)                     // check if geting success
-    {
-        //cout << "Error: alloc one array\n"; // print error
-        //exit(EXIT_FAILURE);                 // if not exit
-    	printf("Error aloc 1");
-    }
-
 	int i;
-    // start work whith data
-    for(i=0;i<to;i++)
-       	arr[i] = grades[i]; // copy old data
-        
-    // trying to delete old data
-    //if(grades != NULL)
-       //free(grades);        // deleting
+	//printf("Start:\n");
+	for(i=0;i<len;i++)
+	{
+		//printf("S %d :\t", i);
+		data_new[i] = data_old[i];
+	
+	}
+	//printf("END:\n");
+}
 
-    return(arr);                // returning
+void free_arr(char **data, int len)
+{
+	int i;
+	
+	for(i=0;i<len;i++)
+	{
+		free(data[i]);
+	
+	}
+}
 
+void print_arr(char **data, int size)
+{
+	int i;
+	
+	for(i=0;i<size;i++)
+	{
+		//for(x=0;x<strlen(data[i]);x++)
+			printf("%s.",data[i]);
+			
+		printf("\n");
+	}
 }
 
 int getID(char *str);
 int cmpName(char *name1,char *name2);
+
+void sort_by_name(char **data,int size)
+{
+	int i, x;
+	
+	char *temp;
+	for(i=0;i<size;i++)
+	{
+		for(x=0;x<size;x++)
+		{
+			if(cmpName(data[i],data[x]) ==1)
+			{
+				//printf("hz 1\n");
+				temp = data[x];
+				data[x]=data[i];
+				data[i]=temp;
+				//break;
+			}			
+		}
+	}
+
+}
+
+
+
 //--------------  Prototypes section ------------------------------------------
 
 //------------------------- Main section --------------------------------------
@@ -143,15 +110,21 @@ int main(int argc, char *argv[])
 	char key[5];		//	Variable for menu		// TODO
 	//char buf[20];		//	Variable for In data	// TODO
 	
-	char data[10][20];
+	char data[100];
 	
-	char **datap;
+	char **datap=NULL;
 	
 	FILE *fRead;		//	Var for red file
 	FILE *fWrite;		// 	Var for write file
 		
 	int ind=0;
 	
+	//int res;
+	
+	//res = strcmp("a","ac");
+	//printf("%d",res);
+	//res = strcmp("acb","ac");
+	//printf("%d",res);
 	if(argc == 3 )
 	{
 
@@ -161,28 +134,43 @@ int main(int argc, char *argv[])
 		if(fRead == NULL)
 			printf("Can`t read file %s \n", argv[1]);
 		else
-			while(fgets(data[ind],20,fRead) != NULL)	// TODO CONST
+			while(fgets(data,50,fRead) != NULL)	// TODO CONST
 			{
 			
+				char **temp=NULL;
+				//printf("1:\n");
+				char *str = (char*)malloc( (sizeof(char)*strlen(data) +1 ));
+				//printf("2:\n");
+				temp = alloc_cell(ind+1);
+				//printf("3:\n");
+				copy_arr(temp,datap,ind);
+				//printf("4:\n");
+				//free_arr(datap,ind);
+				free(datap);
+				datap = temp;
+				
+				
+				strcpy(str,data);				
+				temp[ind] = str;
+				
+
+				//printf("%s \n",temp[ind]);	
+				
 				ind++;
-//				datap = create_Cell(datap,ind);
-				datap = all_two_arr(ind,datap); 			
-				//fputs(buf,data[ind]);
-				printf("%s \n",data[ind-1]);	
-				
-				//printf("---- %d \n",getID(data[ind]));
-				
 				
 			}
 		
 		
-		fgets(key,4,stdin);			// TODO Const
-	
+		fgets(key,5,stdin);			// TODO Const
+		print_arr(datap,ind);
+		printf("\n\n");
+		
 		if(!strcmp(key,"name"))
-			sort_by_name();
+			sort_by_name(datap,ind);
 		else if(!strcmp(key,"id"))
 			sort_by_id();
 	
+		print_arr(datap,ind);
 		printf("DATA %s \n", argv[1]);
 		//return ;
 	
@@ -191,7 +179,8 @@ int main(int argc, char *argv[])
 	
 	}
 	
-
+	free_arr(datap,ind);
+	free(datap);
 	return(1);
 }
 
@@ -228,53 +217,44 @@ int getID(char *str)
 int cmpName(char *name1,char *name2)
 {
 	int count;
+	int len;
 	
-	int name1_len;
-	int name2_len;
-	
-	char name1_str[strlen(name1)];
-	char name2_str[strlen(name2)];
-	
-	for(count=0;count<strlen(name1);count++)
-	{
-		if(name1_str[count] == ' ')
-		{
-			//strncpy(id,str,count+1);
-			
-			name1_len = count-1;
-			strncpy(name1_str,name1,count-1);
 
-			break;
-		}
-			
-	}
+	char name1_str[strlen(name1)];
+	memset(name1_str,'0',strlen(name1));
 	
+	char name2_str[strlen(name2)];
+	memset(name2_str,'0',strlen(name2));
 	
-	for(count=0;count<strlen(name2);count++)
+	len = strlen(name1);
+	for(count=0;count<len;count++)
 	{
-		if(name2_str[count] == ' ')
+		if(name1[count] == ' ')
 		{
-			//strncpy(id,str,count+1);
-			strncpy(name1_str,name1,count-1);
-			
-			name2_len = count-1;
+			strncpy(name1_str,name1,count);
+			name1_str[count] = '\0';
 			break;
 		}
 			
 	}
 	
-	if(strcmp(name1_str,name2_str))
+	len = strlen(name2);
+	for(count=0;count<len;count++)
 	{
-		printf("%s \n",name1_str);
-		printf("%s \n",name2_str);
+		if(name2[count] == ' ')
+		{
+			strncpy(name2_str,name2,count);
+			name2_str[count] = '\0';
+			break;
+		}
+			
+	}
+	
+	if(strcmp(name1_str,name2_str)<0)
 		return(1);
-	}
-	else
-	{
-		printf("%s \n",name2_str);
-		printf("%s \n",name1_str);
-		return(0);
-	}
+
+
+	return(0);
 
 	
 }
