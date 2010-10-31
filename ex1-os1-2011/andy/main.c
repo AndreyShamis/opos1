@@ -70,7 +70,7 @@ int getID(const char *str);
 
 // A function that
 //------------------------------------------------------------------------------
-// Input:
+// Input: tabel of strings (type dubel pointer),
 // Output:
 void sort_by_id(char **data,const int size);
 
@@ -93,20 +93,34 @@ void swap_str(char **str,const int fir,const int sec);
 // Output:
 int cmpName(const char *name1,const char *name2);
 
+
+
 // A function that sorting strings in tabel of data by name order.
+//------------------------------------------------------------------------------
+// Input: tabel of strings (type dubel pointer), size of tabel - number of
+// rows at tabel. (type integer).
+void sort_by_name(char **data,const int size);
+
+// A function that
 //------------------------------------------------------------------------------
 // Input:
 // Output:
-//------------------------- Sort by name --------------------------------------
-// this function sorting strings in array data by name order
-void sort_by_name(char **data,const int size);
 void mem_error();
+
+// A function that
+//------------------------------------------------------------------------------
+// Input: tabel of strings (type dubel pointer),
+// Output:
 void free_arr(char **data,const int len);
 
-
+// A function that
+//------------------------------------------------------------------------------
+// Input:
+// Output:
 void readFile(FILE& fRead,int& str_counter,char **dataDB);
 
-//------------------------- Main section --------------------------------------
+//                                Main section
+//==============================================================================
 int main(int argc, char *argv[])
 {
 
