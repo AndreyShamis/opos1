@@ -48,16 +48,31 @@ void print_arr( char **data,const int size)
 //=============================================================================
 
 
-// A function that copy tabel of strings.
+
+
+// A function that read text file.
 //-----------------------------------------------------------------------------
-// Input: new and old tabels of strings (type dubel pointer).
-void copy_arr(char **data_new,char **data_old,int len);
+// Input: tabel of strings (type dubel pointer), counter of strings (type
+// &char),      #############Miss(FILE&)#####################
+void readFile(FILE& fRead,int& str_counter,char **dataDB);
 
 // A function that allocate memory
 //-----------------------------------------------------------------------------
 // Input:
 // Output:
 char **alloc_cell(const int size);
+
+// A function that sorting strings in tabel of data by id order.
+//-----------------------------------------------------------------------------
+// Input: tabel of strings (type dubel pointer), size of tabel - number of
+// rows at tabel. (type integer).
+void sort_by_id(char **data, const int size);
+
+// A function that sorting strings in tabel of data by name order.
+//-----------------------------------------------------------------------------
+// Input: tabel of strings (type dubel pointer), size of tabel - number of
+// rows at tabel. (type integer).
+void sort_by_name(char **data, const int size);
 
 // A function that locate and convert string of digits to integer.
 //-----------------------------------------------------------------------------
@@ -71,6 +86,11 @@ int popID(const char *str,const int start);
 // Input: Pointer to string from tabel (type *char).
 // Output: id (type int).
 int getID(const char *str);
+
+// A function that copy tabel of strings.
+//-----------------------------------------------------------------------------
+// Input: new and old tabels of strings (type dubel pointer).
+void copy_arr(char **data_new,char **data_old,int len);
 
 // A function that find "space" charecter in string.
 //-----------------------------------------------------------------------------
@@ -93,21 +113,6 @@ void swap_str(char **str, const int fir, const int sec);
 // (type int).
 int cmpName(const char *name1, const char *name2);
 
-
-
-// A function that sorting strings in tabel of data by name order.
-//-----------------------------------------------------------------------------
-// Input: tabel of strings (type dubel pointer), size of tabel - number of
-// rows at tabel. (type integer).
-void sort_by_name(char **data, const int size);
-
-
-// A function that sorting strings in tabel of data by id order.
-//-----------------------------------------------------------------------------
-// Input: tabel of strings (type dubel pointer), size of tabel - number of
-// rows at tabel. (type integer).
-void sort_by_id(char **data, const int size);
-
 // A function that notify user about error  of aloccating memory.
 //-----------------------------------------------------------------------------
 void mem_error();
@@ -117,11 +122,6 @@ void mem_error();
 // Input: tabel of strings (type dubel pointer), number of strings at table.
 void free_arr(char **data, const int len);
 
-// A function that read text file.
-//-----------------------------------------------------------------------------
-// Input: tabel of strings (type dubel pointer), counter of strings (type
-// &char),      #############Miss(FILE&)#####################
-void readFile(FILE& fRead,int& str_counter,char **dataDB);
 
 //                                Main section
 //=============================================================================
@@ -214,7 +214,10 @@ int main(int argc, char *argv[])
 
 
 
-
+// A function that read text file.
+//-----------------------------------------------------------------------------
+// Input: tabel of strings (type dubel pointer), counter of strings (type
+// &char),      #############Miss(FILE&)#####################
 void readFile(FILE& fRead,int& str_counter,char **dataDB)
 {
 	char **temp=NULL;
@@ -234,31 +237,23 @@ void readFile(FILE& fRead,int& str_counter,char **dataDB)
 		dataDB[str_counter] = str;
 
 		str_counter++;
-
 	}
 }
 
-// A function that swap between tow strings that located in 2D tabel.
-// strin = line in tabel.
+// A function that allocate memory
 //-----------------------------------------------------------------------------
-// Input: tabel of strings (type dubel pointer), first and second strings (that
-// need to be swap) location in tabel (type: integers).
-void swap_str(char **str,const int fir,const int sec)
+// Input:
+// Output:
+char **alloc_cell(const int size)
 {
-	char *temp;			//	temp variable
+    char **new_cell = NULL;      // create new pointer-pointer
 
-	temp = str[fir];	//	this block swap
-	str[fir]=str[sec];	// 	between two
-	str[sec]=temp;		//	strings in array
+    new_cell = (char**)malloc(sizeof(char*)*size) ;   // alloc memory
 
-}
+    if(new_cell == NULL)        // check if have memory
+    	mem_error();
 
-// A function that notify user about error  of aloccating memory.
-//-----------------------------------------------------------------------------
-void mem_error()
-{
-	printf("Can`t allocate memory.\n");
-
+    return(new_cell);
 }
 
 // A function that sorting strings in tabel of data by name order.
@@ -279,44 +274,6 @@ void sort_by_name(char **data,const int size)
 			}
 		}
 	}
-
-}
-
-// A function that free aloccated memory.
-//-----------------------------------------------------------------------------
-// Input: tabel of strings (type dubel pointer), number of strings at table.
-void free_arr(char **data,const int len)
-{
-	int i;
-
-	for(i=0;i<len;i++)
-		free(data[i]);
-
-}
-
-char **alloc_cell(const int size)
-{
-    char **new_cell = NULL;      // create new pointer-pointer
-
-    new_cell = (char**)malloc(sizeof(char*)*size) ;   // alloc memory
-
-    if(new_cell == NULL)        // check if have memory
-    	mem_error();
-
-    return(new_cell);
-
-}
-
-// A function that copy tabel of strings.
-//-----------------------------------------------------------------------------
-// Input: new and old tabels of strings (type dubel pointer).
-void copy_arr(char **data_new,char **data_old,int len)
-{
-	int i;
-
-	for(i=0;i<len;i++)
-		data_new[i] = data_old[i];
-
 }
 
 // A function that sorting strings in tabel of data by id order.
@@ -333,9 +290,7 @@ void sort_by_id(char **data,const int size)
 		for(x=0;x<size;x++)
 			if(getID(data[i])<getID(data[x]))
 				swap_str(data,i,x);
-
 	}
-
 }
 
 // A function that get id from string that include mixed data (not only ids).
@@ -384,7 +339,6 @@ int popID(const char *str,const int start)
 		}
 
 	return(atoi(temp));
-
 }
 
 // A function that compare names (alfamerik strings)
@@ -415,9 +369,32 @@ int cmpName(const char *name1,const char *name2)
 	if(strcmp(name1_str,name2_str)<0)
 		return(1);
 
-
 	return(0);
+}
 
+// A function that copy tabel of strings.
+//-----------------------------------------------------------------------------
+// Input: new and old tabels of strings (type dubel pointer).
+void copy_arr(char **data_new,char **data_old,int len)
+{
+	int i;
+
+	for(i=0;i<len;i++)
+		data_new[i] = data_old[i];
+}
+
+// A function that swap between tow strings that located in 2D tabel.
+// strin = line in tabel.
+//-----------------------------------------------------------------------------
+// Input: tabel of strings (type dubel pointer), first and second strings (that
+// need to be swap) location in tabel (type: integers).
+void swap_str(char **str,const int fir,const int sec)
+{
+	char *temp;			//	temp variable
+
+	temp = str[fir];	//	this block swap
+	str[fir]=str[sec];	// 	between two
+	str[sec]=temp;		//	strings in array
 
 }
 
@@ -439,3 +416,20 @@ int find_space(const char *str)
 	return(0);
 }
 
+// A function that free aloccated memory.
+//-----------------------------------------------------------------------------
+// Input: tabel of strings (type dubel pointer), number of strings at table.
+void free_arr(char **data,const int len)
+{
+	int i;
+
+	for(i=0;i<len;i++)
+		free(data[i]);
+}
+
+// A function that notify user about error  of aloccating memory.
+//-----------------------------------------------------------------------------
+void mem_error()
+{
+	printf("Can`t allocate memory.\n");
+}
