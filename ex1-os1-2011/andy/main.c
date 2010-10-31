@@ -13,13 +13,15 @@
  *---------------------
  */
 
-//------------------------- including section ---------------------------------
+//                               Include section
+//==============================================================================
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 
-//-------------------------  Const section ------------------------------------
+//                                Const cection
+//==============================================================================
 #define MAX_STR_LEN  200
 #define MAX_MENU_STR_LEN 5
 
@@ -38,17 +40,63 @@ void print_arr( char **data,const int size)
 	}
 }
 
-//--------------  Prototypes section ------------------------------------------
+
+//                             Prototypes section
+//==============================================================================
+
+// A function that
+//------------------------------------------------------------------------------
+// Input:
+// Output:
 void copy_arr(char **data_new,char **data_old,int len);
+
+// A function that
+//------------------------------------------------------------------------------
+// Input:
+// Output:
 char **alloc_cell(const int size);
+
+// A function that
+//------------------------------------------------------------------------------
+// Input:
+// Output:
 int popID(const char *str,const int start);
+
+// A function that
+//------------------------------------------------------------------------------
+// Input:
+// Output:
 int getID(const char *str);
+
+// A function that
+//------------------------------------------------------------------------------
+// Input:
+// Output:
 void sort_by_id(char **data,const int size);
+
+// A function that
+//------------------------------------------------------------------------------
+// Input:
+// Output:
 int find_space(const char *str);
-//------------------------- SWAP ----------------------------------------------
-// Start swap function
+
+// A function that swap between tow strings that located in 2D tabel.
+// strin = line in tabel.
+//------------------------------------------------------------------------------
+// Input: tabel of strings (type dubel pointer), first and second strings (that
+// need to be swap) location in tabel (type: integers).
 void swap_str(char **str,const int fir,const int sec);
+
+// A function that
+//------------------------------------------------------------------------------
+// Input:
+// Output:
 int cmpName(const char *name1,const char *name2);
+
+// A function that sorting strings in tabel of data by name order.
+//------------------------------------------------------------------------------
+// Input:
+// Output:
 //------------------------- Sort by name --------------------------------------
 // this function sorting strings in array data by name order
 void sort_by_name(char **data,const int size);
