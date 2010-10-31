@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
     // Difine counter of strings at tabel.
 	int str_counter=0;
 
-    // If the user enter nesesery data korect:
+    // If the user enter nesesery data corect:
 	if(argc == 3 )
 	{
         // Open read and write fils.
@@ -175,19 +175,23 @@ int main(int argc, char *argv[])
 			}
 
 			*/
-			fclose(fRead);			// close readed file
 
-			scanf("%s",key);		// Get sort type
+			// Close readed file.
+			fclose(fRead);
 
+            // Get sort type.
+			scanf("%s",key);
+
+            // Print the tabel of syrings.
 			print_arr(dataDB,str_counter);
 			printf("\n\n");
 
-			// Check sort type section
+			// Check sort type.
 			if(!strcmp(key,"name"))
 				sort_by_name(dataDB,str_counter);	//	sort by name
 			else if(!strcmp(key,"id"))
 				sort_by_id(dataDB,str_counter);		// sort by id
-			// end sort section
+
 
 
 			//start write to file section
@@ -198,13 +202,16 @@ int main(int argc, char *argv[])
 
 			print_arr(dataDB, str_counter);
 
-			fclose(fWrite);			// close writed file
+            // Close writed file.
+			fclose(fWrite);
 
+            // free aloccated Memory
 			free_arr(dataDB, str_counter);
 			free(dataDB);
 
 		}
 	}
+	// Tell user how to enter data - corect.
 	else
 	{
 		printf("You need enter 2 parameters:\n");
