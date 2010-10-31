@@ -127,29 +127,35 @@ void free_arr(char **data, const int len);
 //=============================================================================
 int main(int argc, char *argv[])
 {
-
+    // Difine sort key.
 	char key[MAX_MENU_STR_LEN];
 
-
+    // Difine tabel of data.
 	char 	**dataDB=NULL;
 	 		//**temp=NULL,
 			//*str=NULL;
 
-	FILE *fRead;		//	Var for red file
-	FILE *fWrite;		// 	Var for write file
 
+	FILE *fRead;		//	Var for red file.
+	FILE *fWrite;		// 	Var for write file.
+
+    // Difine counter of strings at tabel.
 	int str_counter=0;
 
+    // If the user enter nesesery data korect:
 	if(argc == 3 )
 	{
-
+        // Open read and write fils.
 		fRead = fopen(argv[1],"r");
 		fWrite = fopen(argv[2],"w");
 
+        // If failed to opening read file.
 		if(fRead == NULL)
+            // Error notepy of opening read file.
 			printf("Can`t read file %s \n", argv[1]);
 		else
 		{
+		    // Read file and transform the data to tabel of strings.
 			readFile(fRead,str_counter,dataDB);
 			/*
 			while(fgets(data,MAX_STR_LEN,fRead) != NULL)	// TODO CONST
