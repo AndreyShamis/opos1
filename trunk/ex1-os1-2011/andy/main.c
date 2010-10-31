@@ -1,6 +1,6 @@
 /*
  * EX1 :: A program that manage data base of name's and id's.
- * ============================================================================
+ * ===========================================================================
  * Writen by: Andrey Shamis,  id: 321470882, login: andreysh
  * and:       Ilia Gaisinsky, id: 309480051, login: iliaga
  * Input:  text file that include names and ids, sort key.
@@ -14,14 +14,14 @@
  */
 
 //                               Include section
-//==============================================================================
+//=============================================================================
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 
 //                                Const cection
-//==============================================================================
+//=============================================================================
 #define MAX_STR_LEN  200
 #define MAX_MENU_STR_LEN 5
 
@@ -42,88 +42,89 @@ void print_arr( char **data,const int size)
 
 
 //                             Prototypes section
-//==============================================================================
+//=============================================================================
 
 
 // A function that copy tabel of strings.
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Input: new and old tabels of strings (type dubel pointer).
 void copy_arr(char **data_new,char **data_old,int len);
 
 // A function that allocate
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Input:
 // Output:
 char **alloc_cell(const int size);
 
 // A function that locate and convert string of digits to integer.
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Input: Pointer to sting(type *char) and start point to locate digits
 // (type int).
 // Output: id (type int).
 int popID(const char *str,const int start);
 
 // A function that get id from string that include mixed data (not only ids).
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Input: Pointer to string from tabel (type *char).
 // Output: id (type int).
 int getID(const char *str);
 
-// A function that
-//------------------------------------------------------------------------------
-// Input:
+// A function that find "space" charecter in string.
+//-----------------------------------------------------------------------------
+// Input: Pointer to string which locate in data tabel (type *char).
 // Output:
 int find_space(const char *str);
 
 // A function that swap between tow strings that located in 2D tabel.
 // strin = line in tabel.
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Input: tabel of strings (type dubel pointer), first and second strings (that
 // need to be swap) location in tabel (type: integers).
 void swap_str(char **str,const int fir,const int sec);
 
-// A function that
-//------------------------------------------------------------------------------
-// Input:
-// Output:
+// A function that compare names (alfamerik strings)
+//-----------------------------------------------------------------------------
+// Input: Two pointers to string that include names information that located in
+// data tabel (type *char).
+// Output: Return "1" if name1 smaller then name2, atherwise return "0"
+// (type int).
 int cmpName(const char *name1,const char *name2);
 
 
 
 // A function that sorting strings in tabel of data by name order.
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Input: tabel of strings (type dubel pointer), size of tabel - number of
 // rows at tabel. (type integer).
 void sort_by_name(char **data,const int size);
 
 
 // A function that sorting strings in tabel of data by id order.
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Input: tabel of strings (type dubel pointer), size of tabel - number of
 // rows at tabel. (type integer).
-
 void sort_by_id(char **data,const int size);
 
 // A function that
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Input:
 // Output:
 void mem_error();
 
 // A function that
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Input: tabel of strings (type dubel pointer),
 // Output:
 void free_arr(char **data,const int len);
 
 // A function that
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Input:
 // Output:
 void readFile(FILE& fRead,int& str_counter,char **dataDB);
 
 //                                Main section
-//==============================================================================
+//=============================================================================
 int main(int argc, char *argv[])
 {
 
