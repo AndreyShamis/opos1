@@ -50,7 +50,7 @@ void mem_error();
 void free_arr(char **data,const int len);
 
 
-void readFile(FILE &fRead,int &str_counter,char **dataDB);
+void readFile(FILE& fRead,int& str_counter,char **dataDB);
 
 //------------------------- Main section --------------------------------------
 int main(int argc, char *argv[])
@@ -138,7 +138,7 @@ int main(int argc, char *argv[])
 }
 
 
-void readFile(FILE &fRead,int &str_counter,char **dataDB)
+void readFile(FILE& fRead,int& str_counter,char **dataDB)
 {
 	char **temp=NULL;
 	char data[MAX_STR_LEN];
@@ -237,7 +237,7 @@ void sort_by_id(char **data,const int size)
 	
 	for(i=0;i<size;i++)
 	{
-		getID(data[i]);
+		//getID(data[i]);
 		for(x=0;x<size;x++)
 			if(getID(data[i])<getID(data[x]))
 				swap_str(data,i,x);
@@ -250,8 +250,8 @@ int getID(const char *str)
 {
 	int count,
 		result;
-	
-	for(count=0;count<strlen(str);count++)
+	int len = strlen(str);
+	for(count=0;count<len;count++)
 		if(str[count] == ' ')
 		{
 			result = popID(str,count+1);
@@ -266,9 +266,11 @@ int popID(const char *str,const int start)
 {
 	int count,
 		i=0;
-	char temp[strlen(str)];
+	int len=strlen(str);
 	
-	for(count=start;count<strlen(str);count++)
+	char temp[len];
+	
+	for(count=start;count<len;count++)
 		if(isdigit(str[count]))
 		{
 			temp[i]=str[count];
