@@ -18,102 +18,45 @@
 
 //------------------------------ Sort By NAME ---------------------------------
 void copy_arr(char **data_new,char **data_old,int len);
-char **alloc_cell(int size);
+char **alloc_cell(const int size);
 int popID(const char *str,const int start);
 int getID(const char *str);
-void sort_by_id(char **data,int size);
+void sort_by_id(char **data,const int size);
 int find_space(const char *str);
+void swap_str(char **str,const int fir,const int sec);
+int cmpName(const char *name1,const char *name2);
+void sort_by_name(char **data,const int size);
+
+void free_arr(char **data,const int len);
 
 
 
-
-
-char **alloc_cell(int size)
-{
-    char **new_cell = NULL;      // create new pointer-pointer
-
-    new_cell = (char**)malloc(sizeof(char*)*size) ;   // alloc memory
-
-    if(new_cell == NULL)        // check if have memory
-    	printf("Error ----- all\n");
-    
-    return(new_cell);
-}
-
-void copy_arr(char **data_new,char **data_old,int len)
-{
-	int i;
-	//printf("Start:\n");
-	for(i=0;i<len;i++)
-	{
-		//printf("S %d :\t", i);
-		data_new[i] = data_old[i];
-	
-	}
-	//printf("END:\n");
-}
-
-void free_arr(char **data, int len)
-{
-	int i;
-	
-	for(i=0;i<len;i++)
-	{
-		free(data[i]);
-	
-	}
-}
-
-void print_arr(char **data, int size)
+void print_arr( char **data,const int size)
 {
 	int i;
 	
 	for(i=0;i<size;i++)
 	{
-		//for(x=0;x<strlen(data[i]);x++)
-			printf("%s.",data[i]);
-			
+		printf("%s.",data[i]);		
 		printf("\n");
 	}
 }
 
 
-int cmpName(const char *name1,const char *name2);
-
-void sort_by_name(char **data,int size)
-{
-	int i, x;
-	
-	char *temp;
-	for(i=0;i<size;i++)
-	{
-		for(x=0;x<size;x++)
-		{
-			if(cmpName(data[i],data[x]) ==1)
-			{
-				//printf("hz 1\n");
-				temp = data[x];
-				data[x]=data[i];
-				data[i]=temp;
-				//break;
-			}			
-		}
-	}
-
-}
 
 
 
+
+#define MAX_STR_LEN  200
+#define MAX_MENU_STR_LEN 5
 //--------------  Prototypes section ------------------------------------------
 
 //------------------------- Main section --------------------------------------
 int main(int argc, char *argv[])
 {
 	
-	char key[5];		//	Variable for menu		// TODO
-	//char buf[20];		//	Variable for In data	// TODO
-	
-	char data[100];
+	char key[MAX_MENU_STR_LEN];
+	char data[MAX_STR_LEN];
 	
 	char **datap=NULL;
 	
@@ -158,7 +101,8 @@ int main(int argc, char *argv[])
 			}
 		
 		
-		fgets(key,3,stdin);			// TODO Const
+		//fgets(key,5,stdin);			// TODO Const
+		scanf("%s",key);
 		
 		print_arr(datap,ind);
 		printf("\n\n");
@@ -182,12 +126,76 @@ int main(int argc, char *argv[])
 	return(1);
 }
 
+
+//------------------------- SWAP ----------------------------------------------
+// Start swap function
+void swap_str(char **str,const int fir,const int sec)
+{
+	char *temp;			//	temp variable
+
+	temp = str[fir];	//	this block swap
+	str[fir]=str[sec];	// 	between two   
+	str[sec]=temp;		//	strings in array
+	
+}
+//	End swap function
+
+
+//------------------------- Sort by name --------------------------------------
+// this function sorting strings in array data by name order
+void sort_by_name(char **data,const int size)
+{
+	int i, x;
+	
+	for(i=0;i<size;i++)
+	{
+		for(x=0;x<size;x++)
+		{
+			if(cmpName(data[i],data[x]) ==1)
+			{
+				swap_str(data,i,x);
+			}			
+		}
+	}
+
+}
+
+void free_arr(char **data,const int len)
+{
+	int i;
+	
+	for(i=0;i<len;i++)
+		free(data[i]);
+	
+}
+
+char **alloc_cell(const int size)
+{
+    char **new_cell = NULL;      // create new pointer-pointer
+
+    new_cell = (char**)malloc(sizeof(char*)*size) ;   // alloc memory
+
+    if(new_cell == NULL)        // check if have memory
+    	printf("Error ----- all\n");
+    
+    return(new_cell);
+}
+
+void copy_arr(char **data_new,char **data_old,int len)
+{
+	int i;
+
+	for(i=0;i<len;i++)
+		data_new[i] = data_old[i];
+	
+}
+
+
 //------------------------------ Sort By ID -----------------------------------
-void sort_by_id(char **data,int size)
+void sort_by_id(char **data,const int size)
 {
 	int i,x;
 	
-	char *temp;
 	for(i=0;i<size;i++)
 	{
 		//printf("Debuf: %s\n",data[i]);
@@ -196,11 +204,7 @@ void sort_by_id(char **data,int size)
 		{
 			if(getID(data[i])<getID(data[x]))
 			{
-				//printf("hz 1\n");
-				temp = data[x];
-				data[x]=data[i];
-				data[i]=temp;
-				//break;
+				swap_str(data,i,x);
 			}			
 		}
 	}
