@@ -1,0 +1,15 @@
+#labels ex1,README
+/*
+ * EX1 :: A program that manage data base of name's and id's.
+ * ===========================================================================
+ * Writen by: Andrey Shamis,  id: 321470882, login: andreysh
+ * and:       Ilia Gaisinsky, id: 309480051, login: iliaga
+ * Input:  text file that include names and ids, sort key.
+ * Output: Text file that include names and ids, Dipend on input sort key:
+ * Key    | sort method
+ *---------------------
+ * "name" | by name
+ *---------------------
+ *  "id"  | by id
+ *---------------------
+ */
