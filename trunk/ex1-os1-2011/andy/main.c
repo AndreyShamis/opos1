@@ -44,13 +44,13 @@ void print_arr( char **data,const int size)
 //                             Prototypes section
 //==============================================================================
 
-// A function that
+
+// A function that copy tabel of strings.
 //------------------------------------------------------------------------------
-// Input:
-// Output:
+// Input: new and old tabel's of strings (type dubel pointer).
 void copy_arr(char **data_new,char **data_old,int len);
 
-// A function that
+// A function that allocate
 //------------------------------------------------------------------------------
 // Input:
 // Output:
