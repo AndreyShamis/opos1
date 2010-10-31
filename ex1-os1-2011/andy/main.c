@@ -14,20 +14,10 @@
 #include <ctype.h>
 
 //-------------------------  Const section ------------------------------------
-//const int MAX_STR_LEN 5;
+#define MAX_STR_LEN  200
+#define MAX_MENU_STR_LEN 5
 
 //------------------------------ Sort By NAME ---------------------------------
-void copy_arr(char **data_new,char **data_old,int len);
-char **alloc_cell(const int size);
-int popID(const char *str,const int start);
-int getID(const char *str);
-void sort_by_id(char **data,const int size);
-int find_space(const char *str);
-void swap_str(char **str,const int fir,const int sec);
-int cmpName(const char *name1,const char *name2);
-void sort_by_name(char **data,const int size);
-
-void free_arr(char **data,const int len);
 
 
 
@@ -42,28 +32,41 @@ void print_arr( char **data,const int size)
 	}
 }
 
-
-
-
-
-
-#define MAX_STR_LEN  200
-#define MAX_MENU_STR_LEN 5
 //--------------  Prototypes section ------------------------------------------
+void copy_arr(char **data_new,char **data_old,int len);
+char **alloc_cell(const int size);
+int popID(const char *str,const int start);
+int getID(const char *str);
+void sort_by_id(char **data,const int size);
+int find_space(const char *str);
+//------------------------- SWAP ----------------------------------------------
+// Start swap function
+void swap_str(char **str,const int fir,const int sec);
+int cmpName(const char *name1,const char *name2);
+//------------------------- Sort by name --------------------------------------
+// this function sorting strings in array data by name order
+void sort_by_name(char **data,const int size);
+void mem_error();
+void free_arr(char **data,const int len);
+
+
+void readFile(FILE &fRead,int &str_counter,char **dataDB);
 
 //------------------------- Main section --------------------------------------
 int main(int argc, char *argv[])
 {
 	
 	char key[MAX_MENU_STR_LEN];
-	char data[MAX_STR_LEN];
+
 	
-	char **datap=NULL;
+	char 	**dataDB=NULL;
+	 		//**temp=NULL,
+			//*str=NULL;
 	
 	FILE *fRead;		//	Var for red file
 	FILE *fWrite;		// 	Var for write file
 		
-	int ind=0;
+	int str_counter=0;
 	
 	if(argc == 3 )
 	{
@@ -74,59 +77,89 @@ int main(int argc, char *argv[])
 		if(fRead == NULL)
 			printf("Can`t read file %s \n", argv[1]);
 		else
-			while(fgets(data,50,fRead) != NULL)	// TODO CONST
+		{
+			readFile(fRead,str_counter,dataDB);
+			/*
+			while(fgets(data,MAX_STR_LEN,fRead) != NULL)	// TODO CONST
 			{
-			
-				char **temp=NULL;
-				//printf("1:\n");
-				char *str = (char*)malloc( (sizeof(char)*strlen(data) +1 ));
-				//printf("2:\n");
-				temp = alloc_cell(ind+1);
-				//printf("3:\n");
-				copy_arr(temp,datap,ind);
-				//printf("4:\n");
-				//free_arr(datap,ind);
-				free(datap);
-				datap = temp;
+				str = (char*)malloc( (sizeof(char)*strlen(data) +1 ));
 				
+				temp = alloc_cell(str_counter+1);
+				copy_arr(temp,dataDB,str_counter);
+				free(dataDB);
+				dataDB = temp;
 				
 				strcpy(str,data);				
-				temp[ind] = str;
-				
-
-				//printf("%s \n",temp[ind]);	
-				
-				ind++;
+				dataDB[str_counter] = str;
+							
+				str_counter++;
 				
 			}
 		
+			*/
+			fclose(fRead);			// close readed file
+
+			scanf("%s",key);		// Get sort type
 		
-		//fgets(key,5,stdin);			// TODO Const
-		scanf("%s",key);
+			print_arr(dataDB,str_counter);
+			printf("\n\n");
+			
+			// Check sort type section		
+			if(!strcmp(key,"name"))				
+				sort_by_name(dataDB,str_counter);	//	sort by name
+			else if(!strcmp(key,"id"))
+				sort_by_id(dataDB,str_counter);		// sort by id
+			// end sort section
 		
-		print_arr(datap,ind);
-		printf("\n\n");
 		
-		if(!strcmp(key,"name"))
-			sort_by_name(datap,ind);
-		else if(!strcmp(key,"id"))
-			sort_by_id(datap,ind);
+			//start write to file section
+				//TODO
+				//TODO
+				//TODO
+			//end write to file section
+		
+			print_arr(dataDB,str_counter);
+
+			fclose(fWrite);			// close writed file
 	
-		print_arr(datap,ind);
-		printf("DATA %s \n", argv[1]);
-		//return ;
-	
-		fclose(fRead);			// close readed file
-		fclose(fWrite);			// close writed file
-	
+			free_arr(dataDB,str_counter);
+			free(dataDB);
+			
+		}
+	}
+	else
+	{
+		printf("You need enter 2 parameters:\n");
+		printf("1. Read file name\n");
+		printf("2. Write file name\n");
 	}
 	
-	free_arr(datap,ind);
-	free(datap);
 	return(1);
 }
 
 
+void readFile(FILE &fRead,int &str_counter,char **dataDB)
+{
+	char **temp=NULL;
+	char data[MAX_STR_LEN];
+	char *str=NULL;
+	
+	while(fgets(data,MAX_STR_LEN,fRead) != NULL)	// TODO CONST
+	{
+		str = (char*)malloc( (sizeof(char)*strlen(data) +1 ));
+		
+		temp = alloc_cell(str_counter+1);
+		copy_arr(temp,dataDB,str_counter);
+		free(dataDB);
+		dataDB = temp;
+		
+		strcpy(str,data);				
+		dataDB[str_counter] = str;
+					
+		str_counter++;
+		
+	}
+}
 //------------------------- SWAP ----------------------------------------------
 // Start swap function
 void swap_str(char **str,const int fir,const int sec)
@@ -140,6 +173,11 @@ void swap_str(char **str,const int fir,const int sec)
 }
 //	End swap function
 
+void mem_error()
+{
+	printf("Can`t allocate memory.\n");
+
+}
 
 //------------------------- Sort by name --------------------------------------
 // this function sorting strings in array data by name order
@@ -176,9 +214,10 @@ char **alloc_cell(const int size)
     new_cell = (char**)malloc(sizeof(char*)*size) ;   // alloc memory
 
     if(new_cell == NULL)        // check if have memory
-    	printf("Error ----- all\n");
+    	mem_error();
     
     return(new_cell);
+    
 }
 
 void copy_arr(char **data_new,char **data_old,int len)
@@ -198,36 +237,26 @@ void sort_by_id(char **data,const int size)
 	
 	for(i=0;i<size;i++)
 	{
-		//printf("Debuf: %s\n",data[i]);
 		getID(data[i]);
 		for(x=0;x<size;x++)
-		{
 			if(getID(data[i])<getID(data[x]))
-			{
 				swap_str(data,i,x);
-			}			
-		}
+				
 	}
 
 }
 
 int getID(const char *str)
 {
-	int count;
-	//char id[strlen(str)];
-	int result;
+	int count,
+		result;
 	
 	for(count=0;count<strlen(str);count++)
-	{
 		if(str[count] == ' ')
 		{
-			//printf("start ");
 			result = popID(str,count+1);
-			//printf("%d\n\n",result);
 			break;
 		}
-			
-	}
 
 	return(result);
 }
@@ -235,11 +264,11 @@ int getID(const char *str)
 
 int popID(const char *str,const int start)
 {
-	int count,i=0;
+	int count,
+		i=0;
 	char temp[strlen(str)];
 	
 	for(count=start;count<strlen(str);count++)
-	{
 		if(isdigit(str[count]))
 		{
 			temp[i]=str[count];
@@ -251,7 +280,6 @@ int popID(const char *str,const int start)
 			break;
 			
 		}
-	}
 	
 	return(atoi(temp));
 	
