@@ -25,6 +25,8 @@
 #define MAX_STR_LEN  200
 #define MAX_MENU_STR_LEN 5
 
+
+//#############################################################################
 //------------------------------ Sort By NAME ---------------------------------
 
 
@@ -39,6 +41,7 @@ void print_arr( char **data,const int size)
 		printf("\n");
 	}
 }
+//#############################################################################
 
 
 //                             Prototypes section
@@ -50,7 +53,7 @@ void print_arr( char **data,const int size)
 // Input: new and old tabels of strings (type dubel pointer).
 void copy_arr(char **data_new,char **data_old,int len);
 
-// A function that allocate
+// A function that allocate memory
 //-----------------------------------------------------------------------------
 // Input:
 // Output:
@@ -206,6 +209,11 @@ int main(int argc, char *argv[])
 	return(1);
 }
 
+//                             Function section
+//==============================================================================
+
+
+
 
 void readFile(FILE& fRead,int& str_counter,char **dataDB)
 {
@@ -229,8 +237,12 @@ void readFile(FILE& fRead,int& str_counter,char **dataDB)
 
 	}
 }
-//------------------------- SWAP ----------------------------------------------
-// Start swap function
+
+// A function that swap between tow strings that located in 2D tabel.
+// strin = line in tabel.
+//-----------------------------------------------------------------------------
+// Input: tabel of strings (type dubel pointer), first and second strings (that
+// need to be swap) location in tabel (type: integers).
 void swap_str(char **str,const int fir,const int sec)
 {
 	char *temp;			//	temp variable
@@ -240,16 +252,19 @@ void swap_str(char **str,const int fir,const int sec)
 	str[sec]=temp;		//	strings in array
 
 }
-//	End swap function
 
+// A function that notify user about error  of aloccating memory.
+//-----------------------------------------------------------------------------
 void mem_error()
 {
 	printf("Can`t allocate memory.\n");
 
 }
 
-//------------------------- Sort by name --------------------------------------
-// this function sorting strings in array data by name order
+// A function that sorting strings in tabel of data by name order.
+//-----------------------------------------------------------------------------
+// Input: tabel of strings (type dubel pointer), size of tabel - number of
+// rows at tabel. (type integer).
 void sort_by_name(char **data,const int size)
 {
 	int i, x;
@@ -267,6 +282,9 @@ void sort_by_name(char **data,const int size)
 
 }
 
+// A function that free aloccated memory.
+//-----------------------------------------------------------------------------
+// Input: tabel of strings (type dubel pointer), number of strings at table.
 void free_arr(char **data,const int len)
 {
 	int i;
@@ -289,6 +307,9 @@ char **alloc_cell(const int size)
 
 }
 
+// A function that copy tabel of strings.
+//-----------------------------------------------------------------------------
+// Input: new and old tabels of strings (type dubel pointer).
 void copy_arr(char **data_new,char **data_old,int len)
 {
 	int i;
@@ -298,8 +319,10 @@ void copy_arr(char **data_new,char **data_old,int len)
 
 }
 
-
-//------------------------------ Sort By ID -----------------------------------
+// A function that sorting strings in tabel of data by id order.
+//-----------------------------------------------------------------------------
+// Input: tabel of strings (type dubel pointer), size of tabel - number of
+// rows at tabel. (type integer).
 void sort_by_id(char **data,const int size)
 {
 	int i,x;
@@ -315,6 +338,10 @@ void sort_by_id(char **data,const int size)
 
 }
 
+// A function that get id from string that include mixed data (not only ids).
+//-----------------------------------------------------------------------------
+// Input: Pointer to string from tabel (type *char).
+// Output: id (type int).
 int getID(const char *str)
 {
 	int count,
@@ -330,7 +357,11 @@ int getID(const char *str)
 	return(result);
 }
 
-
+// A function that locate and convert string of digits to integer.
+//-----------------------------------------------------------------------------
+// Input: Pointer to sting(type *char) and start point to locate digits
+// (type int).
+// Output: id (type int).
 int popID(const char *str,const int start)
 {
 	int count,
@@ -356,6 +387,12 @@ int popID(const char *str,const int start)
 
 }
 
+// A function that compare names (alfamerik strings)
+//-----------------------------------------------------------------------------
+// Input: Two pointers to string that include names information that located in
+// data tabel (type *char).
+// Output: Return "1" if name1 smaller then name2, atherwise return "0"
+// (type int).
 int cmpName(const char *name1,const char *name2)
 {
 
@@ -384,6 +421,10 @@ int cmpName(const char *name1,const char *name2)
 
 }
 
+// A function that find "space" charecter in string.
+//-----------------------------------------------------------------------------
+// Input: Pointer to string which locate in data tabel (type *char).
+// Output: index of space in string (type int).
 int find_space(const char *str)
 {
 	int count,
