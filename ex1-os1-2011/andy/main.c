@@ -3,8 +3,8 @@
  * ============================================================================
  * Writen by: Andrey Shamis,  id: 321470882, login: andreysh
  * and:       Ilia Gaisinsky, id: 309480051, login: iliaga
- * Input:  text file that include name's and id's, sort key.
- * Output: Text file that include name's and id's, Dipend on input sort key:
+ * Input:  text file that include names and ids, sort key.
+ * Output: Text file that include names and ids, Dipend on input sort key:
  * Key    | sort method
  *---------------------
  * "name" | by name
@@ -47,7 +47,7 @@ void print_arr( char **data,const int size)
 
 // A function that copy tabel of strings.
 //------------------------------------------------------------------------------
-// Input: new and old tabel's of strings (type dubel pointer).
+// Input: new and old tabels of strings (type dubel pointer).
 void copy_arr(char **data_new,char **data_old,int len);
 
 // A function that allocate
@@ -63,17 +63,11 @@ char **alloc_cell(const int size);
 // Output: id (type int).
 int popID(const char *str,const int start);
 
-// A function that get id from string that include mixed data (not only id's).
+// A function that get id from string that include mixed data (not only ids).
 //------------------------------------------------------------------------------
 // Input: Pointer to string from tabel (type *char).
 // Output: id (type int).
 int getID(const char *str);
-
-// A function that
-//------------------------------------------------------------------------------
-// Input: tabel of strings (type dubel pointer),
-// Output:
-void sort_by_id(char **data,const int size);
 
 // A function that
 //------------------------------------------------------------------------------
@@ -101,6 +95,14 @@ int cmpName(const char *name1,const char *name2);
 // Input: tabel of strings (type dubel pointer), size of tabel - number of
 // rows at tabel. (type integer).
 void sort_by_name(char **data,const int size);
+
+
+// A function that sorting strings in tabel of data by id order.
+//------------------------------------------------------------------------------
+// Input: tabel of strings (type dubel pointer), size of tabel - number of
+// rows at tabel. (type integer).
+
+void sort_by_id(char **data,const int size);
 
 // A function that
 //------------------------------------------------------------------------------
