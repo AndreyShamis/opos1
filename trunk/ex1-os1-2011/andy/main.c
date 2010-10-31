@@ -56,16 +56,17 @@ void copy_arr(char **data_new,char **data_old,int len);
 // Output:
 char **alloc_cell(const int size);
 
-// A function that
+// A function that locate and convert string of digits to integer.
 //------------------------------------------------------------------------------
-// Input:
-// Output:
+// Input: Pointer to sting(type *char) and start point to locate digits
+// (type int).
+// Output: id (type int).
 int popID(const char *str,const int start);
 
-// A function that
+// A function that get id from string that include mixed data (not only id's).
 //------------------------------------------------------------------------------
-// Input:
-// Output:
+// Input: Pointer to string from tabel (type *char).
+// Output: id (type int).
 int getID(const char *str);
 
 // A function that
