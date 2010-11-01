@@ -1,6 +1,5 @@
-//#include <stdio.h>
-
-
+#include <stdio.h>
+#include <stdlib.h>
 
 #ifndef MEM_SEC
 #define MEM_SEC
