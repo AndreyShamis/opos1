@@ -54,7 +54,7 @@ void print_arr( char **data,const int size)
 //-----------------------------------------------------------------------------
 // Input: tabel of strings (type dubel pointer), counter of strings (type
 // &char),      #############Miss(FILE&)#####################
-void readFile(FILE& fRead,int& str_counter,char **dataDB);
+void readFile(FILE *fRead,int *str_counter,char **dataDB);
 
 // A function that allocate memory
 //-----------------------------------------------------------------------------
@@ -90,7 +90,7 @@ int getID(const char *str);
 // A function that copy tabel of strings.
 //-----------------------------------------------------------------------------
 // Input: new and old tabels of strings (type dubel pointer).
-void copy_arr(char **data_new,char **data_old,int len);
+void copy_arr(char **data_new,char **data_old,const int len);
 
 // A function that find "space" charecter in string.
 //-----------------------------------------------------------------------------
@@ -156,25 +156,12 @@ int main(int argc, char *argv[])
 		else
 		{
 		    // Read file and transform the data to tabel of strings.
-			readFile(fRead,str_counter,dataDB);
-			/*
-			while(fgets(data,MAX_STR_LEN,fRead) != NULL)	// TODO CONST
-			{
-				str = (char*)malloc( (sizeof(char)*strlen(data) +1 ));
+			readFile(fRead,&str_counter,dataDB);
 
-				temp = alloc_cell(str_counter+1);
-				copy_arr(temp,dataDB,str_counter);
-				free(dataDB);
-				dataDB = temp;
 
-				strcpy(str,data);
-				dataDB[str_counter] = str;
-
-				str_counter++;
-
-			}
-
-			*/
+			print_arr(dataDB,str_counter);
+			
+			printf("%d\n",str_counter);
 
 			// Close readed file.
 			fclose(fRead);
@@ -231,7 +218,7 @@ int main(int argc, char *argv[])
 //-----------------------------------------------------------------------------
 // Input: tabel of strings (type dubel pointer), counter of strings (type
 // &char),      #############Miss(FILE&)#####################
-void readFile(FILE& fRead,int& str_counter,char **dataDB)
+void readFile(FILE *fRead,int *str_counter,char **dataDB)
 {
 	char **temp=NULL;
 	char data[MAX_STR_LEN];
@@ -241,15 +228,21 @@ void readFile(FILE& fRead,int& str_counter,char **dataDB)
 	{
 		str = (char*)malloc( (sizeof(char)*strlen(data) +1 ));
 
-		temp = alloc_cell(str_counter+1);
-		copy_arr(temp,dataDB,str_counter);
+		printf("%d - \n", *str_counter);
+		
+		temp = alloc_cell((*str_counter)+1);
+		//printf("%d - \n", (*str_counter)+1);
+		
+		copy_arr(temp,dataDB,*str_counter);
 		free(dataDB);
 		dataDB = temp;
 
-		strcpy(str,data);
-		dataDB[str_counter] = str;
+		printf("%s \n" ,dataDB[(*str_counter)]);
 
-		str_counter++;
+		strcpy(str,data);
+		dataDB[(*str_counter)] = str;
+
+		(*str_counter)++;
 	}
 }
 
@@ -314,7 +307,9 @@ int getID(const char *str)
 {
 	int count,
 		result;
+		
 	int len = strlen(str);
+	
 	for(count=0;count<len;count++)
 		if(str[count] == ' ')
 		{
@@ -336,7 +331,7 @@ int popID(const char *str,const int start)
 		i=0;
 	int len=strlen(str);
 
-	char temp[len];
+	char temp[MAX_STR_LEN];
 
 	for(count=start;count<len;count++)
 		if(isdigit(str[count]))
@@ -365,10 +360,10 @@ int cmpName(const char *name1,const char *name2)
 
 	int count;
 
-	char name1_str[strlen(name1)];
+	char name1_str[MAX_STR_LEN];
+	char name2_str[MAX_STR_LEN];
+	
 	memset(name1_str,'0',strlen(name1));
-
-	char name2_str[strlen(name2)];
 	memset(name2_str,'0',strlen(name2));
 
 	count = find_space(name1);
@@ -388,7 +383,7 @@ int cmpName(const char *name1,const char *name2)
 // A function that copy tabel of strings.
 //-----------------------------------------------------------------------------
 // Input: new and old tabels of strings (type dubel pointer).
-void copy_arr(char **data_new,char **data_old,int len)
+void copy_arr(char **data_new,char **data_old,const int len)
 {
 	int i;
 
