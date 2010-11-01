@@ -33,13 +33,15 @@
 
 void print_arr( char **data,const int size)
 {
-	int i;
-
+	int i=0;
+	
 	for(i=0;i<size;i++)
 	{
+		
 		printf("%s.",data[i]);
 		printf("\n");
 	}
+	printf("\n\n");
 }
 //#############################################################################
 
@@ -48,13 +50,14 @@ void print_arr( char **data,const int size)
 //=============================================================================
 
 
+void incorect_param();
 
 
 // A function that read text file.
 //-----------------------------------------------------------------------------
 // Input: tabel of strings (type dubel pointer), counter of strings (type
 // &char),      #############Miss(FILE&)#####################
-void readFile(FILE *fRead,int *str_counter,char **dataDB);
+char  **readFile(FILE *fRead,int *str_counter);
 
 // A function that allocate memory
 //-----------------------------------------------------------------------------
@@ -156,22 +159,17 @@ int main(int argc, char *argv[])
 		else
 		{
 		    // Read file and transform the data to tabel of strings.
-			readFile(fRead,&str_counter,dataDB);
-
-
-			print_arr(dataDB,str_counter);
+			dataDB=readFile(fRead,&str_counter);
 			
-			printf("%d\n",str_counter);
-
 			// Close readed file.
 			fclose(fRead);
 
             // Get sort type.
-			scanf("%s",key);
 
             // Print the tabel of syrings.
 			print_arr(dataDB,str_counter);
-			printf("\n\n");
+			
+			scanf("%s",key);
 
 			// Check sort type.
 			if(!strcmp(key,"name"))
@@ -179,6 +177,7 @@ int main(int argc, char *argv[])
 			else if(!strcmp(key,"id"))
 				sort_by_id(dataDB,str_counter);		// sort by id
 
+			print_arr(dataDB,str_counter);
 
 
 			//start write to file section
@@ -187,7 +186,7 @@ int main(int argc, char *argv[])
 				//TODO
 			//end write to file section
 
-			print_arr(dataDB, str_counter);
+			//print_arr(dataDB, str_counter);
 
             // Close writed file.
 			fclose(fWrite);
@@ -200,11 +199,7 @@ int main(int argc, char *argv[])
 	}
 	// Tell user how to enter data - corect.
 	else
-	{
-		printf("You need enter 2 parameters:\n");
-		printf("1. Read file name\n");
-		printf("2. Write file name\n");
-	}
+		incorect_param();
 
 	return(1);
 }
@@ -214,36 +209,44 @@ int main(int argc, char *argv[])
 
 
 
+//------------------------------- Incorrect param------------------------------
+
+void incorect_param()
+{
+	printf("You need enter 2 parameters:\n");
+	printf("1. Read file name\n");
+	printf("2. Write file name\n");
+
+}
+
 // A function that read text file.
 //-----------------------------------------------------------------------------
 // Input: tabel of strings (type dubel pointer), counter of strings (type
 // &char),      #############Miss(FILE&)#####################
-void readFile(FILE *fRead,int *str_counter,char **dataDB)
+char **readFile(FILE *fRead,int *str_counter)
 {
-	char **temp=NULL;
+	char **temp=NULL, **dataDB=NULL;
 	char data[MAX_STR_LEN];
 	char *str=NULL;
 
 	while(fgets(data,MAX_STR_LEN,fRead) != NULL)	// TODO CONST
 	{
-		str = (char*)malloc( (sizeof(char)*strlen(data) +1 ));
+		str = (char*)malloc( (sizeof(char)*strlen(data))+1);
 
-		printf("%d - \n", *str_counter);
 		
 		temp = alloc_cell((*str_counter)+1);
-		//printf("%d - \n", (*str_counter)+1);
 		
 		copy_arr(temp,dataDB,*str_counter);
 		free(dataDB);
 		dataDB = temp;
-
-		printf("%s \n" ,dataDB[(*str_counter)]);
-
+		temp = NULL;
 		strcpy(str,data);
 		dataDB[(*str_counter)] = str;
 
 		(*str_counter)++;
 	}
+	
+	return(dataDB);
 }
 
 // A function that allocate memory
