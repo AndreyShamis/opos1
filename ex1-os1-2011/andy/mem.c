@@ -16,6 +16,25 @@ char **alloc_cell(const int size)
     return(new_cell);
 }
 
+
+// TODO 
+//--------------------- FUNCTION ALLOCATE STRING MEMRY ------------------------
+
+char *alloc_string(const int size)
+{
+    char *new_str = NULL;      // create new pointer-pointer
+
+    new_str = (char*)malloc(sizeof(char)*size) ;   // alloc memory
+
+    if(new_str == NULL)        // check if have memory
+    	mem_error();
+
+    return(new_str);
+}
+
+
+
+//
 // A function that free aloccated memory.
 //-----------------------------------------------------------------------------
 // Input: tabel of strings (type dubel pointer), number of strings at table.
@@ -34,5 +53,6 @@ void free_arr(char **data,const int len)
 void mem_error()
 {
 	printf("Can`t allocate memory.\n");
+	exit(EXIT_FAILURE);
 }
 

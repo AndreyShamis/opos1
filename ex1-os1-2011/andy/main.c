@@ -144,12 +144,3 @@ void incorect_param()
 	printf("2. Write file name\n");
 
 }
-
-
-
-
-
-
-
-
-

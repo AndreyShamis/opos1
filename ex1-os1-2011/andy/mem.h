@@ -10,6 +10,10 @@
 // Output:
 char **alloc_cell(const int size);
 
+
+char *alloc_string(const int size);
+
+
 // A function that notify user about error  of aloccating memory.
 //-----------------------------------------------------------------------------
 void mem_error();
@@ -18,5 +22,8 @@ void mem_error();
 //-----------------------------------------------------------------------------
 // Input: tabel of strings (type dubel pointer), number of strings at table.
 void free_arr(char **data, const int len);
+
+
+
 
 #endif
