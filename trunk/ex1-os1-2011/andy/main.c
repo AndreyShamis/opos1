@@ -22,6 +22,7 @@
 #include "mem.h"
 #include "sort.h"
 #include "read.h"
+#include "write.h"
 
 //                                Const cection
 //=============================================================================
@@ -46,6 +47,25 @@ void print_arr( char **data,const int size)
 	}
 	printf("\n\n");
 }
+
+void print_arr_t( char **data,const int size)
+{
+	int i=0,x=0;
+	
+	for(i=0;i<size;i++)
+	{
+		for(x=0;x<strlen(data[i]);x++)
+		{	
+			if(data[i][x] == ' ')
+				printf("\r\t\t\t\t");
+				
+			printf("%c",data[i][x]);
+			
+		}
+		printf("\n");
+	}
+	printf("\n\n");
+}
 //#############################################################################
 
 
@@ -54,13 +74,26 @@ void print_arr( char **data,const int size)
 
 void incorect_param();
 
+void menu(char **dataDB,const int str_counter)
+{
+    // Difine sort key.
+	char key[MAX_MENU_STR_LEN];
+
+	scanf("%s",key);
+
+	// Check sort type.
+	if(!strcmp(key,"name"))
+		sort_by_name(dataDB,str_counter);	//	sort by name
+	else if(!strcmp(key,"id"))
+		sort_by_id(dataDB,str_counter);		// sort by id
+
+}
 
 //                                Main section
 //=============================================================================
 int main(int argc, char *argv[])
 {
-    // Difine sort key.
-	char key[MAX_MENU_STR_LEN];
+
 
     // Difine tabel of data.
 	char 	**dataDB=NULL;
@@ -82,6 +115,8 @@ int main(int argc, char *argv[])
 		if(fRead == NULL)
             // Error notepy of opening read file.
 			printf("Can`t read file %s \n", argv[1]);
+		else if(fWrite == NULL)
+			printf("Can`t write to file %s \n",argv[2]);
 		else
 		{
 		    // Read file and transform the data to tabel of strings.
@@ -93,27 +128,11 @@ int main(int argc, char *argv[])
             // Get sort type.
 
             // Print the tabel of syrings.
-			print_arr(dataDB,str_counter);
+			print_arr(dataDB,str_counter);			
+			menu(dataDB,str_counter);
+			print_arr_t(dataDB,str_counter);
 			
-			scanf("%s",key);
-
-			// Check sort type.
-			if(!strcmp(key,"name"))
-				sort_by_name(dataDB,str_counter);	//	sort by name
-			else if(!strcmp(key,"id"))
-				sort_by_id(dataDB,str_counter);		// sort by id
-
-			print_arr(dataDB,str_counter);
-
-
-			//start write to file section
-				//TODO
-				//TODO
-				//TODO
-			//end write to file section
-
-			//print_arr(dataDB, str_counter);
-
+			writeFile(fWrite,str_counter,dataDB);
             // Close writed file.
 			fclose(fWrite);
 

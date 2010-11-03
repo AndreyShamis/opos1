@@ -12,7 +12,7 @@ char **readFile(FILE *fRead,int *str_counter)
 
 	while(fgets(data,MAX_STR_LEN,fRead) != NULL)	// TODO CONST
 	{
-		str = (char*)malloc( (sizeof(char)*strlen(data))+1);
+		str = alloc_string (sizeof(char)*strlen(data)+1);
 
 		
 		temp = alloc_cell((*str_counter)+1);
