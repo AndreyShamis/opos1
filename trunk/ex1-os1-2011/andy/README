@@ -1,7 +1,12 @@
 
 
 
-## TODO 
-	Problem with :	werdik 0000000001
+## Bugs::  TODO 
+
+-	Problem with :	werdik 0000000001
+	//	Not definition which lentgh of id can be used
+	//	
 	
-	Problem whith Low or Big case character
+-	Problem whith Low or Big case character
+	//	No defenition if user name first char must be in Big case
+	//	or in low case
