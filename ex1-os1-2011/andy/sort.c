@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "sort.h"
 
 // A function that sorting strings in tabel of data by name order.
@@ -28,15 +29,34 @@ void sort_by_id(char **data,const int size)
 {
 	int i,x;
 
+	int id1_len;
+	int id2_len;
+	
+
 	for(i=0;i<size;i++)
 	{
 		//getID(data[i]);
 		for(x=0;x<size;x++)
-			if(getID(data[i])<getID(data[x]))
+		{
+			id1_len = strlen((data[i]) + find_space(data[i]) );
+			id2_len = strlen((data[x])+find_space(data[x]));
+			if(id1_len < id2_len)
+			{
+//				printf("1: %s - \n",(data[i])+find_space(data[i]));
+//				printf("2: %s - \n",(data[x])+find_space(data[x]));
 				swap_str(data,i,x);
+			}
+			else if(id1_len == id2_len && strcmp((data[i])+find_space(data[i]),(data[x])+find_space(data[x])) <0)
+			{
+				swap_str(data,i,x);;
+			}
+				
+
+		}
 	}
 }
 
+/*
 // A function that get id from string that include mixed data (not only ids).
 //-----------------------------------------------------------------------------
 // Input: Pointer to string from tabel (type *char).
@@ -86,6 +106,8 @@ int popID(const char *str,const int start)
 
 	return(atoi(temp));
 }
+
+*/
 
 // A function that compare names (alfamerik strings)
 //-----------------------------------------------------------------------------

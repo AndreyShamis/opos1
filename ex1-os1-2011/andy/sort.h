@@ -43,6 +43,7 @@ void sort_by_id(char **data, const int size);
 // rows at tabel. (type integer).
 void sort_by_name(char **data, const int size);
 
+/*
 // A function that locate and convert string of digits to integer.
 //-----------------------------------------------------------------------------
 // Input: Pointer to sting(type *char) and start point to locate digits
@@ -55,5 +56,5 @@ int popID(const char *str,const int start);
 // Input: Pointer to string from tabel (type *char).
 // Output: id (type int).
 int getID(const char *str);
-
+*/
 #endif
