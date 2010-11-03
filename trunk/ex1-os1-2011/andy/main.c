@@ -16,8 +16,8 @@
 //                               Include section
 //=============================================================================
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+//#include <stdlib.h>
+//#include <string.h>
 
 #include "mem.h"
 #include "sort.h"
@@ -121,7 +121,6 @@ int main(int argc, char *argv[])
 		{
 		    // Read file and transform the data to tabel of strings.
 			dataDB=readFile(fRead,&str_counter);
-			
 			// Close readed file.
 			fclose(fRead);
 
