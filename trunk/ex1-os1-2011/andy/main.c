@@ -45,7 +45,7 @@ void print_arr( char **data,const int size)
 		printf("%s.",data[i]);
 		printf("\n");
 	}
-	printf("\n\n");
+	printf("\n============================================================\n");
 }
 
 void print_arr_t( char **data,const int size)
@@ -64,7 +64,7 @@ void print_arr_t( char **data,const int size)
 		}
 		printf("\n");
 	}
-	printf("\n\n");
+	printf("\n============================================================\n");
 }
 //#############################################################################
 
@@ -74,12 +74,9 @@ void print_arr_t( char **data,const int size)
 
 void incorect_param();
 
-void menu(char **dataDB,const int str_counter)
+void menu(char **dataDB,const int str_counter,char key[])
 {
     // Difine sort key.
-	char key[MAX_MENU_STR_LEN];
-
-	scanf("%s",key);
 
 	// Check sort type.
 	if(!strcmp(key,"name"))
@@ -97,6 +94,7 @@ int main(int argc, char *argv[])
 
     // Difine tabel of data.
 	char 	**dataDB=NULL;
+	char key[MAX_MENU_STR_LEN];
 
 	FILE *fRead;		//	Var for red file.
 	FILE *fWrite;		// 	Var for write file.
@@ -107,9 +105,14 @@ int main(int argc, char *argv[])
     // If the user enter nesesery data corect:
 	if(argc == 3 )
 	{
+
+		scanf("%s",key);
+
         // Open read and write fils.
 		fRead 	= 	fopen(argv[1],"r");
 		fWrite 	= 	fopen(argv[2],"w");
+
+
 
         // If failed to opening read file.
 		if(fRead == NULL)
@@ -127,9 +130,14 @@ int main(int argc, char *argv[])
             // Get sort type.
 
             // Print the tabel of syrings.
-			print_arr(dataDB,str_counter);			
-			menu(dataDB,str_counter);
+			print_arr(dataDB,str_counter);
+			
+			
+			menu(dataDB,str_counter,key);
+			
 			print_arr_t(dataDB,str_counter);
+			
+			
 			
 			writeFile(fWrite,str_counter,dataDB);
             // Close writed file.
