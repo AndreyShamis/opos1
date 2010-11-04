@@ -9,8 +9,10 @@ char **readFile(FILE *fRead,int *str_counter)
 	char **temp=NULL, **dataDB=NULL;
 	char data[MAX_STR_LEN];
 	char *str=NULL;
+	
 
-	while(fgets(data,MAX_STR_LEN,fRead) != NULL)	// TODO CONST
+	while( fgets(data,MAX_STR_LEN,fRead) != NULL 
+		|| fgets(data,MAX_STR_LEN,stdin) != NULL)	// TODO CONST
 	{
 		str = alloc_string (sizeof(char)*strlen(data)+1);
 
@@ -20,7 +22,7 @@ char **readFile(FILE *fRead,int *str_counter)
 		copy_arr(temp,dataDB,*str_counter);
 		free(dataDB);
 		dataDB = temp;
-		temp = NULL;
+		//temp = NULL;
 		strcpy(str,data);
 		dataDB[(*str_counter)] = str;
 
@@ -29,6 +31,15 @@ char **readFile(FILE *fRead,int *str_counter)
 	
 	return(dataDB);
 }
+
+
+
+
+
+
+
+
+
 
 
 // A function that copy tabel of strings.
