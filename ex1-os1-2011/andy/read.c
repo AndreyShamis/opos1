@@ -11,6 +11,7 @@ char **readLines(FILE *fRead,int *str_counter)
 	char 	data[MAX_STR_LEN];				// TEMP variable for string
 	char 	*str	=	NULL;				// string-pointer
 	int 	status	=	FILE_R;				// STATUS INPUT DATA 
+	int		data_len=	0;
 
 	//	get data while file and console input not eof
 	//	allocate memory for 2-array and for each string
@@ -27,13 +28,16 @@ char **readLines(FILE *fRead,int *str_counter)
 			if(!readLineConsole(data))		// READ TO data FROM FILE
 				status = EOF_R; 			// UNTIL NOT EOF
 		
+		if(status != EOF_R)
+			data_len	=	strlen(data);
+			
 		//	have something in data variable
 		//	and this somthings more than 2 charachters
-		if(status != EOF_R && strlen(data)>MIN_STR_LEN)
+		if(status != EOF_R && data_len>MIN_STR_LEN)
 		{
 			
 			//	allocate memory for one string
-			str = alloc_string(sizeof(char)*strlen(data)+1);
+			str = alloc_string(sizeof(char)*data_len+1);
 			
 			//	allocate memory for 2-array
 			temp = alloc_cell((*str_counter)+1);
@@ -49,6 +53,7 @@ char **readLines(FILE *fRead,int *str_counter)
 			
 			// copy string which was geted to heap pointer
 			strcpy(str,data);
+			str[data_len] = '\0';
 			
 			// input string which was geted to our data structure
 			dataDB[(*str_counter)] = str;
@@ -71,9 +76,9 @@ int readLineFile(char *data,FILE *fRead)
 {
 	//	try to get
 	if(fgets(data,MAX_STR_LEN,fRead) != NULL)
-		return(1);						//	return succeful
+		return(TRUE);						//	return succeful
 		
-	return(0);							//	return fail
+	return(FALSE);							//	return fail
 	
 }
 
