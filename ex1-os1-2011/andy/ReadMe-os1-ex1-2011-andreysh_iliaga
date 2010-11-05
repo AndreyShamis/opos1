@@ -1,0 +1,44 @@
+/*
+ * EX1 :: A program that manage data base of name's and id's.
+ * ===========================================================================
+ * Writen by: Andrey Shamis,  id: 321470882, login: andreysh
+ * and:       Ilia Gaisinsky, id: 309480051, login: iliaga
+ * Input:	1: 	SORT TYPE (id/name)  
+ *			2:	additional data(<Name><_[space]><id>)
+ * Input in parameters:
+ *			text file that include names and ids.
+ * Output: Text file that include names and ids, Dipend on input sort key:
+ * Key    | sort method
+ *---------------------
+ * "name" | by name
+ *---------------------
+ *  "id"  | by id
+ *---------------------
+ *
+ *		to compile : make
+ *
+ *		to run:	./ex1 <INPUT FILE> <OUTPUT FILE>
+ *		example-1:	./ex1 in2.txt id.txt
+ *					id
+ *					
+ *		example-2:	./ex1 in2.txt name.txt
+ *					name
+ *
+ */
+
+
+##  TODO-1 
+
+-	Problem with :	werdik 0000000001
+		No full explanation of what kinds of job numbers can be made whether 
+		to treat the number of zeros at the beginning or not. 
+		Therefore, sorting (function) does not apply to this section and 
+		sorts without regard to the zeros at the beginning of ID.
+			
+##	TODO-2
+-	Problem whith Low or Big case character
+		No full explanation of the task in which specifies data format. 
+		For example whether the user names begin with a lowercase letter, 
+		as well as such whether in general consist of a name with capital 
+		letters. Therefore, the solution is not considered radical cases.
+		
