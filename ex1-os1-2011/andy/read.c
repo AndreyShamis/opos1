@@ -28,7 +28,8 @@ char **readLines(FILE *fRead,int *str_counter)
 				status = EOF_R; 			// UNTIL NOT EOF
 		
 		//	have something in data variable
-		if(status != EOF_R)
+		//	and this somthings more than 2 charachters
+		if(status != EOF_R && strlen(data)>MIN_STR_LEN)
 		{
 			
 			//	allocate memory for one string
