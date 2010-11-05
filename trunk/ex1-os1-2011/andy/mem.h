@@ -6,11 +6,14 @@
 
 // A function that allocate memory
 //-----------------------------------------------------------------------------
-// Input:
-// Output:
+// Input:		size of data structure needed
+// Return:		pointer to data structure
 char **alloc_cell(const int size);
 
-
+//--------------------- FUNCTION ALLOCATE STRING MEMRY ------------------------
+//	functin which allocate memory for string
+//	if fail call to mem_error
+//	input:	size of string size needed
 char *alloc_string(const int size);
 
 
@@ -22,8 +25,6 @@ void mem_error();
 //-----------------------------------------------------------------------------
 // Input: tabel of strings (type dubel pointer), number of strings at table.
 void free_arr(char **data, const int len);
-
-
 
 
 #endif
