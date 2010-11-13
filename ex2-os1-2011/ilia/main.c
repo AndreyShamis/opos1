@@ -37,6 +37,7 @@
 #include "read.h"
 #include "write.h"
 #include "utils.h"
+#include <string.h>
 
 
 //                             Prototypes section
@@ -58,6 +59,19 @@ int ifFileOpen(FILE *fRead, FILE *fWrite);
 //			data counter in data structure
 //			type of sort
 void sort(char **dataDB,const int str_counter,char key[]);
+
+//-------------------------- Sun Sort------------------------------------------
+//	function which
+//	input
+void sonSort(char **dataDB, int str_counter, char *inputFileName, int son);
+
+//-------------------------- Print file------------------------------------------
+//	function which
+//	input
+void printFile(int son);
+
+
+
 //======================== END OF PROTOTYPE ===================================
 
 //                                Main section
@@ -66,10 +80,9 @@ int main(int argc, char *argv[])
 {
 
 	char 	**dataDB	=	NULL;	    // 	Difine tabel of data.
-	char key[MAX_MENU_STR_LEN];			// Difine sort key.
+	//char key[MAX_MENU_STR_LEN];			// Difine sort key.
 
-	FILE *fRead		=	NULL;			//	Var for red file.
-	FILE *fWrite	=	NULL;			// 	Var for write file.
+
 
 	int str_counter	=	0;	// Difine counter of strings at tabel.
 
@@ -79,7 +92,7 @@ int main(int argc, char *argv[])
 	if(argc == 3 )
 	{
 
-        pid_t stutus;
+        pid_t status;
 
         int i;
 
@@ -92,13 +105,11 @@ int main(int argc, char *argv[])
                 exit(EXIT_FAILURE);
             }
             else if(status == 0)
-            {
-                sonSort(i);
-            }
-        }
-        for(i= 0; i< 2; i++)
-        {
-            int sonId = wait(&status);
+
+                sonSort(dataDB, str_counter, argv[1], i);
+
+
+            wait(&status);
         }
 
         if(printType == 1)
@@ -106,6 +117,7 @@ int main(int argc, char *argv[])
             for(i= 0; i< 2; i++)
             {
                 status = fork();
+
                 if(status < 0)
                 {
                     fputs("error in fork", stderr);
@@ -115,11 +127,17 @@ int main(int argc, char *argv[])
                 {
                     printFile(i);
                 }
+                else
+                {
+                    wait(&status);
+                }
             }
-            for(i= 0; i< 2; i++)
-            {
-                int sonId = wait(&status);
-            }
+            wait(&status);
+
+            //for(i= 0; i< 2; i++)
+           // {
+             //   wait(&status);
+            //}
         }
 
         else
@@ -134,7 +152,7 @@ int main(int argc, char *argv[])
             {
                 printFile(1);
             }
-            sonId = wait(&status);
+            wait(&status);
 
             status = fork();
             if(status < 0)
@@ -146,7 +164,7 @@ int main(int argc, char *argv[])
             {
                 printFile(2);
             }
-            sonId = wait(&status);
+            wait(&status);
         }
     }
 	else
@@ -215,34 +233,38 @@ void sort(char **dataDB,const int str_counter,char key[])
 //-------------------------- Sun Sort------------------------------------------
 //	function which
 //	input
-void sonSort(int son)
+void sonSort(char **dataDB, int str_counter, char *inputFileName, int son)
 {
-    char str[MAX_MENU_STR_LEN]
+    FILE *fRead		=	NULL;			//	Var for red file.
+	FILE *fWrite	=	NULL;			// 	Var for write file.
 
-    fRead = fopen(argv[1],"r");	// Open read and write fils.
+
+    char str[MAX_MENU_STR_LEN];
 
     if(son == 0)
     {
-        str = "id";
+
+        strcopy(str, "id")
         fWrite = fopen("id.out","w");
     }
     else
     {
-        str = "name";
+        strcopy(str, "name")
         fWrite = fopen("name.out","w");
     }
 
+    fRead = fopen(inputFileName,"r");	// Open read and write fils.
 
     if(ifFileOpen(fRead,fWrite))
     {
         // Read file and transform the data to tabel of strings.
-        dataDB=readLines(fRead,&str_counter);
+        dataDB= readLines(fRead, &str_counter);
         fclose(fRead);						// Close readed file.
 
-        sort(dataDB,str_counter,str);		//	SORT
+        sort(dataDB, str_counter, str);		//	SORT
 
 
-        writeFile(fWrite,str_counter,dataDB);//	write to file sorted data
+        writeFile(fWrite, str_counter, dataDB);//	write to file sorted data
         fclose(fWrite);						// Close writed file.
 
         //	FREE MEMORY
@@ -252,6 +274,27 @@ void sonSort(int son)
     }
 }
 
-//-------------------------- Sun Sort------------------------------------------
+//-------------------------- Print file------------------------------------------
 //	function which
 //	input
+void printFile(int son)
+{
+    char = fileName[MIN_STR_LEN];
+
+    if(son == 1)
+
+        fileName = "name.out";
+    else
+
+        fileName = "id.out";
+
+
+    if(execlp("cat", "cat", fileName, NULL)
+    {
+        perror("exaclp() faild");
+
+        exit(EXIT_FAILURE);
+    }
+}
+
+
