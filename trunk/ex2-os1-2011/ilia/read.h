@@ -36,10 +36,14 @@ void copy_arr(char **data_new,char **data_old,const int len);
 //			1 - if input succeful
 int readLineFile(char *data,FILE *fRead);
 
+
+/*
 //-------------- READ LINE FROM CONSOLE ---------------------------------------
 //	input 	pointer to string where be retuned string
 //	---------------------------------------------------------------------------
 //	return	0 - if input == NULL = EOF
 //			1 - if input succeful
 int readLineConsole(char *data);
+
+*/
 #endif

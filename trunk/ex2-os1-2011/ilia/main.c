@@ -244,12 +244,12 @@ void sonSort(char **dataDB, int str_counter, char *inputFileName, int son)
     if(son == 0)
     {
 
-        strcopy(str, "id")
+        strcpy(str, "id");
         fWrite = fopen("id.out","w");
     }
     else
     {
-        strcopy(str, "name")
+        strcpy(str, "name");
         fWrite = fopen("name.out","w");
     }
 
@@ -279,17 +279,18 @@ void sonSort(char **dataDB, int str_counter, char *inputFileName, int son)
 //	input
 void printFile(int son)
 {
-    char = fileName[MIN_STR_LEN];
+    char fileName[MIN_STR_LEN];
 
     if(son == 1)
 
-        fileName = "name.out";
+        strcpy(fileName, "name.out");
+
     else
 
-        fileName = "id.out";
+        strcpy(fileName, "id.out");
 
 
-    if(execlp("cat", "cat", fileName, NULL)
+    if(execlp("cat", "cat", fileName, NULL))
     {
         perror("exaclp() faild");
 
