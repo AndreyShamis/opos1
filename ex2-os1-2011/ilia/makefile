@@ -1,5 +1,5 @@
-ex1: 	main.o mem.o sort.o read.o write.o
-		gcc main.o mem.o sort.o read.o write.o -o ex1
+ex2: 	main.o mem.o sort.o read.o write.o
+		gcc main.o mem.o sort.o read.o write.o -o ex2
 
 sort.o:	sort.c sort.h
 		gcc -Wall -c sort.c
