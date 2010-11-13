@@ -1,27 +1,27 @@
 /*
- * EX1 :: A program that manage data base of name's and id's.
+ * EX2:: A program that manage data base of name's and id's.
  * ===========================================================================
  * Writen by: Andrey Shamis,  id: 321470882, login: andreysh
  * and:       Ilia Gaisinsky, id: 309480051, login: iliaga
- * Input:	1: 	SORT TYPE (id/name)
+ * Input:	1: 	SORT TYPE (id/name)  
  *			2:	additional data(<Name><_[space]><id>)
  * Input in parameters:
  *			text file that include names and ids.
  * Output: Text file that include names and ids, Dipend on input sort key:
  * Key    | sort method
  *---------------------
- * "name" | by name
+ * "2" | by name
  *---------------------
- *  "id"  | by id
+ *  "1"  | by id
  *---------------------
  *
  *		to compile : make
  *
- *		to run:	./ex1 <INPUT FILE> <OUTPUT FILE>
- *		example-1:	./ex1 in2.txt id.txt
+ *		to run:	./ex2 <INPUT FILE> <SORT TYPE>
+ *		example-1:	./ex2 in2.txt 1
  *					id
- *
- *		example-2:	./ex1 in2.txt name.txt
+ *					
+ *		example-2:	./ex2 in2.txt 2
  *					name
  *
  */

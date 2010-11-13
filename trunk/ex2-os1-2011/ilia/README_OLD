@@ -1,5 +1,5 @@
 /*
- * EX2:: A program that manage data base of name's and id's.
+ * EX1 :: A program that manage data base of name's and id's.
  * ===========================================================================
  * Writen by: Andrey Shamis,  id: 321470882, login: andreysh
  * and:       Ilia Gaisinsky, id: 309480051, login: iliaga
@@ -10,18 +10,18 @@
  * Output: Text file that include names and ids, Dipend on input sort key:
  * Key    | sort method
  *---------------------
- * "2" | by name
+ * "name" | by name
  *---------------------
- *  "1"  | by id
+ *  "id"  | by id
  *---------------------
  *
  *		to compile : make
  *
- *		to run:	./ex2 <INPUT FILE> <SORT TYPE>
- *		example-1:	./ex2 in2.txt 1
+ *		to run:	./ex1 <INPUT FILE> <OUTPUT FILE>
+ *		example-1:	./ex1 in2.txt id.txt
  *					id
  *					
- *		example-2:	./ex2 in2.txt 2
+ *		example-2:	./ex1 in2.txt name.txt
  *					name
  *
  */
