@@ -3,7 +3,7 @@
  * ===========================================================================
  * Writen by: Andrey Shamis,  id: 321470882, login: andreysh
  * and:       Ilia Gaisinsky, id: 309480051, login: iliaga
- * Input:	1: 	SORT TYPE (id/name)  
+ * Input:	1: 	SORT TYPE (id/name)
  *			2:	additional data(<Name><_[space]><id>)
  * Input in parameters:
  *			text file that include names and ids.
@@ -20,7 +20,7 @@
  *		to run:	./ex2 <INPUT FILE> <SORT TYPE>
  *		example-1:	./ex2 in2.txt 1
  *					id
- *					
+ *
  *		example-2:	./ex2 in2.txt 2
  *					name
  *
@@ -102,18 +102,18 @@ int main(int argc, char *argv[])
 			else if(!status)
 			{
 				sonSort(dataDB, str_counter, argv[1], counter);
-				exit(EXIT_SUCCESS);
+				//exit(EXIT_SUCCESS);
 			}
-			else	
-				wait(&status);
-		
 		}
+		for(counter= 0; counter< NUMBER_SONS; counter++)
+
+			wait(&status);
 
 
         if(printType == RANDOM)
         {
-            //for(counter= 0; counter< NUMBER_SONS; counter++)
-            //{
+            for(counter= 1; counter<= NUMBER_SONS; counter++)
+            {
                 status = fork();
 				//pid_t  status2;
 
@@ -121,26 +121,34 @@ int main(int argc, char *argv[])
 		            forkError();
                 else if(!status)
                 {
-                    printFile(2);
-                    exit(EXIT_SUCCESS);
-                }
-                
-				pid_t  status2;
-				
-				status2 = fork();
-                if(status2 < 0)
-		            forkError();
-                else if(!status2)
-                {
-                    printFile(1);
-                    exit(EXIT_SUCCESS);
-                }
+                    printFile(counter);
+                    //exit(EXIT_SUCCESS);
 
-				wait(&status);
-				wait(&status2);
+                    int i;
+                    for(i=0;i < 999999999; i++)
+
+						;
+                }
+            }
+            for(counter= 0; counter< NUMBER_SONS; counter++)
+
+            	wait(&status);
+				//pid_t  status2;
+
+				//status2 = fork();
+                //if(status2 < 0)
+		         //   forkError();
+               // else if(!status2)
+               // {
+                    //printFile(counter);
+                //    exit(EXIT_SUCCESS);
+               //}
+
+				//wait(&status);
+				//wait(&status2);
                 //else
-                	//wait(&status);	
-                	
+                	//wait(&status);
+
             //}
             //wait(&status);
         }
@@ -150,27 +158,27 @@ int main(int argc, char *argv[])
             status = fork();
             if(status < 0)
             	forkError();
-            else if(!status) 
+            else if(!status)
             {
             	printFile(2);
-            	exit(EXIT_SUCCESS);
+            	//exit(EXIT_SUCCESS);
             }
             else
             	wait(&status);
-            	
+
             status = fork();
             if(status < 0)
             	forkError();
-            else if(!status) 
+            else if(!status)
             {
             	printFile(1);
-            	exit(EXIT_SUCCESS);
+            	//exit(EXIT_SUCCESS);
             }
            	else
             	wait(&status);
-            
+
         }
-        
+
         printf("THE END\n");
     }
 	else
@@ -272,6 +280,7 @@ void sonSort(char **dataDB, int str_counter, char *inputFileName, int son)
         free(dataDB);						// free data structure
 
     }
+    exit(EXIT_SUCCESS);
 }
 
 //-------------------------- Print file------------------------------------------
@@ -289,6 +298,12 @@ void printFile(int son)
 
         strcpy(fileName, "id.out");
 
+	int i;
+	for(i=0;i < 999999999; i++)
+
+		;
+
+
 
     if(execlp("cat", "cat", fileName, NULL))
     {
@@ -296,6 +311,9 @@ void printFile(int son)
 
         exit(EXIT_FAILURE);
     }
+    else
+
+    	exit(EXIT_SUCCESS);
 }
 
 
