@@ -27,6 +27,19 @@
  */
 
 
+LIST OF FILES (c/h only)
+
+ main.c
+ mem.c
+ mem.h
+ read.c
+ read.h
+ sort.c
+ sort.h
+ utils.h
+ write.c
+ write.h
+
 ##  TODO-1 
 
 -	Problem with :	werdik 0000000001
