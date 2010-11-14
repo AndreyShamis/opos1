@@ -12,8 +12,8 @@ enum{
 	TRUE	=	1,				//	true for functions using
 	FALSE	=	0,				//	false for functions using
 
-	SERIES = 1,
-	RUNDOM = 2,
+	SERIES 	= 	1,
+	RUNDOM 	= 	2,
 };
 
 #endif
