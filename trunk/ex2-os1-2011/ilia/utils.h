@@ -18,8 +18,8 @@ enum{
 	SERIES 	= 	1,
 	RANDOM 	= 	2,
 
-	SUN1	=	1,
-	SUN2	=	2,
+	SON1	=	1,
+	SON2	=	2,
 };
 
 #endif
