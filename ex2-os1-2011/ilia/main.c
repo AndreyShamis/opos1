@@ -71,6 +71,11 @@ void sonSort(char **dataDB, int str_counter, char *inputFileName, int son);
 void printFile(int son);
 
 
+void forkError()
+{
+	perror("FORK - error\n");
+	exit(EXIT_FAILURE);
+}
 
 //======================== END OF PROTOTYPE ===================================
 
@@ -80,34 +85,23 @@ int main(int argc, char *argv[])
 {
 
 	pid_t status;
-	char 	**dataDB	=	NULL;	    // 	Difine tabel of data.
-	//char key[MAX_MENU_STR_LEN];			// Difine sort key.
-
-
-
-	int str_counter	=	0;	// Difine counter of strings at tabel.
-
-	int printType = atoi(argv[2]);
+	char 	**dataDB	=	NULL;	    // Difine tabel of data.
+	int str_counter		=	0;			// Difine counter of strings at tabel.
+	int printType 		= atoi(argv[2]);// Type of oreder print
 
     // If the user enter nesesery data corect:
-	if(argc == 3 )
+	if(argc == NUMBER_PARAM)
 	{
+        int counter;
 
-        
-
-        int i;
-
-		for(i= 0; i< 2; i++)
+		for(counter= 0; counter< NUMBER_SONS; counter++)
 		{
 			status = fork();
 			if(status < 0)
+				forkError();
+			else if(!status)
 			{
-				fputs("error in fork", stderr);
-				exit(EXIT_FAILURE);
-			}
-			else if(status == 0)
-			{
-				sonSort(dataDB, str_counter, argv[1], i);
+				sonSort(dataDB, str_counter, argv[1], counter);
 				exit(EXIT_SUCCESS);
 			}
 			else	
@@ -116,50 +110,68 @@ int main(int argc, char *argv[])
 		}
 
 
-        if(printType == 1 )
+        if(printType == RANDOM)
         {
-            for(i= 0; i< 2; i++)
-            {
+            //for(counter= 0; counter< NUMBER_SONS; counter++)
+            //{
                 status = fork();
+				//pid_t  status2;
 
                 if(status < 0)
+		            forkError();
+                else if(!status)
                 {
-                    fputs("error in fork", stderr);
-                    exit(EXIT_FAILURE);
+                    printFile(2);
+                    exit(EXIT_SUCCESS);
                 }
-                else if(status == 0)
-                    printFile(i);
-                else
-                	wait(&status);
+                
+				pid_t  status2;
+				
+				status2 = fork();
+                if(status2 < 0)
+		            forkError();
+                else if(!status2)
+                {
+                    printFile(1);
+                    exit(EXIT_SUCCESS);
+                }
+
+				wait(&status);
+				wait(&status2);
+                //else
+                	//wait(&status);	
                 	
-            }
+            //}
+            //wait(&status);
         }
 
-        else if(printType == 2 )
+        else if(printType == SERIES )
         {
             status = fork();
             if(status < 0)
+            	forkError();
+            else if(!status) 
             {
-                fputs("error in fork", stderr);
-                exit(EXIT_FAILURE);
+            	printFile(2);
+            	exit(EXIT_SUCCESS);
             }
-            else if(status == 0) 
-            	printFile(1);
             else
             	wait(&status);
             	
             status = fork();
             if(status < 0)
+            	forkError();
+            else if(!status) 
             {
-                fputs("error in fork", stderr);
-                exit(EXIT_FAILURE);
+            	printFile(1);
+            	exit(EXIT_SUCCESS);
             }
-            else if(status == 0) 
-            	printFile(2);
-            else
+           	else
             	wait(&status);
             
         }
+        
+        printf("THE END\n");
     }
 	else
 								// Tell user how to enter data - corect.
@@ -285,5 +297,8 @@ void printFile(int son)
         exit(EXIT_FAILURE);
     }
 }
+
+
+
 
 
