@@ -17,6 +17,9 @@ enum{
 
 	SERIES 	= 	1,
 	RANDOM 	= 	2,
+
+	SUN1	=	1,
+	SUN2	=	2,
 };
 
 #endif
