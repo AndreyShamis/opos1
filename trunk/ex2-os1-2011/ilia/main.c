@@ -79,6 +79,7 @@ void printFile(int son);
 int main(int argc, char *argv[])
 {
 
+	pid_t status;
 	char 	**dataDB	=	NULL;	    // 	Difine tabel of data.
 	//char key[MAX_MENU_STR_LEN];			// Difine sort key.
 
@@ -92,11 +93,11 @@ int main(int argc, char *argv[])
 	if(argc == 3 )
 	{
 
-        pid_t status;
+        
 
         int i;
 
-        for(i= 0; i< 2; i++)
+        for(i= 0; i< 2 && status <1; i++)
         {
             status = fork();
             if(status < 0)
