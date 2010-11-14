@@ -1,5 +1,7 @@
 /*
  * EX2:: A program that manage data base of name's and id's.
+ * makes two child for read and sort data
+ * and makes two child 
  * ===========================================================================
  * Writen by: Andrey Shamis,  id: 321470882, login: andreysh
  * and:       Ilia Gaisinsky, id: 309480051, login: iliaga
@@ -10,19 +12,18 @@
  * Output: Text file that include names and ids, Dipend on input sort key:
  * Key    | sort method
  *---------------------
- * "2" | by name
+ * "2"  | random
  *---------------------
- *  "1"  | by id
+ * "1"  | series
  *---------------------
  *
  *		to compile : make
  *
  *		to run:	./ex2 <INPUT FILE> <SORT TYPE>
  *		example-1:	./ex2 in2.txt 1
- *					id
- *
+ *					
  *		example-2:	./ex2 in2.txt 2
- *					name
+ *	
  *
  */
 
@@ -65,7 +66,7 @@ void sort(char **dataDB,const int str_counter,char key[]);
 //	input
 void sonSort(char **dataDB, int str_counter, char *inputFileName, int son);
 
-//--------------------Print sons in series order------------------------------------------
+//--------------------Print sons in series order-------------------------------
 //	function which
 //	input
 void sonsPrintSeries();
@@ -81,7 +82,7 @@ void sonsPrintRandom();
 //	input
 void printFile(int son);
 
-//-------------------------- Chek fork error-------------------------------------
+//-------------------------- Chek fork error-----------------------------------
 //	function which
 //	input
 void chekForkError(pid_t *status);
@@ -146,20 +147,20 @@ int main(int argc, char *argv[])
 
 
 //------------------------------ OPEN FILES -----------------------------------
-//	input files desc to file to read and file to write
-//	return	false if cant open any of file
-//			true if all files is opened
+//	input files desc to file
+//	return	false if cant open file
+//			true if is opened
 int ifFileOpen(FILE *fFile)
 {
-    // If failed to opening read file.
+    // If failed to opening file.
 	if(fFile == NULL)
     {
-        // Error notepy of opening read file.
+        // Error notepy of opening file.
 		printf("Can`t open file. \n");
 		return(FALSE);
 	}
 
-	return(TRUE);					//	FILES OPEN SUCCESS
+	return(TRUE);					//	FILE OPEN SUCCESS
 
 }
 
@@ -234,7 +235,7 @@ void sonSort(char **dataDB, int str_counter, char *inputFileName, int son)
     exit(EXIT_SUCCESS);
 }
 
-//--------------------Print sons in series order------------------------------------------
+//--------------------Print sons in series order-------------------------------
 //	function which
 //	input
 void sonsPrintSeries()
@@ -267,14 +268,13 @@ void sonsPrintSeries()
 		wait(&status);
 }
 
-//--------------------Print sons in random order------------------------------------------
+//--------------------Print sons in random order-------------------------------
 //	function which
 //	input
 void sonsPrintRandom()
 {
 	pid_t status;
 	int sonCoun;
-
 
 	for(sonCoun= SON1; sonCoun<= NUMBER_SONS; sonCoun++)
 	{
@@ -283,25 +283,15 @@ void sonsPrintRandom()
 		chekForkError(&status);
 
 		if(!status)
-		{
 			printFile(sonCoun);
-
-			int i;
-			for(i=0;i < 999999999; i++)
-				;
-		}
+	
 	}
+	
 	waitSons(&status);
+
 }
 
-
-
-
-
-
-
-
-//-------------------------- Print file------------------------------------------
+//-------------------------- Print file----------------------------------------
 //	function which
 //	input
 void printFile(int son)
@@ -309,18 +299,11 @@ void printFile(int son)
     char fileName[MIN_STR_LEN];
 
     if(son == SON1)
-
         strcpy(fileName, "id.out");
-
     else
-
         strcpy(fileName, "name.out");
 
-	int i;
-	for(i=0;i < 999999999; i++)
-
-		;
-
+	
     if(execlp("cat", "cat", fileName, NULL))
     {
         perror("exaclp() faild");
@@ -328,20 +311,14 @@ void printFile(int son)
         exit(EXIT_FAILURE);
     }
     else
-
     	exit(EXIT_SUCCESS);
+
 }
 
 
-
-
-
-
-
-
-//-------------------------- Chek fork error-------------------------------------
-//	function which
-//	input
+//-------------------------- Chek fork error-----------------------------------
+//	function which	get pointer to pid_t status of fork
+//	and if can not fork do exit with error
 void chekForkError(pid_t *status)
 {
 	if(*status < 0)
@@ -349,17 +326,19 @@ void chekForkError(pid_t *status)
 		perror("FORK - error\n");
 		exit(EXIT_FAILURE);
 	}
+	
 }
 
-//-------------------------- Wait sons------------------------------------------
-//	function which
-//	input
+//-------------------------- Wait sons-----------------------------------------
+//	function which waiting for son with pid_t provided by ststus 
+//	input	pointer to pid_t status 
 void waitSons(pid_t *status)
 {
-	int counter;
-
+	int counter;						//	counter variable
+	
+	//	for NUMBERS of SONS	wa
 	for(counter= 0; counter< NUMBER_SONS; counter++)
-
-            	wait(status);
+		wait(status);
+            	
 }
 
