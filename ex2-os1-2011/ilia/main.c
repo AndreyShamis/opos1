@@ -70,12 +70,17 @@ void sonSort(char **dataDB, int str_counter, char *inputFileName, int son);
 //	input
 void printFile(int son);
 
+//-------------------------- Print file------------------------------------------
+//	function which
+//	input
+void forkError();
 
-void forkError()
-{
-	perror("FORK - error\n");
-	exit(EXIT_FAILURE);
-}
+
+
+//-------------------------- Print file------------------------------------------
+//	function which
+//	input
+void waitSons(pid_t *status);
 
 //======================== END OF PROTOTYPE ===================================
 
@@ -97,60 +102,36 @@ int main(int argc, char *argv[])
 		for(counter= 0; counter< NUMBER_SONS; counter++)
 		{
 			status = fork();
+
 			if(status < 0)
+
 				forkError();
+
 			else if(!status)
-			{
+
 				sonSort(dataDB, str_counter, argv[1], counter);
-				//exit(EXIT_SUCCESS);
-			}
 		}
-		for(counter= 0; counter< NUMBER_SONS; counter++)
 
-			wait(&status);
-
+		waitSons(&status);
 
         if(printType == RANDOM)
         {
             for(counter= 1; counter<= NUMBER_SONS; counter++)
             {
                 status = fork();
-				//pid_t  status2;
 
                 if(status < 0)
 		            forkError();
                 else if(!status)
                 {
                     printFile(counter);
-                    //exit(EXIT_SUCCESS);
 
                     int i;
                     for(i=0;i < 999999999; i++)
-
 						;
                 }
             }
-            for(counter= 0; counter< NUMBER_SONS; counter++)
-
-            	wait(&status);
-				//pid_t  status2;
-
-				//status2 = fork();
-                //if(status2 < 0)
-		         //   forkError();
-               // else if(!status2)
-               // {
-                    //printFile(counter);
-                //    exit(EXIT_SUCCESS);
-               //}
-
-				//wait(&status);
-				//wait(&status2);
-                //else
-                	//wait(&status);
-
-            //}
-            //wait(&status);
+            waitSons(&status);
         }
 
         else if(printType == SERIES )
@@ -159,24 +140,28 @@ int main(int argc, char *argv[])
             if(status < 0)
             	forkError();
             else if(!status)
-            {
-            	printFile(2);
-            	//exit(EXIT_SUCCESS);
-            }
+
+            	printFile(SUN1);
+
             else
+
             	wait(&status);
+
+
 
             status = fork();
-            if(status < 0)
-            	forkError();
-            else if(!status)
-            {
-            	printFile(1);
-            	//exit(EXIT_SUCCESS);
-            }
-           	else
-            	wait(&status);
 
+            if(status < 0)
+
+            	forkError();
+
+            else if(!status)
+
+            	printFile(SUN2);
+
+           	else
+
+            	wait(&status);
         }
 
         printf("THE END\n");
@@ -292,11 +277,11 @@ void printFile(int son)
 
     if(son == 1)
 
-        strcpy(fileName, "name.out");
+        strcpy(fileName, "id.out");
 
     else
 
-        strcpy(fileName, "id.out");
+        strcpy(fileName, "name.out");
 
 	int i;
 	for(i=0;i < 999999999; i++)
@@ -317,6 +302,30 @@ void printFile(int son)
 }
 
 
+//-------------------------- Print file------------------------------------------
+//	function which
+//	input
+void forkError()
+{
+	perror("FORK - error\n");
+	exit(EXIT_FAILURE);
+}
 
+
+
+
+
+
+//-------------------------- Print file------------------------------------------
+//	function which
+//	input
+void waitSons(pid_t *status)
+{
+	int counter;
+
+	for(counter= 0; counter< NUMBER_SONS; counter++)
+
+            	wait(status);
+}
 
 
