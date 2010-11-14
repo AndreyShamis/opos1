@@ -51,7 +51,7 @@ void incorect_param();
 //	input files desc to file to read and file to write
 //	return	false if cant open any of file
 //			true if all files is opened
-int ifFileOpen(FILE *fRead, FILE *fWrite);
+int ifFileOpen(FILE *fFile);
 
 //-------------------------- SORT CALL ----------------------------------------
 //	function which call to sort method
@@ -97,23 +97,26 @@ int main(int argc, char *argv[])
 
         int i;
 
-        for(i= 0; i< 2 && status <1; i++)
-        {
-            status = fork();
-            if(status < 0)
-            {
-                fputs("error in fork", stderr);
-                exit(EXIT_FAILURE);
-            }
-            else if(status == 0)
+		for(i= 0; i< 2; i++)
+		{
+			status = fork();
+			if(status < 0)
+			{
+				fputs("error in fork", stderr);
+				exit(EXIT_FAILURE);
+			}
+			else if(status == 0)
+			{
+				sonSort(dataDB, str_counter, argv[1], i);
+				exit(EXIT_SUCCESS);
+			}
+			else	
+				wait(&status);
+		
+		}
 
-                sonSort(dataDB, str_counter, argv[1], i);
 
-
-            wait(&status);
-        }
-
-        if(printType == 1)
+        if(printType == 1 )
         {
             for(i= 0; i< 2; i++)
             {
@@ -125,23 +128,14 @@ int main(int argc, char *argv[])
                     exit(EXIT_FAILURE);
                 }
                 else if(status == 0)
-                {
                     printFile(i);
-                }
                 else
-                {
-                    wait(&status);
-                }
+                	wait(&status);
+                	
             }
-            wait(&status);
-
-            //for(i= 0; i< 2; i++)
-           // {
-             //   wait(&status);
-            //}
         }
 
-        else
+        else if(printType == 2 )
         {
             status = fork();
             if(status < 0)
@@ -149,23 +143,22 @@ int main(int argc, char *argv[])
                 fputs("error in fork", stderr);
                 exit(EXIT_FAILURE);
             }
-            else if(status == 0)
-            {
-                printFile(1);
-            }
-            wait(&status);
-
+            else if(status == 0) 
+            	printFile(1);
+            else
+            	wait(&status);
+            	
             status = fork();
             if(status < 0)
             {
                 fputs("error in fork", stderr);
                 exit(EXIT_FAILURE);
             }
-            else if(status == 0)
-            {
-                printFile(2);
-            }
-            wait(&status);
+            else if(status == 0) 
+            	printFile(2);
+            else
+            	wait(&status);
+            
         }
     }
 	else
@@ -185,19 +178,13 @@ int main(int argc, char *argv[])
 //	input files desc to file to read and file to write
 //	return	false if cant open any of file
 //			true if all files is opened
-int ifFileOpen(FILE *fRead, FILE *fWrite)
+int ifFileOpen(FILE *fFile)
 {
     // If failed to opening read file.
-	if(fRead == NULL)
+	if(fFile == NULL)
     {
         // Error notepy of opening read file.
-		printf("Can`t read input file. \n");
-		return(FALSE);
-	}
-	else if(fWrite == NULL)
-	{
-		//	print message of error open file to write
-		printf("Can`t write to file. \n");
+		printf("Can`t open file. \n");
 		return(FALSE);
 	}
 
@@ -256,7 +243,7 @@ void sonSort(char **dataDB, int str_counter, char *inputFileName, int son)
 
     fRead = fopen(inputFileName,"r");	// Open read and write fils.
 
-    if(ifFileOpen(fRead,fWrite))
+    if(ifFileOpen(fRead) && ifFileOpen(fWrite))
     {
         // Read file and transform the data to tabel of strings.
         dataDB= readLines(fRead, &str_counter);
