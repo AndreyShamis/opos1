@@ -49,9 +49,9 @@
 void incorect_param();
 
 //------------------------------ OPEN FILES -----------------------------------
-//	input files desc to file to read and file to write
-//	return	false if cant open any of file
-//			true if all files is opened
+//	input files desc to file
+//	return	false if cant open file
+//			true if is opened
 int ifFileOpen(FILE *fFile);
 
 //-------------------------- SORT CALL ----------------------------------------
@@ -64,7 +64,7 @@ void sort(char **dataDB,const int str_counter,char key[]);
 //-------------------------- Sun Sort------------------------------------------
 //	function which
 //	input
-void sonSort(char **dataDB, int str_counter, char *inputFileName, int son);
+void sonSort(char **dataDB, int str_counter,char *inputFileName,const int son);
 
 //--------------------Print sons in series order-------------------------------
 //	function which
@@ -80,12 +80,12 @@ void sonsPrintRandom();
 //-------------------------- Print file----------------------------------------
 //	function which
 //	input
-void printFile(int son);
+void printFile(const int son);
 
 //-------------------------- Chek fork error-----------------------------------
 //	function which
 //	input
-void chekForkError(pid_t *status);
+void chekForkError(const pid_t *status);
 
 //-------------------------- Wait sons-----------------------------------------
 //	function which
@@ -103,35 +103,38 @@ int main(int argc, char *argv[])
 	char 	**dataDB	=	NULL;	    // Difine tabel of data.
 	int str_counter		=	0;			// Difine counter of strings at tabel.
 	int printType 		= atoi(argv[2]);// Type of oreder print
-	int sonCoun;
+	int sonCoun			=	0;			// counter for FOR
 
     // If the user enter nesesery data corect:
 	if(argc == NUMBER_PARAM)
 	{
 
+		//	START	READ SORT AREA FOR TWO SONS
 		for(sonCoun= SON1; sonCoun<= NUMBER_SONS; sonCoun++)
 		{
 			status = fork();
-
 			chekForkError(&status);
 
 			if(!status)
-
+			{
+				//	call two function sort(which know read also)
 				sonSort(dataDB, str_counter, argv[1], sonCoun);
+				exit(EXIT_SUCCESS);		// exit success
+			}	
+			
 		}
-
-		waitSons(&status);
-
+		
+		waitSons(&status);				// Wait for two sons
+		//	END READ SORT AREA
+		
+		
         if(printType == RANDOM)
-
         	sonsPrintRandom();
-
-
         else if(printType == SERIES)
-
         	sonsPrintSeries();
-
+        	
         printf("THE END\n");
+       
     }
 	else
 								// Tell user how to enter data - corect.
@@ -145,6 +148,156 @@ int main(int argc, char *argv[])
 //                             Function section
 //=============================================================================
 
+
+
+
+//-------------------------- SORT CALL ----------------------------------------
+//	function which call to sort method
+//	input 	data structure
+//			data counter in data structure
+//			type of sort
+void sort(char **dataDB,const int str_counter,char key[])
+{
+
+	// Check sort type.
+	if(!strcmp(key,SORT_BY_NAME))
+		sort_by_name(dataDB,str_counter);	//	sort by name
+	else if(!strcmp(key,SORT_BY_ID))
+		sort_by_id(dataDB,str_counter);		// sort by id
+
+}
+
+//-------------------------- Sun Sort------------------------------------------
+//	function which
+//	input
+void sonSort(char **dataDB, int str_counter,char *inputFileName,const int son)
+{
+    FILE *fRead		=	NULL;			//	Var for red file.
+	FILE *fWrite	=	NULL;			// 	Var for write file.
+
+
+    char str[MAX_MENU_STR_LEN];
+
+    if(son == SON1)
+    {
+        strcpy(str,SORT_BY_ID);
+        fWrite = fopen(ID_FILE_NAME,FILE_WRITE);
+    }
+    else
+    {
+        strcpy(str, SORT_BY_NAME);
+        fWrite = fopen(NAME_FILE_NAME,FILE_WRITE);
+    }
+
+    fRead = fopen(inputFileName,FILE_READ);	// Open read and write fils.
+
+    if(ifFileOpen(fRead) && ifFileOpen(fWrite))
+    {
+        // Read file and transform the data to tabel of strings.
+        dataDB= readLines(fRead, &str_counter);
+        fclose(fRead);						// Close readed file.
+
+        sort(dataDB, str_counter, str);		//	SORT
+
+
+        writeFile(fWrite, str_counter, dataDB);//	write to file sorted data
+        fclose(fWrite);						// Close writed file.
+
+        //	FREE MEMORY
+        free_arr(dataDB, str_counter);		// free aloccated Memory
+        free(dataDB);						// free data structure
+
+    }
+
+}
+
+//--------------------Print sons in series order-------------------------------
+//	function which
+//	input
+void sonsPrintSeries()
+{
+	pid_t status;
+
+	status = fork();
+	chekForkError(&status);
+
+	if(!status)
+		printFile(SON1);
+	else
+		wait(&status);
+
+
+	status = fork();
+	chekForkError(&status);
+
+	if(!status)
+		printFile(SON2);
+	else
+		wait(&status);
+
+}
+
+//--------------------Print sons in random order-------------------------------
+//	function which
+//	input
+void sonsPrintRandom()
+{
+	pid_t status;
+	int sonCoun;
+
+	for(sonCoun= SON1; sonCoun<= NUMBER_SONS; sonCoun++)
+	{
+		status = fork();
+		chekForkError(&status);
+
+		if(!status)
+			printFile(sonCoun);
+	
+	}
+	
+	waitSons(&status);
+
+}
+
+//-------------------------- Print file----------------------------------------
+//	function which
+//	input
+void printFile(const int son)
+{
+    char fileName[MAX_FILE_NAME];
+
+    if(son == SON1)
+        strcpy(fileName, ID_FILE_NAME);
+    else
+        strcpy(fileName, NAME_FILE_NAME);
+
+	
+    if(execlp(CAT_FILE,CAT_FILE, fileName, NULL))
+    {
+        perror("exaclp() faild\n");
+
+        exit(EXIT_FAILURE);
+    }
+    else
+    	exit(EXIT_SUCCESS);
+
+}
+
+
+
+//-------------------------- Wait sons-----------------------------------------
+//	function which waiting for son with pid_t provided by ststus 
+//	input	pointer to pid_t status 
+void waitSons(pid_t *status)
+{
+	int counter;						//	counter variable
+	
+	//	for NUMBERS of SONS	wa
+	for(counter= 0; counter< NUMBER_SONS; counter++)
+		wait(status);
+    	
+ 
+}
 
 //------------------------------ OPEN FILES -----------------------------------
 //	input files desc to file
@@ -174,152 +327,11 @@ void incorect_param()
 
 }
 
-//-------------------------- SORT CALL ----------------------------------------
-//	function which call to sort method
-//	input 	data structure
-//			data counter in data structure
-//			type of sort
-void sort(char **dataDB,const int str_counter,char key[])
-{
-
-	// Check sort type.
-	if(!strcmp(key,"name"))
-		sort_by_name(dataDB,str_counter);	//	sort by name
-	else if(!strcmp(key,"id"))
-		sort_by_id(dataDB,str_counter);		// sort by id
-
-}
-
-//-------------------------- Sun Sort------------------------------------------
-//	function which
-//	input
-void sonSort(char **dataDB, int str_counter, char *inputFileName, int son)
-{
-    FILE *fRead		=	NULL;			//	Var for red file.
-	FILE *fWrite	=	NULL;			// 	Var for write file.
-
-
-    char str[MAX_MENU_STR_LEN];
-
-    if(son == SON1)
-    {
-
-        strcpy(str, "id");
-        fWrite = fopen("id.out","w");
-    }
-    else
-    {
-        strcpy(str, "name");
-        fWrite = fopen("name.out","w");
-    }
-
-    fRead = fopen(inputFileName,"r");	// Open read and write fils.
-
-    if(ifFileOpen(fRead) && ifFileOpen(fWrite))
-    {
-        // Read file and transform the data to tabel of strings.
-        dataDB= readLines(fRead, &str_counter);
-        fclose(fRead);						// Close readed file.
-
-        sort(dataDB, str_counter, str);		//	SORT
-
-
-        writeFile(fWrite, str_counter, dataDB);//	write to file sorted data
-        fclose(fWrite);						// Close writed file.
-
-        //	FREE MEMORY
-        free_arr(dataDB, str_counter);		// free aloccated Memory
-        free(dataDB);						// free data structure
-
-    }
-    exit(EXIT_SUCCESS);
-}
-
-//--------------------Print sons in series order-------------------------------
-//	function which
-//	input
-void sonsPrintSeries()
-{
-	pid_t status;
-
-	status = fork();
-
-	chekForkError(&status);
-
-	if(!status)
-
-		printFile(SON1);
-
-	else
-
-		wait(&status);
-
-
-	status = fork();
-
-	chekForkError(&status);
-
-	if(!status)
-
-		printFile(SON2);
-
-	else
-
-		wait(&status);
-}
-
-//--------------------Print sons in random order-------------------------------
-//	function which
-//	input
-void sonsPrintRandom()
-{
-	pid_t status;
-	int sonCoun;
-
-	for(sonCoun= SON1; sonCoun<= NUMBER_SONS; sonCoun++)
-	{
-		status = fork();
-
-		chekForkError(&status);
-
-		if(!status)
-			printFile(sonCoun);
-	
-	}
-	
-	waitSons(&status);
-
-}
-
-//-------------------------- Print file----------------------------------------
-//	function which
-//	input
-void printFile(int son)
-{
-    char fileName[MIN_STR_LEN];
-
-    if(son == SON1)
-        strcpy(fileName, "id.out");
-    else
-        strcpy(fileName, "name.out");
-
-	
-    if(execlp("cat", "cat", fileName, NULL))
-    {
-        perror("exaclp() faild");
-
-        exit(EXIT_FAILURE);
-    }
-    else
-    	exit(EXIT_SUCCESS);
-
-}
-
 
 //-------------------------- Chek fork error-----------------------------------
 //	function which	get pointer to pid_t status of fork
 //	and if can not fork do exit with error
-void chekForkError(pid_t *status)
+void chekForkError(const pid_t *status)
 {
 	if(*status < 0)
 	{
@@ -328,17 +340,3 @@ void chekForkError(pid_t *status)
 	}
 	
 }
-
-//-------------------------- Wait sons-----------------------------------------
-//	function which waiting for son with pid_t provided by ststus 
-//	input	pointer to pid_t status 
-void waitSons(pid_t *status)
-{
-	int counter;						//	counter variable
-	
-	//	for NUMBERS of SONS	wa
-	for(counter= 0; counter< NUMBER_SONS; counter++)
-		wait(status);
-            	
-}
-

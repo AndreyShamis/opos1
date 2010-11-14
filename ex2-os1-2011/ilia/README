@@ -29,16 +29,16 @@
 
 LIST OF FILES (c/h only)
 
- main.c
- mem.c
- mem.h
- read.c
- read.h
- sort.c
- sort.h
- utils.h
- write.c
- write.h
+ main.c			//	main program file
+ mem.c			//	memory functions
+ mem.h			//	memory header
+ read.c			//	read from file 
+ read.h			//	read from file header
+ sort.c			//	sort functions 
+ sort.h			//	sort file header
+ utils.h		//	SEE FOR check constants used in program and enum
+ write.c		//	write to file function
+ write.h		//	write header
 
 ##  TODO-1 
 
