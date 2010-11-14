@@ -65,19 +65,28 @@ void sort(char **dataDB,const int str_counter,char key[]);
 //	input
 void sonSort(char **dataDB, int str_counter, char *inputFileName, int son);
 
-//-------------------------- Print file------------------------------------------
+//--------------------Print sons in series order------------------------------------------
+//	function which
+//	input
+void sonsPrintSeries();
+
+//--------------------Print sons in random order-------------------------------
+//	function which
+//	input
+void sonsPrintRandom();
+
+
+//-------------------------- Print file----------------------------------------
 //	function which
 //	input
 void printFile(int son);
 
-//-------------------------- Print file------------------------------------------
+//-------------------------- Chek fork error-------------------------------------
 //	function which
 //	input
-void forkError();
+void chekForkError(pid_t *status);
 
-
-
-//-------------------------- Print file------------------------------------------
+//-------------------------- Wait sons-----------------------------------------
 //	function which
 //	input
 void waitSons(pid_t *status);
@@ -93,76 +102,33 @@ int main(int argc, char *argv[])
 	char 	**dataDB	=	NULL;	    // Difine tabel of data.
 	int str_counter		=	0;			// Difine counter of strings at tabel.
 	int printType 		= atoi(argv[2]);// Type of oreder print
+	int sonCoun;
 
     // If the user enter nesesery data corect:
 	if(argc == NUMBER_PARAM)
 	{
-        int counter;
 
-		for(counter= 0; counter< NUMBER_SONS; counter++)
+		for(sonCoun= SON1; sonCoun<= NUMBER_SONS; sonCoun++)
 		{
 			status = fork();
 
-			if(status < 0)
+			chekForkError(&status);
 
-				forkError();
+			if(!status)
 
-			else if(!status)
-
-				sonSort(dataDB, str_counter, argv[1], counter);
+				sonSort(dataDB, str_counter, argv[1], sonCoun);
 		}
 
 		waitSons(&status);
 
         if(printType == RANDOM)
-        {
-            for(counter= 1; counter<= NUMBER_SONS; counter++)
-            {
-                status = fork();
 
-                if(status < 0)
-		            forkError();
-                else if(!status)
-                {
-                    printFile(counter);
-
-                    int i;
-                    for(i=0;i < 999999999; i++)
-						;
-                }
-            }
-            waitSons(&status);
-        }
-
-        else if(printType == SERIES )
-        {
-            status = fork();
-            if(status < 0)
-            	forkError();
-            else if(!status)
-
-            	printFile(SUN1);
-
-            else
-
-            	wait(&status);
+        	sonsPrintRandom();
 
 
+        else if(printType == SERIES)
 
-            status = fork();
-
-            if(status < 0)
-
-            	forkError();
-
-            else if(!status)
-
-            	printFile(SUN2);
-
-           	else
-
-            	wait(&status);
-        }
+        	sonsPrintSeries();
 
         printf("THE END\n");
     }
@@ -234,7 +200,7 @@ void sonSort(char **dataDB, int str_counter, char *inputFileName, int son)
 
     char str[MAX_MENU_STR_LEN];
 
-    if(son == 0)
+    if(son == SON1)
     {
 
         strcpy(str, "id");
@@ -268,6 +234,73 @@ void sonSort(char **dataDB, int str_counter, char *inputFileName, int son)
     exit(EXIT_SUCCESS);
 }
 
+//--------------------Print sons in series order------------------------------------------
+//	function which
+//	input
+void sonsPrintSeries()
+{
+	pid_t status;
+
+	status = fork();
+
+	chekForkError(&status);
+
+	if(!status)
+
+		printFile(SON1);
+
+	else
+
+		wait(&status);
+
+
+	status = fork();
+
+	chekForkError(&status);
+
+	if(!status)
+
+		printFile(SON2);
+
+	else
+
+		wait(&status);
+}
+
+//--------------------Print sons in random order------------------------------------------
+//	function which
+//	input
+void sonsPrintRandom()
+{
+	pid_t status;
+	int sonCoun;
+
+
+	for(sonCoun= SON1; sonCoun<= NUMBER_SONS; sonCoun++)
+	{
+		status = fork();
+
+		chekForkError(&status);
+
+		if(!status)
+		{
+			printFile(sonCoun);
+
+			int i;
+			for(i=0;i < 999999999; i++)
+				;
+		}
+	}
+	waitSons(&status);
+}
+
+
+
+
+
+
+
+
 //-------------------------- Print file------------------------------------------
 //	function which
 //	input
@@ -275,7 +308,7 @@ void printFile(int son)
 {
     char fileName[MIN_STR_LEN];
 
-    if(son == 1)
+    if(son == SON1)
 
         strcpy(fileName, "id.out");
 
@@ -287,8 +320,6 @@ void printFile(int son)
 	for(i=0;i < 999999999; i++)
 
 		;
-
-
 
     if(execlp("cat", "cat", fileName, NULL))
     {
@@ -302,21 +333,25 @@ void printFile(int son)
 }
 
 
-//-------------------------- Print file------------------------------------------
+
+
+
+
+
+
+//-------------------------- Chek fork error-------------------------------------
 //	function which
 //	input
-void forkError()
+void chekForkError(pid_t *status)
 {
-	perror("FORK - error\n");
-	exit(EXIT_FAILURE);
+	if(*status < 0)
+	{
+		perror("FORK - error\n");
+		exit(EXIT_FAILURE);
+	}
 }
 
-
-
-
-
-
-//-------------------------- Print file------------------------------------------
+//-------------------------- Wait sons------------------------------------------
 //	function which
 //	input
 void waitSons(pid_t *status)
@@ -327,5 +362,4 @@ void waitSons(pid_t *status)
 
             	wait(status);
 }
-
 
