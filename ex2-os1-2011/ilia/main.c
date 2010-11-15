@@ -32,7 +32,6 @@
  *		example-1:	./ex2 in2.txt 1
  *					
  *		example-2:	./ex2 in2.txt 2
- *	
  *
  */
 
@@ -69,18 +68,18 @@ int ifFileOpen(FILE *fFile);
 void sort(char **dataDB,const int str_counter,char key[]);
 
 //-------------------------- Sun Sort------------------------------------------
-//	function which
-//	input
-void sonSort(char **dataDB, int str_counter,char *inputFileName,const int son);
+//	function which call for sort 
+//	input	strings array, name of input file and number of son 
+void sonSort(char **dataDB,char *inputFileName,const int son);
 
 //-------------------------- Print file----------------------------------------
-//	function which
-//	input
+//	function which print from file 
+//	input son number
 void printFile(const int son);
 
 //-------------------------- Chek fork error-----------------------------------
-//	function which
-//	input
+//	function which check if fork success
+//	input	pid_t of status
 void chekForkError(const pid_t *status);
 
 //-------------------------- Wait sons-----------------------------------------
@@ -93,9 +92,10 @@ void waitSons(pid_t *status);
 //	input type of print
 void prePrint(int printType);
 
-//==============================            ===================================
-//
-//
+//============================== READ AND SORT ================================
+//	function which for each son open him 
+//	and waiting for both of them
+//	input string of input file name
 void readSort(char *inputFile);
 
 //======================== END OF PROTOTYPE ===================================
@@ -123,25 +123,29 @@ int main(int argc, char *argv[])
 //                             Function section
 //=============================================================================
 
-//==============================            ===================================
-//
-//
+//============================== READ AND SORT ================================
+//	function which for each son open him 
+//	and waiting for both of them
+//	input string of input file name
 void readSort(char *inputFile)
 {
 	int sonCoun			=	0;			// counter for FOR
 	pid_t status;						// status of child in fork use
 	char 	**dataDB	=	NULL;	    // Difine tabel of data.
-	int str_counter		=	0;			// Difine counter of strings at tabel.
 		
 	for(sonCoun= SON1; sonCoun<= NUMBER_SONS; sonCoun++)
 	{
 		status = fork();
-		chekForkError(&status);
+		
+		chekForkError(&status);			//	check if fork success
+		
 		if(!status)
-		{	//	call two function sort(which know read also)
-			sonSort(dataDB, str_counter, inputFile, sonCoun);
+		{	
+			//	call two function sort(which know read also)
+			sonSort(dataDB, inputFile, sonCoun);
 			exit(EXIT_SUCCESS);		// exit success
 		}	
+		
 	}
 	
 	waitSons(&status);				// Wait for two sons
@@ -153,31 +157,29 @@ void readSort(char *inputFile)
 //	input type of print
 void prePrint(int printType)
 {
-	pid_t status;
-	int sonCoun;
+	pid_t status;			//	fork pid status
+	int sonCoun;			//	counter
 
 	for(sonCoun= SON1; sonCoun<= NUMBER_SONS; sonCoun++)
 	{
 		status = fork();
-		chekForkError(&status);
+		chekForkError(&status);		//	check if fork sussecc
 
-		if(!status)
-			printFile(sonCoun);
+		if(!status)					//	for son
+			printFile(sonCoun);		//	print
 		
-		if(printType == SERIES)
-			wait(&status);
+		if(printType == SERIES)		//	if series print wait
+			wait(&status);			//	wwait
 	}
 	
-	if(printType == RANDOM)
-		waitSons(&status);
+	if(printType == RANDOM)			//	if random print wait for both
+		waitSons(&status);			//	call to function which wait for both
 
 }
 
 //-------------------------- SORT CALL ----------------------------------------
 //	function which call to sort method
-//	input 	data structure
-//			data counter in data structure
-//			type of sort
+//	input	strings array, name of input file and number of son 
 void sort(char **dataDB,const int str_counter,char key[])
 {
 
@@ -192,23 +194,24 @@ void sort(char **dataDB,const int str_counter,char key[])
 //-------------------------- Sun Sort------------------------------------------
 //	function which
 //	input
-void sonSort(char **dataDB, int str_counter,char *inputFileName,const int son)
+void sonSort(char **dataDB,char *inputFileName,const int son)
 {
     FILE *fRead		=	NULL;			//	Var for red file.
 	FILE *fWrite	=	NULL;			// 	Var for write file.
 
+	int str_counter		=	0;			// Difine counter of strings at tabel.
 
     char str[MAX_MENU_STR_LEN];
 
-    if(son == SON1)
+    if(son == SON1)						//	for first son
     {
-        strcpy(str,SORT_BY_ID);
-        fWrite = fopen(ID_FILE_NAME,FILE_WRITE);
+        strcpy(str,SORT_BY_ID);				//	set str ID for sort
+        fWrite = fopen(ID_FILE_NAME,FILE_WRITE);	//	open file for write
     }
-    else
+    else								//	for second son
     {
         strcpy(str, SORT_BY_NAME);
-        fWrite = fopen(NAME_FILE_NAME,FILE_WRITE);
+        fWrite = fopen(NAME_FILE_NAME,FILE_WRITE);	//	open file for write
     }
 
     fRead = fopen(inputFileName,FILE_READ);	// Open read and write fils.
@@ -233,19 +236,17 @@ void sonSort(char **dataDB, int str_counter,char *inputFileName,const int son)
 
 }
 
-
-
 //-------------------------- Print file----------------------------------------
-//	function which
-//	input
+//	function which print from file 
+//	input son number
 void printFile(const int son)
 {
-    char fileName[MAX_FILE_NAME];
+    char fileName[MAX_FILE_NAME];			//	output file name variable
 
-    if(son == SON1)
-        strcpy(fileName, ID_FILE_NAME);
-    else
-        strcpy(fileName, NAME_FILE_NAME);
+    if(son == SON1)							//	if first son
+        strcpy(fileName, ID_FILE_NAME);		//	set file name to ID
+    else									//	else
+        strcpy(fileName, NAME_FILE_NAME);	//	set to NAME
 
 	
     if(execlp(CAT_FILE,CAT_FILE, fileName, NULL))
@@ -270,7 +271,7 @@ void waitSons(pid_t *status)
 	
 	//	for NUMBERS of SONS	wa
 	for(counter= 0; counter< NUMBER_SONS; counter++)
-		wait(status);
+		wait(status);					//	wait for son 
     	
  
 }
@@ -309,7 +310,7 @@ void incorect_param()
 //	and if can not fork do exit with error
 void chekForkError(const pid_t *status)
 {
-	if(*status < 0)
+	if(*status < 0)						//	if fork fail
 	{
 		perror("FORK - error\n");
 		exit(EXIT_FAILURE);
