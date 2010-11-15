@@ -48,7 +48,7 @@ LIST OF FILES (c/h only)
  sort.h			//	sort file header
  
  //Very important file which include all constant used in program
- utils.h		//	SEE FOR check constants used in program and enum
+ utils.h		//	SEE FOR check constants used in program
  
  write.c		//	write to file function
  write.h		//	write header

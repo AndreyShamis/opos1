@@ -20,21 +20,12 @@
 //	function for exec
 #define CAT_FILE		"cat"	//	function to read whith cat
 
+#define	TRUE		1				//	true for functions using
+#define	FALSE		0				//	false for functions using
 
-//------------------ DEFINE ENUM SECTION --------------------------------------
-#ifndef UTILS_SEC
-#define UTILS_SEC
+#define	SERIES 	 	1			//	Type of print order
+#define	RANDOM 	 	2			//	Type of print order
 
-//================================= ENUM SECTION ==============================
-enum{
-	TRUE	=	1,				//	true for functions using
-	FALSE	=	0,				//	false for functions using
+#define	SON1		1			//	define number of son
+#define	SON2		2			//	define number of son
 
-	SERIES 	= 	1,
-	RANDOM 	= 	2,
-
-	SON1	=	1,
-	SON2	=	2,
-};
-
-#endif
