@@ -5,12 +5,21 @@
  * ===========================================================================
  * Writen by: Andrey Shamis,  id: 321470882, login: andreysh
  * and:       Ilia Gaisinsky, id: 309480051, login: iliaga
- * Input:	1: 	SORT TYPE (id/name)
- *			2:	additional data(<Name><_[space]><id>)
+ *	==========================================================================
+ * Input:	1-parameter - source for file will be readed and sorted
+ *			2-parameter - 1 / 2 
  * Input in parameters:
  *			text file that include names and ids.
- * Output: Text file that include names and ids, Dipend on input sort key:
- * Key    | sort method
+ * Output: Two Text file that include names and ids, Dipend on input sort key:
+ *	Named :	
+ *		//	files names
+ *		#define ID_FILE_NAME	"id.out"	//	file name for outputs id`s
+ *		#define NAME_FILE_NAME	"name.out"	//	file name for output names
+ *	In output used UNIX tools cat / to change the default tools
+ *	you can change  in utils.h constant
+ *		#define CAT_FILE		"cat"	//	function to read whith cat
+ *============================================================================
+ * Key    | Outpud method
  *---------------------
  * "2"  | random
  *---------------------
@@ -39,8 +48,6 @@
 #include "write.h"
 #include "utils.h"
 #include <string.h>
-
-
 //                             Prototypes section
 //=============================================================================
 
@@ -66,17 +73,6 @@ void sort(char **dataDB,const int str_counter,char key[]);
 //	input
 void sonSort(char **dataDB, int str_counter,char *inputFileName,const int son);
 
-//--------------------Print sons in series order-------------------------------
-//	function which
-//	input
-void sonsPrintSeries();
-
-//--------------------Print sons in random order-------------------------------
-//	function which
-//	input
-void sonsPrintRandom();
-
-
 //-------------------------- Print file----------------------------------------
 //	function which
 //	input
@@ -92,64 +88,90 @@ void chekForkError(const pid_t *status);
 //	input
 void waitSons(pid_t *status);
 
+//---------------------------- PrePrint ---------------------------------------
+//	function which select between type of print
+//	input type of print
+void prePrint(int printType);
+
+//==============================            ===================================
+//
+//
+void readSort(char *inputFile);
+
 //======================== END OF PROTOTYPE ===================================
 
-//                                Main section
-//=============================================================================
+//=========================== Main section ====================================
+//
 int main(int argc, char *argv[])
 {
-
-	pid_t status;
-	char 	**dataDB	=	NULL;	    // Difine tabel of data.
-	int str_counter		=	0;			// Difine counter of strings at tabel.
 	int printType 		= atoi(argv[2]);// Type of oreder print
-	int sonCoun			=	0;			// counter for FOR
 
     // If the user enter nesesery data corect:
 	if(argc == NUMBER_PARAM)
-	{
-
-		//	START	READ SORT AREA FOR TWO SONS
-		for(sonCoun= SON1; sonCoun<= NUMBER_SONS; sonCoun++)
-		{
-			status = fork();
-			chekForkError(&status);
-
-			if(!status)
-			{
-				//	call two function sort(which know read also)
-				sonSort(dataDB, str_counter, argv[1], sonCoun);
-				exit(EXIT_SUCCESS);		// exit success
-			}	
-			
-		}
-		
-		waitSons(&status);				// Wait for two sons
-		//	END READ SORT AREA
-		
-		
-        if(printType == RANDOM)
-        	sonsPrintRandom();
-        else if(printType == SERIES)
-        	sonsPrintSeries();
-        	
-        printf("THE END\n");
-       
+	{ 
+		readSort(argv[1]);				//	Read And sort for both sons
+		prePrint(printType);			//	Print "CAT" for both sons
+        printf("THE END\n");       		//	Print THE END
     }
 	else
-								// Tell user how to enter data - corect.
-		incorect_param();						//	print error
+		incorect_param();			// Tell user how to enter data - corect.
 
 	return(EXIT_SUCCESS);						//	exit from program
 
 }
 
-
 //                             Function section
 //=============================================================================
 
+//==============================            ===================================
+//
+//
+void readSort(char *inputFile)
+{
+	int sonCoun			=	0;			// counter for FOR
+	pid_t status;						// status of child in fork use
+	char 	**dataDB	=	NULL;	    // Difine tabel of data.
+	int str_counter		=	0;			// Difine counter of strings at tabel.
+		
+	for(sonCoun= SON1; sonCoun<= NUMBER_SONS; sonCoun++)
+	{
+		status = fork();
+		chekForkError(&status);
+		if(!status)
+		{	//	call two function sort(which know read also)
+			sonSort(dataDB, str_counter, inputFile, sonCoun);
+			exit(EXIT_SUCCESS);		// exit success
+		}	
+	}
+	
+	waitSons(&status);				// Wait for two sons
 
+}
 
+//---------------------------- PrePrint ---------------------------------------
+//	function which select between type of print
+//	input type of print
+void prePrint(int printType)
+{
+	pid_t status;
+	int sonCoun;
+
+	for(sonCoun= SON1; sonCoun<= NUMBER_SONS; sonCoun++)
+	{
+		status = fork();
+		chekForkError(&status);
+
+		if(!status)
+			printFile(sonCoun);
+		
+		if(printType == SERIES)
+			wait(&status);
+	}
+	
+	if(printType == RANDOM)
+		waitSons(&status);
+
+}
 
 //-------------------------- SORT CALL ----------------------------------------
 //	function which call to sort method
@@ -211,53 +233,7 @@ void sonSort(char **dataDB, int str_counter,char *inputFileName,const int son)
 
 }
 
-//--------------------Print sons in series order-------------------------------
-//	function which
-//	input
-void sonsPrintSeries()
-{
-	pid_t status;
 
-	status = fork();
-	chekForkError(&status);
-
-	if(!status)
-		printFile(SON1);
-	else
-		wait(&status);
-
-
-	status = fork();
-	chekForkError(&status);
-
-	if(!status)
-		printFile(SON2);
-	else
-		wait(&status);
-
-}
-
-//--------------------Print sons in random order-------------------------------
-//	function which
-//	input
-void sonsPrintRandom()
-{
-	pid_t status;
-	int sonCoun;
-
-	for(sonCoun= SON1; sonCoun<= NUMBER_SONS; sonCoun++)
-	{
-		status = fork();
-		chekForkError(&status);
-
-		if(!status)
-			printFile(sonCoun);
-	
-	}
-	
-	waitSons(&status);
-
-}
 
 //-------------------------- Print file----------------------------------------
 //	function which

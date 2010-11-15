@@ -1,3 +1,15 @@
+//======================= DESCRIPTION =========================================
+/*
+ *	This file give tools for sort strings in array 
+ *	by some kind of sort
+ *	Like ID and NAME
+ *	Which included in one string
+ *	And this file also include function swap between two strings in array
+ *	See functions description for more information.
+ *
+ */
+//======================== SORT TOOLS =========================================
+
 #include "utils.h"
 #include <string.h>
 
