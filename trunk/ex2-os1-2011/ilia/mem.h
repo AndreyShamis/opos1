@@ -1,3 +1,13 @@
+//======================= DESCRIPTION =========================================
+/*
+ *	Memory functions
+ *	This file give solutions for work with memory
+ *	Included function for allocate memory [2]-char and [1]-char
+ *	Also give function for delete from memory
+ *	See functions description for more information.
+ */
+//========================= MEMORY TOOLS ======================================
+
 #include <stdio.h>
 #include <stdlib.h>
 

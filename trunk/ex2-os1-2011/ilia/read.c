@@ -19,15 +19,19 @@ char **readLines(FILE *fRead,int *str_counter)
 	while(status != EOF_R)
 	{
 
-
+		//	------------ FILE READ BLOCK ---------------------------------
 		if(status == FILE_R )				//	IF FILE NOT EOF
 	 		if(!readLineFile(data,fRead))	//	READ FROM FILE TO data
 				status = EOF_R; 			//	UNTIL NULL
+		//	For give read to console change
+		//	status = EOF_R; to status = CONSOLE_R;
+		//	------------ END READ FILE BLOCK ----------------------------
 
+		//	------------ CONSOLE READ BLOCK ------------------------------
 		//if(status == CONSOLE_R )			// IF CONSOLE NOT EOF
 		//	if(!readLineConsole(data))		// READ TO data FROM FILE
 		//		status = EOF_R; 			// UNTIL NOT EOF
-
+		//	------------ END READ CONSOLE BLOCK --------------------------
 		if(status != EOF_R)
 			data_len	=	strlen(data);
 
@@ -95,7 +99,7 @@ void copy_arr(char **data_new,char **data_old,const int len)
 		data_new[counter] = data_old[counter];
 
 }
-/*
+
 //-------------- READ LINE FROM CONSOLE ---------------------------------------
 //	input 	pointer to string where be retuned string
 //	---------------------------------------------------------------------------
@@ -110,4 +114,4 @@ int readLineConsole(char *data)
 	return(FALSE);							//	return fail
 
 }
-*/
+

@@ -1,3 +1,12 @@
+//======================= DESCRIPTION =========================================
+/*
+ *	This file give solution for read functions from file
+ *	and from console into same string array
+ *	(!!! In this version NO READING FROM CONSOLE )
+ *	See functions description for more information.
+ */
+//========================= READ TOOLS ========================================
+
 #include "utils.h"
 #include "mem.h"
 #include <string.h>
@@ -37,7 +46,6 @@ void copy_arr(char **data_new,char **data_old,const int len);
 int readLineFile(char *data,FILE *fRead);
 
 
-/*
 //-------------- READ LINE FROM CONSOLE ---------------------------------------
 //	input 	pointer to string where be retuned string
 //	---------------------------------------------------------------------------
@@ -45,5 +53,5 @@ int readLineFile(char *data,FILE *fRead);
 //			1 - if input succeful
 int readLineConsole(char *data);
 
-*/
+
 #endif
