@@ -1,28 +1,38 @@
 /*
  * EX2:: A program that manage data base of name's and id's.
+ * makes two child for read and sort data
+ * and makes two child 
  * ===========================================================================
  * Writen by: Andrey Shamis,  id: 321470882, login: andreysh
  * and:       Ilia Gaisinsky, id: 309480051, login: iliaga
- * Input:	1: 	SORT TYPE (id/name)  
- *			2:	additional data(<Name><_[space]><id>)
+ *	==========================================================================
+ * Input:	1-parameter - source for file will be readed and sorted
+ *			2-parameter - 1 / 2 
  * Input in parameters:
  *			text file that include names and ids.
- * Output: Text file that include names and ids, Dipend on input sort key:
- * Key    | sort method
+ * Output: Two Text file that include names and ids, Dipend on input sort key:
+ *	Named :	
+ *		//	files names
+ *		#define ID_FILE_NAME	"id.out"	//	file name for outputs id`s
+ *		#define NAME_FILE_NAME	"name.out"	//	file name for output names
+ *	In output used UNIX tools cat / to change the default tools
+ *	you can change  in utils.h constant
+ *		#define CAT_FILE		"cat"	//	function to read whith cat
+ *============================================================================
+ * Key    | Outpud method
  *---------------------
- * "2" | by name
+ * "2"  | random
  *---------------------
- *  "1"  | by id
+ * "1"  | series
  *---------------------
  *
  *		to compile : make
  *
  *		to run:	./ex2 <INPUT FILE> <SORT TYPE>
  *		example-1:	./ex2 in2.txt 1
- *					id
  *					
  *		example-2:	./ex2 in2.txt 2
- *					name
+ *	
  *
  */
 
@@ -36,9 +46,22 @@ LIST OF FILES (c/h only)
  read.h			//	read from file header
  sort.c			//	sort functions 
  sort.h			//	sort file header
+ 
+ //Very important file which include all constant used in program
  utils.h		//	SEE FOR check constants used in program and enum
+ 
  write.c		//	write to file function
  write.h		//	write header
+ 
+ mikefile		//	include compile instructions
+ 
+ Other files
+ :	in2.txt		-	input file
+ :	id.out		-	output file sorted by id
+ :	name.out	-	output file sorted by name
+ 
+ For more information about each file see *.h to know what exactly do
+ each file, and function description how exactly use them.
 
 ##  TODO-1 
 
