@@ -15,9 +15,9 @@
 #define READ_SEC 
 
 
-#define	FILE_R 		= 2			//	can read file from file
-#define	CONSOLE_R 	= 1			//	cant read from file can read from console
-#define	EOF_R		= 0			//	cant read 
+#define	FILE_R 		  2			//	can read file from file
+#define	CONSOLE_R 	  1			//	cant read from file can read from console
+#define	EOF_R		  0			//	cant read 
 
 
 // A function that read text file.

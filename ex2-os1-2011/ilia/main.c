@@ -104,14 +104,22 @@ void readSort(char *inputFile);
 //
 int main(int argc, char *argv[])
 {
-	int printType 		= atoi(argv[2]);// Type of oreder print
+	int printType 		= 0;// Type of oreder print
 
     // If the user enter nesesery data corect:
-	if(argc == NUMBER_PARAM)
+	if(argc == NUMBER_PARAM )
 	{ 
-		readSort(argv[1]);				//	Read And sort for both sons
-		prePrint(printType);			//	Print "CAT" for both sons
-        printf("THE END\n");       		//	Print THE END
+		printType 		= atoi(argv[2]);//	get print type 
+		
+		if(printType == SERIES || printType == RANDOM)
+		{
+			readSort(argv[1]);				//	Read And sort for both sons
+			prePrint(printType);			//	Print "CAT" for both sons
+        	printf("THE END\n");       		//	Print THE END
+    	}
+    	else
+    		printf("Print type incorrect\n");
+    
     }
 	else
 		incorect_param();			// Tell user how to enter data - corect.
