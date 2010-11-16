@@ -307,8 +307,8 @@ int ifFileOpen(FILE *fFile)
 void incorect_param()
 {
 	printf("You need enter 2 parameters:\n");
-	printf("1. Read file name\n");
-	printf("2. Write file name\n");
+	printf("1. Read file name.\n");
+	printf("2. Print type.\n");
 
 }
 
