@@ -36,5 +36,12 @@ void mem_error();
 // Input: tabel of strings (type dubel pointer), number of strings at table.
 void free_arr(char **data, const int len);
 
+// A function that copy tabel of strings.
+//-----------------------------------------------------------------------------
+// 	Input: new and old tabels of strings (type dubel pointer).
+//	data_new 	-	new data structure
+//	data_old	-	old data structure
+
+void copy_arr(char **data_new,char **data_old,const int len);
 
 #endif
