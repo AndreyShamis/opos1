@@ -51,8 +51,22 @@ void free_arr(char **data,const int len)
 //-----------------------------------------------------------------------------
 void mem_error()
 {
-	printf("Can`t allocate memory.\n");		//	print message
+	perror("Can`t allocate memory.\n");		//	print message
 	exit(EXIT_FAILURE);						//	exit whith error
 	
 }
 
+
+// A function that copy tabel of strings.
+//-----------------------------------------------------------------------------
+// 	Input: new and old tabels of strings (type dubel pointer).
+//	data_new 	-	new data structure
+//	data_old	-	old data structure
+void copy_arr(char **data_new,char **data_old,const int len)
+{
+	int counter;								// counter variable
+
+	for(counter=0;counter<len;counter++)		//	copy data(pointers)
+		data_new[counter] = data_old[counter];
+
+}
