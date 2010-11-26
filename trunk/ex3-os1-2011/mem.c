@@ -45,6 +45,8 @@ void free_arr(char **data,const int len)
 	for(counter=0;counter<len;counter++)
 		free(data[counter]);	//	free string in data structure
 		
+	free(data);
+		
 }
 
 // A function that notify user about error  of aloccating memory.
