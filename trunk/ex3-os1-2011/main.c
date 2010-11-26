@@ -124,20 +124,28 @@ char **commandArr(const char input[], int *size)
 	
 }
 
-int multiTask(char **data, const int size)
+int mt(char *input)
 {
-	int counter=0;
+	int str_len = 	0;
+	int counter	=	0;	
+	str_len = strlen(input);
 	
-	for(counter = 0;counter < size;counter++)
-		if(strlen(data[counter]) == 1 && data[counter][0] == '&')
+	for(counter = str_len;counter>0;counter--)
+	{
+		if(input[counter] == '&')
 		{
-			data[counter][0] = ' ';
+			
+			input[counter] = ' ';
 			return(1);
 		}
-		
-	return(0);
 	
+	}
+	
+	return(0);
+
 }
+
+
 //================== Catch exit Handler =======================================
 void catch_chld(const pid_t num)
 {
@@ -151,6 +159,24 @@ void catch_chld(const pid_t num)
 	printf("%ld.%06ld ,%ld.%06ld ,%d\n",sys_time,sys_timeu,usr_time,usr_timeu,exit_stat);
 }
 
+char **multiTask(char **data, const int size, int *mt_val )
+{
+	int counter=0;
+	
+	(*mt_val) = 0;
+	
+	for(counter = 0;counter < size;counter++)
+		if(strlen(data[counter]) == 1 && data[counter][0] == '&')
+		{
+			printf("Try to change\n");
+			data[counter][0] = ' ';
+			(*mt_val) = 1;
+			return(data);
+		}
+		
+	return(data);
+	
+}
 //=============================================================================
 void del_new_line(char *string)
 {
@@ -224,11 +250,16 @@ int main()
 			continue;
 		
 		}
+		
+		//multi_task = mt(input);
 		//	covert command line to array
 		vector_param = commandArr(input,&size);
 		
 		//	check if have & in array/ remove them
-		multi_task = multiTask(vector_param,size);
+		
+		//multi_task = multiTask(vector_param,size);
+		vector_param =  multiTask(vector_param,size,&multi_task);
+		print_arr_t(vector_param,size);
 		//	add to array NULL on end of array
 		vector_param = addTostr(vector_param,&size);		
 		
