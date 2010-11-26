@@ -2,15 +2,17 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/time.h>
+#include <sys/resource.h>	//	for russage
 #include "mem.h"
 
 
 
 #define MAX_INPUT_LEN 30
 
+	struct rusage u_rusage;
 
-
-
+int status = 0;
 
 void print_arr_t(char **data,const int size)
 {
@@ -106,22 +108,15 @@ char **commandArr(const char input[], int *size)
 				}
 			
 				temp[space_counter] = new_string;
-			
-
 				string_start = sit+1;	//	set left from space next char
-
 				space_counter++;		//	counter of strings counted
 				return_temp = temp;
 			}			
-			
 		}
-
 	
 		if(input[sit] == '\0')		//	if and of string exit from cycle
 			break;
 	}
-	
-	//printf("Found : %d .\n", space_counter);
 	
 	(*size) = space_counter;
 	
@@ -143,20 +138,20 @@ int multiTask(char **data, const int size)
 	return(0);
 	
 }
-
-void catch_chld(const int num)
+//================== Catch exit Handler =======================================
+void catch_chld(const pid_t num)
 {
-	int sys_time = 0;
-	int usr_time = 0;
-	int exit_stat= 0;
-	printf("CHILD NUMBER:%d\t",num);
+	long sys_time = u_rusage.ru_stime.tv_sec;
+	long sys_timeu =  u_rusage.ru_stime.tv_usec;
+	long usr_time = u_rusage.ru_utime.tv_sec;
+	long usr_timeu =  u_rusage.ru_utime.tv_usec;
+	int exit_stat= status;
+
 	
-	printf("ppid %d\t", getppid());
-	printf("pid %d\n", getpid());
-	
-	printf("%d ,%d ,%d\n",sys_time,usr_time,exit_stat);
+	printf("%ld.%06ld ,%ld.%06ld ,%d\n",sys_time,sys_timeu,usr_time,usr_timeu,exit_stat);
 }
 
+//=============================================================================
 void del_new_line(char *string)
 {
 	int str_len	=	0;			//	string len variable		
@@ -211,8 +206,10 @@ int main()
 	int size=0;	
 	char **vector_param = NULL;
 	int multi_task = 0;
-	pid_t status ;
+	pid_t child_pid;
+	//int status = 0;
 	
+	setHendlerOptions();
 	
 	getstring(input,MAX_INPUT_LEN);
 	
@@ -236,19 +233,27 @@ int main()
 		vector_param = addTostr(vector_param,&size);		
 		
 		
-		status = fork();
+		child_pid = fork();
 
 		
 		if(fork <0)
 			exit(EXIT_FAILURE);
-		else if(status == 0)
-			exec(vector_param,size);
-		else if(status > 0)
+		else if(child_pid == 0)
 		{
+
+			exec(vector_param,size);
+		}
+		else if(child_pid > 0)
+		{
+			
 			if(multi_task)
-				printf("\nEnter to MULTI TASK MODE\n");
+				while (wait4(child_pid, &status, 0,&u_rusage) > 0 ) printf("One more child dead.\n");
 			else
-				wait4(&status);
+				//while (
+				wait4(child_pid, &status, 0,&u_rusage);// > 0 ) printf("One more child dead.\n");
+		//		printf("\nEnter to MULTI TASK MODE\n");
+		//	else
+//				wait4(&child_pid);
 			free_arr(vector_param,size);
 		}
 		
