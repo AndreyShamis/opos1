@@ -2,6 +2,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/types.h>
 #include <sys/time.h>
 #include <sys/resource.h>	//	for russage
 #include "mem.h"
@@ -11,8 +12,7 @@
 #define MAX_INPUT_LEN 30
 
 	struct rusage u_rusage;
-
-int status = 0;
+	int status = 0;
 
 void print_arr_t(char **data,const int size)
 {
@@ -173,12 +173,18 @@ void del_new_line(char *string)
 }
 
 
-void getstring(char *input,const int max_size)
+int getstring(char *input,const int max_size)
 {
 	if(fgets(input,max_size,stdin) != NULL)
+	{	
 		del_new_line(input);
+		return(1);
+	}
 	else
-		input = NULL;	
+	{
+		input = NULL;
+		return(0);
+	}	
 }
 
 int mt(char *input)
@@ -190,7 +196,7 @@ int mt(char *input)
     
     for(counter = str_len;counter>0;counter--)
     {
-        if(input[counter] == '&')
+        if(input[counter] == '&' && input[counter-1] == ' ')
         {                
             input[counter] = ' ';
             return(1);
@@ -206,8 +212,10 @@ void exec(char **vector_param,const int size)
 	
 	exec_stat = execvp(vector_param[0],vector_param); 
 
+	//	clean memory
 	free_arr(vector_param,size);
-		
+	
+	//	if execvp fail
 	if(exec_stat)
 		exit(EXIT_FAILURE);
 	else
@@ -227,20 +235,19 @@ void setHendlerOptions()
 
 }
 
-int main()
-{	
+void cycle()
+{
+
 	char input[MAX_INPUT_LEN];
 	int size=0;	
 	char **vector_param = NULL;
 	int multi_task = 0;
 	pid_t child_pid;
-	//int status = 0;
 	
-	setHendlerOptions();
+	//	get input and delete \n symbol on the end of input
 	
-	getstring(input,MAX_INPUT_LEN);
 	
-	while(input != NULL)
+	while(getstring(input,MAX_INPUT_LEN))
 	{
 	
 		if(!strcmp(input,"exit"))
@@ -249,49 +256,53 @@ int main()
 		{
 			getstring(input,MAX_INPUT_LEN);
 			continue;
-		
 		}
 		
 		//	check if have / remove them / set multi task true
-				
 		multi_task = mt(input);
-		
+
 		//	covert command line to array
 		vector_param = commandArr(input,&size);
 		
-			//print_arr_t(vector_param , size);
 		//	add to array NULL on end of array
 		vector_param = addTostr(vector_param,&size);		
-		
-		
+			
 		child_pid = fork();
-
 		
 		if(fork <0)
 			exit(EXIT_FAILURE);
 		else if(child_pid == 0)
 		{
-
-			exec(vector_param,size);
+			exec(vector_param,size);	//	do execvp with vector param
+			//if(multi_task)		
+			//	wait4(child_pid,&status,WNOHANG,&u_rusage);
+			
 		}
 		else if(child_pid > 0)
 		{
-			
-			if(multi_task)
-				wait4(0, &status, 0,&u_rusage);
-			else
-				//while (
-				wait4(child_pid, &status, 0,&u_rusage);// > 0 ) printf("One more child dead.\n");
-		//		printf("\nEnter to MULTI TASK MODE\n");
-		//	else
-//				wait4(&child_pid);
 			free_arr(vector_param,size);
-		}
-		
-		getstring(input,MAX_INPUT_LEN);
+			
+			if(!multi_task)
+				wait3(&status, 0,&u_rusage);
+			//else
+			//	wait4(child_pid,&status,WNOHANG,&u_rusage);
 				
+			//	get input and delete \n symbol on the end of input
+			//getstring(input,MAX_INPUT_LEN);	
+		}		
 	}	
+	while(wait4(-1, &status,WUNTRACED ,&u_rusage) > 0)
+	{
+		printf("\n\nLOL\n\n");
+	}
 
+}
+
+int main()
+{	
+	
+	setHendlerOptions();
+	cycle();
 	puts("Bye-Bye");		
 	return(EXIT_SUCCESS);
 }
