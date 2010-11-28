@@ -2,9 +2,6 @@ all:		mem.o ex1a.o ex1b.o shell.o
 			gcc mem.o shell.o ex1a.o -o ex1a
 			gcc mem.o shell.o ex1b.o -o ex1b
 
-#ex1b:		mem.o shell.o ex1b.o
-#			gcc mem.o shell.o ex1b.o -o	ex1b
-
 ex1a.o:		ex1a.c ex1a.h
 			gcc -Wall -c ex1a.c
 

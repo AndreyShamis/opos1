@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include <errno.h>
+#include <signal.h>
 #include <sys/resource.h>	//	for russage
 #include "mem.h"
 
