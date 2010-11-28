@@ -20,7 +20,7 @@ int status ;
 void del_new_line(char *string);
 
 //================== Catch exit Handler =======================================
-void catch_chld(const pid_t num);
+void catch_chld(pid_t num);
 
 char **commandArr(const char input[], int *size);
 

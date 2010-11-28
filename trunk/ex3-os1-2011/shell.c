@@ -6,7 +6,6 @@
 //#############################################################################
 
 
-
 char *substr(const char *string, const int start,const int len)
 {
 	char *temp = NULL;
@@ -100,15 +99,21 @@ char **commandArr(const char input[], int *size)
 }
 
 //================== Catch exit Handler =======================================
-void catch_chld(const pid_t num)
+void catch_chld(pid_t num)
 {
+
+
+	while(wait4(-1,&status,WNOHANG,&u_rusage) > 0)
+	{
+		;
+		//getrusage(num,&u_rusage);
+		//printf("lol\n Status:%d\n Num %d\n",status,num);
+	}
 	long sys_time = u_rusage.ru_stime.tv_sec;
 	long sys_timeu =  u_rusage.ru_stime.tv_usec;
 	long usr_time = u_rusage.ru_utime.tv_sec;
 	long usr_timeu =  u_rusage.ru_utime.tv_usec;
 	int exit_stat= status;
-
-	
 	printf("%ld.%06ld ,%ld.%06ld ,%d\n",sys_time,sys_timeu,usr_time,usr_timeu,exit_stat);
 	
 }
@@ -213,11 +218,6 @@ void cycle()
 	
 		if(!strcmp(input,"exit"))
 			break;
-		//else if(!strcmp(input,""))
-		//{
-		//	getstring(input,MAX_INPUT_LEN);
-		//	continue;
-		//}
 		
 		//	check if have / remove them / set multi task true
 		multi_task = multi_tsk(input);
@@ -240,15 +240,11 @@ void cycle()
 			
 			if(!multi_task)
 				wait4(child_pid,&status, 0,&u_rusage);
-			else//| WUNTRACED ,,WCONTINUED WNOHANG
-				wait4(child_pid,&status, WNOHANG ,&u_rusage);
+			//else//| WUNTRACED ,,WCONTINUED WNOHANG
+			//	wait4(child_pid,&status, WNOHANG && WUNTRACED ,&u_rusage);
 
 		}		
 	}	
-//	while(wait4(-1, &status,WUNTRACED ,&u_rusage) > 0)
-//	{
-//		printf("\n\nLOL\n\n");
-//	}
 
 }
 
