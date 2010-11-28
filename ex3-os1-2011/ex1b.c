@@ -19,6 +19,10 @@ int main()
 
 void catch_int(int num)
 {
+	while(wait4(-1,&status,WNOHANG,&u_rusage) > 0)
+	{
+		printf("Cheto%d",num);
+	}
 	printf("catch_int\n");
 
 }

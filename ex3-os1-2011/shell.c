@@ -236,6 +236,7 @@ void cycle()
 			exec(vector_param,size);	//	do execvp with vector param
 		else if(child_pid > 0)
 		{
+			
 			free_arr(vector_param,size);
 			
 			if(!multi_task)
