@@ -102,13 +102,13 @@ char **commandArr(const char input[], int *size)
 void catch_chld(pid_t num)
 {
 
-
-	while(wait4(-1,&status,WNOHANG,&u_rusage) > 0)
-	{
-		;
+	wait4(-1,&status,WNOHANG,&u_rusage) ;
+	//while(> 0)
+	//{
+		//;
 		//getrusage(num,&u_rusage);
 		//printf("lol\n Status:%d\n Num %d\n",status,num);
-	}
+	//}
 	long sys_time = u_rusage.ru_stime.tv_sec;
 	long sys_timeu =  u_rusage.ru_stime.tv_usec;
 	long usr_time = u_rusage.ru_utime.tv_sec;
@@ -143,7 +143,7 @@ int getstring(char *input,const int max_size)
 	else
 	{
 		//input = NULL;
-		printf("Can not read. Pid: %d\n",getpid());
+		//printf("Can not read. Pid: %d\n",getpid());
 		return(0);
 	}	
 }
@@ -218,14 +218,19 @@ void cycle()
 	
 		if(!strcmp(input,"exit"))
 			break;
-		
-		//	check if have / remove them / set multi task true
+		else if(!strcmp(input,"bg"))
+		{
+			
+			kill(child_pid,SIGCONT);
+			continue;
+		}
+		//	check if have & / remove them / set multi task true
 		multi_task = multi_tsk(input);
 
 		//	covert command line to array
 		vector_param = commandArr(input,&size);
 		
-		//	add to array NULL on end of array
+		//	add to array NULL on the end of array
 		vector_param = addTostr(vector_param,&size);		
 			
 		child_pid = fork();
