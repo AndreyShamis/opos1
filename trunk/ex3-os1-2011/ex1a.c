@@ -27,6 +27,8 @@ void catch_chld(pid_t num)
 	printf("%ld.%06ld ,%ld.%06ld ,%d\n",sys_time,sys_timeu,usr_time,usr_timeu,exit_stat);
 	
 }
+
+//=============================================================================
 void print_arr_t(char **data,const int size)
 {
 	int i=0,x=0;
@@ -49,7 +51,7 @@ void print_arr_t(char **data,const int size)
 	printf("============================================================\n");
 }
 
-
+//=============================================================================
 void setHendlerOptions()
 {
 	//	handler block 
@@ -63,6 +65,7 @@ void setHendlerOptions()
 
 }
 
+//=============================================================================
 void cycle()
 {
 
@@ -111,6 +114,7 @@ void cycle()
 
 }
 
+//=============================================================================
 int main()
 {	
 	
