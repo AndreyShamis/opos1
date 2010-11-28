@@ -7,21 +7,24 @@
 struct rusage u_rusage;
 int status ;
 
-int grp_id;
+int stoped_id;
 
 //================== Catch exit Handler =======================================
 void catch_chld(pid_t num)
 {
 
-	wait4(-1,&status,WNOHANG,&u_rusage) ;
-
-	long sys_time = u_rusage.ru_stime.tv_sec;
-	long sys_timeu =  u_rusage.ru_stime.tv_usec;
-	long usr_time = u_rusage.ru_utime.tv_sec;
-	long usr_timeu =  u_rusage.ru_utime.tv_usec;
-	int exit_stat= status;
-	printf("%ld.%06ld ,%ld.%06ld ,%d\n",sys_time,sys_timeu,usr_time,usr_timeu,exit_stat);
-	
+	if(!WIFSTOPPED(status))
+	{
+		wait4(-1,&status,WNOHANG,&u_rusage) ;
+		stoped_id = 0;
+		long sys_time = u_rusage.ru_stime.tv_sec;
+		long sys_timeu =  u_rusage.ru_stime.tv_usec;
+		long usr_time = u_rusage.ru_utime.tv_sec;
+		long usr_timeu =  u_rusage.ru_utime.tv_usec;
+		int exit_stat= status;
+		printf("%ld.%06ld ,%ld.%06ld ,%d\
+		\n",sys_time,sys_timeu,usr_time,usr_timeu,exit_stat);
+	}
 }
 
 
@@ -31,7 +34,7 @@ void catch_int(int num)
 {
 	setHandler();
 
-	printf("catch_int\n");
+	//printf("catch_int\n");
 
 }
 
@@ -70,7 +73,7 @@ void cycle()
 		//		exit(EXIT_FAILURE);
 		//		
 		//	}
-		//	grp_id = getpgrp();
+		//	stoped_id = getpgrp();
 		//	printf("New group %d\n",getpgrp());
 
 	char input[MAX_INPUT_LEN];
@@ -89,13 +92,17 @@ void cycle()
 			break;
 		else if(!strcmp(input,"bg"))
 		{
+			if(stoped_id)
+			{
+				kill(stoped_id,SIGCONT);
 			
-			kill(grp_id,SIGCONT);
+				printf("Try %d\n",stoped_id);
 			
-			printf("Try %d\n",grp_id);
+				wait3(&status, WUNTRACED,&u_rusage);
+			}
 			
-			wait3(&status, WUNTRACED,&u_rusage);
 			continue;
+			
 		}
 		//	check if have & / remove them / set multi task true
 		multi_task = multi_tsk(input);
@@ -119,8 +126,8 @@ void cycle()
 		{
 			
 			free_arr(vector_param,size);
-			grp_id = child_pid;
-			printf("Main aba %d\n",grp_id);
+			stoped_id = child_pid;
+			printf("Main aba %d\n",stoped_id);
 			if(!multi_task)
 				wait3(&status, WUNTRACED,&u_rusage);
 			//else//| WUNTRACED ,,WCONTINUED WNOHANG
