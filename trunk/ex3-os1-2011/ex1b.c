@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "shell.h"
+#include "ex1b.h"
 
 
 struct rusage u_rusage;
@@ -13,12 +14,7 @@ void catch_chld(pid_t num)
 {
 
 	wait4(-1,&status,WNOHANG,&u_rusage) ;
-	//while(> 0)
-	//{
-		//;
-		//getrusage(num,&u_rusage);
-		//printf("lol\n Status:%d\n Num %d\n",status,num);
-	//}
+
 	long sys_time = u_rusage.ru_stime.tv_sec;
 	long sys_timeu =  u_rusage.ru_stime.tv_usec;
 	long usr_time = u_rusage.ru_utime.tv_sec;
@@ -33,25 +29,16 @@ void catch_chld(pid_t num)
 
 void catch_int(int num)
 {
-	while(waitpid(-1,&status,WNOHANG) > 0)
-	{
-		printf("Cheto%d",num);
-	}
+	setHandler();
+
 	printf("catch_int\n");
 
 }
 
 void catch_stop(int num)
 {
-	//int grp = 0;//getpgrp();
+	setHandler();
 
-	//kill(grp_id,SIGTSTP);
-	//grp_id = grp;
-	//if(killpg(grp_id,SIGTSTP) != 0)
-	//{
-	//	printf("Kill !!= 0\n");
-	//}
-	//printf("Catch stop - Grp: %d , grp_id %d\n",grp,grp_id);
 }
 
 void setHandler()
@@ -104,7 +91,10 @@ void cycle()
 		{
 			
 			kill(grp_id,SIGCONT);
+			
 			printf("Try %d\n",grp_id);
+			
+			wait3(&status, WUNTRACED,&u_rusage);
 			continue;
 		}
 		//	check if have & / remove them / set multi task true
