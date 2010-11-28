@@ -27,23 +27,22 @@ void catch_chld(pid_t num)
 	}
 }
 
-
-
-
+//=============================================================================
 void catch_int(int num)
 {
 	setHandler();
-
-	//printf("catch_int\n");
+	printf("\n");			//	print new line for neauty
 
 }
 
+//=============================================================================
 void catch_stop(int num)
 {
 	setHandler();
-
+	//printf("\n");			//	print new line for neauty
 }
 
+//=============================================================================
 void setHandler()
 {
 	signal(SIGTSTP,catch_stop);
@@ -51,6 +50,7 @@ void setHandler()
 
 }
 
+//=============================================================================
 void setHendlerOptions()
 {
 	//	handler block 
@@ -64,26 +64,15 @@ void setHendlerOptions()
 
 }
 
+//=============================================================================
 void cycle()
 {
 
-		//	if(setpgrp() !=0)
-		//	{
-		//		perror("Can not setpgrp()\n");
-		//		exit(EXIT_FAILURE);
-		//		
-		//	}
-		//	stoped_id = getpgrp();
-		//	printf("New group %d\n",getpgrp());
-
-	char input[MAX_INPUT_LEN];
-	int size=0;	
-	char **vector_param = NULL;
-	int multi_task = 0;
-	pid_t child_pid;
-	
-	//	get input and delete \n symbol on the end of input
-	
+	char 	input[MAX_INPUT_LEN];
+	int 	size=0;	
+	char 	**vector_param = NULL;
+	int 	multi_task = 0;
+	pid_t 	child_pid;	
 	
 	while(getstring(input,MAX_INPUT_LEN))
 	{
@@ -118,21 +107,20 @@ void cycle()
 		if(fork <0)
 			exit(EXIT_FAILURE);
 		else if(child_pid == 0)
-		{
-
 			exec(vector_param,size);	//	do execvp with vector param
-		}
 		else if(child_pid > 0)
 		{
 			
 			free_arr(vector_param,size);
-			stoped_id = child_pid;
-			printf("Main aba %d\n",stoped_id);
+			//printf("Main aba %d\n",stoped_id);
 			if(!multi_task)
+			{
+				stoped_id = child_pid;
 				wait3(&status, WUNTRACED,&u_rusage);
+			}
 			//else//| WUNTRACED ,,WCONTINUED WNOHANG
 			//	wait4(child_pid,&status, WNOHANG && WUNTRACED ,&u_rusage);
-	           if (WIFEXITED(status)) {
+	    /*       if (WIFEXITED(status)) {
                    printf("exited, status=%d\n", WEXITSTATUS(status));
                } else if (WIFSIGNALED(status)) {
                    printf("killed by signal %d\n", WTERMSIG(status));
@@ -141,13 +129,14 @@ void cycle()
                } else if (WIFCONTINUED(status)) {
                    printf("continued\n");
                }
-
+*/
 
 		}		
 	}	
 
 }
 
+//=============================================================================
 int main()
 {	
 	setHandler();

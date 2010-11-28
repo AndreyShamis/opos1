@@ -6,6 +6,7 @@
 //#############################################################################
 
 
+//=============================================================================
 char *substr(const char *string, const int start,const int len)
 {
 	char *temp = NULL;
@@ -33,7 +34,7 @@ char *substr(const char *string, const int start,const int len)
 	
 }
 
-
+//=============================================================================
 char **addTostr(char **arr,int *size)
 {
 	char 	**temp = NULL;
@@ -48,6 +49,8 @@ char **addTostr(char **arr,int *size)
 	
 	
 }
+
+//=============================================================================
 char **commandArr(const char input[], int *size)
 {
 	char **temp			=	NULL;
@@ -98,8 +101,6 @@ char **commandArr(const char input[], int *size)
 	
 }
 
-
-
 //=============================================================================
 void del_new_line(char *string)
 {
@@ -114,7 +115,7 @@ void del_new_line(char *string)
 		
 }
 
-
+//=============================================================================
 int getstring(char *input,const int max_size)
 {
 	if(fgets(input,max_size,stdin) != NULL)
@@ -130,6 +131,7 @@ int getstring(char *input,const int max_size)
 	}	
 }
 
+//=============================================================================
 int multi_tsk(char *input)
 {
     int str_len 	=  	0;
@@ -149,6 +151,7 @@ int multi_tsk(char *input)
 
 }
 
+//=============================================================================
 void exec(char **vector_param,const int size)
 {
 	int exec_stat = 0;	//	exec status exit parameter
