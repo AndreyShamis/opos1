@@ -1,24 +1,24 @@
 #include <stdio.h>
 #include <string.h>
 #include "shell.h"
+#include "ex1a.h"
 
-struct rusage u_rusage;
-int status ;
-
-int grp_id;
-
+//=============================================================================
+int main()
+{	
+	
+	setHendlerOptions();
+	cycle();
+	puts("Bye-Bye");		
+	return(EXIT_SUCCESS);
+}
 
 //================== Catch exit Handler =======================================
 void catch_chld(pid_t num)
 {
 
 	wait4(-1,&status,WNOHANG,&u_rusage) ;
-	//while(> 0)
-	//{
-		//;
-		//getrusage(num,&u_rusage);
-		//printf("lol\n Status:%d\n Num %d\n",status,num);
-	//}
+
 	long sys_time = u_rusage.ru_stime.tv_sec;
 	long sys_timeu =  u_rusage.ru_stime.tv_usec;
 	long usr_time = u_rusage.ru_utime.tv_sec;
@@ -28,41 +28,11 @@ void catch_chld(pid_t num)
 	
 }
 
-//=============================================================================
-void print_arr_t(char **data,const int size)
-{
-	int i=0,x=0;
-
-
-	printf("PRINT SIZE: %d\n",size);
-	
-	for(i=0;i<size;i++)
-	{
-		if(data[i] != NULL)
-		{
-			for(x=0;x<strlen(data[i]);x++)
-			{	
-				printf("%c.",data[i][x]);
-			
-			}
-		}
-		printf("\n");
-	}
-	printf("============================================================\n");
-}
 
 //=============================================================================
 void setHendlerOptions()
 {
-	//	handler block 
 	signal(SIGCHLD,catch_chld);
-//	struct sigaction act;
-//	act.sa_handler = catch_chld;
-//	sigfillset(&act.sa_mask);
-//	act.sa_flags = 0; 				//	do every time
-//	sigaction(SIGCHLD,&act,NULL);
-
-
 }
 
 //=============================================================================
@@ -114,13 +84,5 @@ void cycle()
 
 }
 
-//=============================================================================
-int main()
-{	
-	
-	setHendlerOptions();
-	cycle();
-	puts("Bye-Bye");		
-	return(EXIT_SUCCESS);
-}
+
 

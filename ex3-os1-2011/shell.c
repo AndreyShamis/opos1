@@ -1,52 +1,55 @@
 #include "shell.h"
 
 
-
-
-//#############################################################################
-
-
 //=============================================================================
+//	Function which geting string start position and len
+//	and return the substring by lentgh and start
 char *substr(const char *string, const int start,const int len)
 {
-	char *temp = NULL;
-	int counter=0;
-	int len_self=0;
-	int string_len = strlen(string); 
+	char 	*temp = NULL;				//	pointer to string	
+	int 	counter=0;					//	counter for FOR
+	int 	len_self=0;					//	helper variable
+	int 	string_len = strlen(string);//	helper variable for str len
 	
+	//	check if needed len is correct
 	if(len > string_len || len <0)
 		len_self = string_len - start - 1;
-	else if (len == 0)
-		return(NULL);
-	else
-		len_self = len;
+	else if (len == 0)		//	if len zero(dont need str)return string NULL
+		return((char *)NULL);
+	else					//	else set helper variable be len 
+		len_self = len;	
 
-	//printf("Start: %d , Len: %d , SELF LEN: %d; Used: %d\n",start,len,len_self,len_self+1);
-		
+	//	create the string space in memory
 	temp = alloc_string(len_self+1);
 	
+	//	copy every char needed to new string
 	for(counter = 0 ;counter < len_self;counter++)
 		temp[counter] = string[start+counter];
 	
+	//	put on the end null terminated char
 	temp[len_self] = '\0';
 	
+	//	return the new string
 	return(temp);
 	
 }
 
 //=============================================================================
+//	function wich geted array of string and size of him
+//	and created new string in this array and puted in the end the NULL
+//	which used in execvp
+//	return new array of strings with NULL on the end
 char **addTostr(char **arr,int *size)
 {
-	char 	**temp = NULL;
+	char 	**temp 	= 	NULL;		//	varaiable be returned
 	
-	temp = alloc_cell((*size)+1);
-	copy_arr(temp,arr,*size);
-	free(arr);
-	temp[*size] = (char *) NULL;
-	(*size)++;
+	temp = alloc_cell((*size)+1); 	//	recreate the array of strings
+	copy_arr(temp,arr,*size);		//	copy from old array to new array
+	free(arr);						//	free old array
+	temp[*size] = (char *) NULL;	//	put on the NULL
+	(*size)++;						//	increase counter
 	
 	return(temp);
-	
 	
 }
 
@@ -102,16 +105,18 @@ char **commandArr(const char input[], int *size)
 }
 
 //=============================================================================
+//	function which getting string and delete the \n ion the of string
+//	used after fgets which put \n on the and
+//	return string without \n in pointer variable
 void del_new_line(char *string)
 {
-	int str_len	=	0;			//	string len variable		
-	//	get line of string
-	str_len = strlen(string);
-	//	put null terminated symbol to \n
+	int str_len	=	0;				//	string len variable		
 	
-	//	if user  not input nothing
-	if(str_len > 1)
-		string[str_len-1] = '\0';
+	str_len = strlen(string);		//	get line of string
+	
+						
+	if(str_len > 1)					//	if user  not input nothing
+		string[str_len-1] = '\0';	//	put null terminated symbol to \n
 		
 }
 
@@ -123,12 +128,9 @@ int getstring(char *input,const int max_size)
 		del_new_line(input);
 		return(1);
 	}
-	else
-	{
-		//input = NULL;
-		//printf("Can not read. Pid: %d\n",getpid());
-		return(0);
-	}	
+		
+	return(0);
+	
 }
 
 //=============================================================================
@@ -147,6 +149,7 @@ int multi_tsk(char *input)
             return(1);
     	}	
     }
+    
     return(0);
 
 }

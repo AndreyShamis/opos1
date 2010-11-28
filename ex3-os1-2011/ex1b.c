@@ -3,12 +3,15 @@
 #include "shell.h"
 #include "ex1b.h"
 
-
-struct rusage u_rusage;
-int status ;
-
-int stoped_id;
-
+//=============================================================================
+int main()
+{	
+	setHandler();
+	setHendlerOptions();
+	cycle();
+	puts("Bye-Bye");		
+	return(EXIT_SUCCESS);
+}
 //================== Catch exit Handler =======================================
 void catch_chld(pid_t num)
 {
@@ -53,15 +56,7 @@ void setHandler()
 //=============================================================================
 void setHendlerOptions()
 {
-	//	handler block 
 	signal(SIGCHLD,catch_chld);
-//	struct sigaction act;
-//	act.sa_handler = catch_chld;
-//	sigfillset(&act.sa_mask);
-//	act.sa_flags = 0; 				//	do every time
-//	sigaction(SIGCHLD,&act,NULL);
-
-
 }
 
 //=============================================================================
@@ -112,36 +107,15 @@ void cycle()
 		{
 			
 			free_arr(vector_param,size);
-			//printf("Main aba %d\n",stoped_id);
 			if(!multi_task)
 			{
 				stoped_id = child_pid;
 				wait3(&status, WUNTRACED,&u_rusage);
 			}
-			//else//| WUNTRACED ,,WCONTINUED WNOHANG
-			//	wait4(child_pid,&status, WNOHANG && WUNTRACED ,&u_rusage);
-	    /*       if (WIFEXITED(status)) {
-                   printf("exited, status=%d\n", WEXITSTATUS(status));
-               } else if (WIFSIGNALED(status)) {
-                   printf("killed by signal %d\n", WTERMSIG(status));
-               } else if (WIFSTOPPED(status)) {
-                   printf("stopped by signal %d\n", WSTOPSIG(status));
-               } else if (WIFCONTINUED(status)) {
-                   printf("continued\n");
-               }
-*/
 
 		}		
 	}	
 
 }
 
-//=============================================================================
-int main()
-{	
-	setHandler();
-	setHendlerOptions();
-	cycle();
-	puts("Bye-Bye");		
-	return(EXIT_SUCCESS);
-}
+
