@@ -2,7 +2,6 @@
 #define EX1A_SEC
 struct rusage u_rusage;
 int status ;
-int grp_id;
 
 
 //================== Catch exit Handler =======================================

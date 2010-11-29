@@ -54,52 +54,66 @@ char **addTostr(char **arr,int *size)
 }
 
 //=============================================================================
+//	function which geting input line without \n on the end of string
+//	convert the string to array of strings and separate them by space
+//	size it is pointer to know which size be the new array of string
+//	function retuned new array of strings
 char **commandArr(const char input[], int *size)
 {
-	char **temp			=	NULL;
-	char *new_string	=	NULL;
-	char **return_temp	=	NULL;
-	int sit=0;
-	int string_start = 0;
-	int space_counter=0;
-	char prev_char = '\0';
+	char 	**temp			=	NULL;	//	temp variable for array
+	char 	*new_string		=	NULL;	//	tem variable for string
+	char 	**return_temp	=	NULL;	//	variable be returned
+	int 	sit				=	0;		//	counter for fro
+	int 	string_start 	= 	0;		//	helper variable of start os string
+	int 	space_counter	=	0;		//	space counter
+	char	prev_char 		= 	'\0';	//	previuos char
 	
 	for(sit=0;sit<MAX_INPUT_LEN;sit++)
 	{
 		if((input[sit] == ' ' || input[sit] == '\0') && prev_char != ' ')
 		{			
+			//	create string
 			new_string =substr(input,string_start,sit-string_start);
 			
+			//	if created string not null
 			if(new_string != NULL)
 			{
-			
+				//	create new array
 				temp = alloc_cell(space_counter+1);
 		
+				//	check if have somthing in array be retuned
 				if(return_temp != NULL)
 				{
+					//	copy from old array to new
 					copy_arr(temp,return_temp,space_counter);
 					free(return_temp);
 				}
 			
+				//	put new string in new array
 				temp[space_counter] = new_string;
+				//	increase counter for new string
 				string_start = sit+1;	//	set left from space next char
+				//	increase space counter
 				space_counter++;		//	counter of strings counted
+				//	set retuned value to point to temp value
 				return_temp = temp;
 			}			
 		}
 		else if(prev_char == ' ' && prev_char == input[sit])
-		{
+		{	//	if have space after spce
 			string_start = sit+1;	
 		}
-	
+		//	set previous char
 		prev_char = input[sit];
 		
+		//	if and of line exit from for
 		if(input[sit] == '\0')		//	if and of string exit from cycle
 			break;
 	}
 	
+	//	update pointer of size
 	(*size) = space_counter;
-	
+	//	return value / return pointer to new array of strings
 	return(return_temp);
 	
 }
@@ -121,11 +135,16 @@ void del_new_line(char *string)
 }
 
 //=============================================================================
+//	function which know to get string
+//	function geting pointer to string where this string be puted
+//	geting the max size string which can get
+//	return true if seccess
+//	return false in not
 int getstring(char *input,const int max_size)
 {
 	if(fgets(input,max_size,stdin) != NULL)
 	{	
-		del_new_line(input);
+		del_new_line(input);		//	delete \n from string
 		return(1);
 	}
 		
@@ -134,19 +153,22 @@ int getstring(char *input,const int max_size)
 }
 
 //=============================================================================
+//	function which get input string check if in string we have &
+//	if yes delete him from string and return true
+//	else return false
 int multi_tsk(char *input)
 {
-    int str_len 	=  	0;
-    int counter     =	0;
+    int str_len 	=  	0;			//	helper variable to know string len
+    int counter     =	0;			//	counter of charckter
       
-    str_len = strlen(input);
+    str_len = strlen(input);		//	get len of string
     
     for(counter = str_len;counter>0;counter--)
     {
         if(input[counter] == '&' && input[counter-1] == ' ')
         {                
-            input[counter] = ' ';
-            return(1);
+            input[counter] = ' ';	//	put space in &
+            return(1);				//	return true
     	}	
     }
     
@@ -155,6 +177,9 @@ int multi_tsk(char *input)
 }
 
 //=============================================================================
+//	fucntion which do execvp with parameters geted in array of string
+//	and also get size of this array
+//	nithing be returned
 void exec(char **vector_param,const int size)
 {
 	int exec_stat = 0;	//	exec status exit parameter
