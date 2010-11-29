@@ -91,6 +91,7 @@ void cycle()
 			break;							//	exit from while
 		else if(!strcmp(input,"bg"))		//	check if user send "bg"
 		{
+			//	check if have some body in background and him pid not 0
 			if(backgrdnd == 1 && stoped_id != 0)
 			{
 				backgrdnd = 0;				//	reset to know if can put some
@@ -125,16 +126,15 @@ void cycle()
 		{
 			
 			free_arr(vector_param,size);
-			if(!multi_task)
+			if(!multi_task)				//	if not multi task process
 			{
-				if(backgrdnd == 0)
-				{
-					//backgrdnd = 0;
-					stoped_id = child_pid;
-					setHandler();
+				if(backgrdnd == 0)		//	check if dont have process
+				{						//	in background
+					stoped_id = child_pid;	//	set global pid
+					setHandler();			//	reset handlers
 				}
 				else
-					signal(SIGTSTP,SIG_IGN);
+					signal(SIGTSTP,SIG_IGN);//	can not send SIGTSTP
 					
 				wait3(&status, WUNTRACED,&u_rusage);
 				
