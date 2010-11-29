@@ -7,10 +7,10 @@
 int main()
 {	
 	
-	setHendlerOptions();
-	cycle();
-	puts("Bye-Bye");		
-	return(EXIT_SUCCESS);
+	setHendlerOptions();			//	set handler
+	cycle();						//	enter to main cycle-function in shell
+	puts("Bye-Bye");				//	put bye bye
+	return(EXIT_SUCCESS);			//	exit
 }
 
 //================== Catch exit Handler =======================================
@@ -24,7 +24,8 @@ void catch_chld(pid_t num)
 	long usr_time = u_rusage.ru_utime.tv_sec;
 	long usr_timeu =  u_rusage.ru_utime.tv_usec;
 	int exit_stat= status;
-	printf("%ld.%06ld ,%ld.%06ld ,%d\n",sys_time,sys_timeu,usr_time,usr_timeu,exit_stat);
+	printf("%ld.%06ld ,%ld.%06ld ,%d \
+	\n",sys_time,sys_timeu,usr_time,usr_timeu,exit_stat);
 	
 }
 
@@ -38,15 +39,12 @@ void setHendlerOptions()
 //=============================================================================
 void cycle()
 {
+	char 	input[MAX_INPUT_LEN];			//	variable for input
+	int 	size				=	0;		//	size of string array
+	char 	**vector_param 		= 	NULL;	//	string array
+	int 	multi_task 			= 	0;		//	have multi task process now
+	pid_t 	child_pid;						//	child process id
 
-	char input[MAX_INPUT_LEN];
-	int size=0;	
-	char **vector_param = NULL;
-	int multi_task = 0;
-	pid_t child_pid;
-	
-	//	get input and delete \n symbol on the end of input
-	
 	
 	while(getstring(input,MAX_INPUT_LEN))
 	{
@@ -66,23 +64,21 @@ void cycle()
 		child_pid = fork();
 		
 		if(fork <0)
-			exit(EXIT_FAILURE);
+		{
+			perror("Can not fork()\n");	//	print error
+			exit(EXIT_FAILURE);			//	exit
+		}
 		else if(child_pid == 0)
 			exec(vector_param,size);	//	do execvp with vector param
 		else if(child_pid > 0)
 		{
 			
-			free_arr(vector_param,size);
+			free_arr(vector_param,size);//	clear memory
 			
-			if(!multi_task)
+			if(!multi_task)				//	if not multi task
 				wait4(child_pid,&status, 0,&u_rusage);
-			//else//| WUNTRACED ,,WCONTINUED WNOHANG
-			//	wait4(child_pid,&status, WNOHANG && WUNTRACED ,&u_rusage);
-
 		}		
 	}	
 
 }
-
-
-
+//======================= END OF FILE =========================================
