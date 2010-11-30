@@ -35,7 +35,7 @@ void catch_chld(pid_t num)
 		printf("%ld.%06ld ,%ld.%06ld ,%d \
 		\n",sys_time,sys_timeu,usr_time,usr_timeu,exit_stat);
 	
-		status = -1;
+		status = 0;
 	}
 
 }
@@ -125,6 +125,7 @@ void cycle()
 		}
 		else if(child_pid == 0)
 		{
+			status = 0;
 			if(multi_task)
 			{
 				//	if son run whith & set ignore signal
@@ -132,6 +133,7 @@ void cycle()
 				signal(SIGINT,SIG_IGN);		//	can not send SIGINT		
 			
 			}
+				
 			exec(vector_param,size);	//	do execvp with vector param
 		}
 		else if(child_pid > 0)
