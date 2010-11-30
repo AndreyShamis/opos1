@@ -89,6 +89,8 @@ void cycle()
 	
 		if(!strcmp(input,"exit"))
 			break;							//	exit from while
+		else if(!strcmp(input,"\n"))
+			continue;
 		else if(!strcmp(input,"bg"))		//	check if user send "bg"
 		{
 			//	check if have some body in background and him pid not 0
