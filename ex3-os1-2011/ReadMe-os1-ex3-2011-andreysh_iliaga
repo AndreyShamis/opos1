@@ -36,4 +36,14 @@ In addition if process do some program in foreground you can kill the process
 by pressing CTRL+C. 
 
 //---------------------------------------------------------------------------//
+
+Files used
+
+ex3a.c		-	ex3a.h 				// First program
+ex3b.c 		-	ex3b.h       		// Second Program
+mem.c 		- 	mem.h               // File to work with memory
+shell.c		-	shell.h          	//	Shell main functions
+makefile  							//	makefile
+ReadMe-os1-ex3-2011-andreysh_iliaga	//	readme
+
 ===============================================================================

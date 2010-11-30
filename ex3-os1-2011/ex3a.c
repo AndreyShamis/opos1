@@ -63,7 +63,8 @@ void cycle()
 	
 		if(!strcmp(input,"exit"))
 			break;
-		
+		else if(!strcmp(input,"\n"))
+			continue;
 		//	check if have & / remove them / set multi task true
 		multi_task = multi_tsk(input);
 

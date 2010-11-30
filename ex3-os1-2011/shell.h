@@ -1,3 +1,10 @@
+//======================== DESCRIPTION ========================================
+//	this file is header for shell.c	which declare function used in shell.c
+//	the main function of this file is working whith entering string
+//	creating the array of string which will be sended in argv to
+//	function execvp after creation of child by function fork
+
+
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
