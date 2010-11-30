@@ -19,7 +19,7 @@ int main()
 void catch_chld(pid_t num)
 {
 
-	if(WIFEXITED(status))
+	if(!WEXITSTATUS(status) && !WIFSTOPPED(status)) 
 	{
 		wait3(&status,WNOHANG,&u_rusage) ;
 		
@@ -35,6 +35,7 @@ void catch_chld(pid_t num)
 		printf("%ld.%06ld ,%ld.%06ld ,%d \
 		\n",sys_time,sys_timeu,usr_time,usr_timeu,exit_stat);
 	
+		status = -1;
 	}
 
 }
@@ -100,7 +101,7 @@ void cycle()
 											//	to background
 				kill(stoped_id,SIGCONT);	//	send signal to continue
 				wait3(&status, WUNTRACED,&u_rusage);	//	wait him
-				setHandler();				//	reset handler by default
+				//setHandler();				//	reset handler by default
 			}
 			
 			continue;						//	contunue by while
@@ -123,25 +124,31 @@ void cycle()
 			exit(EXIT_FAILURE);			//	exit
 		}
 		else if(child_pid == 0)
+		{
+			if(multi_task)
+			{
+				//	if son run whith & set ignore signal
+				signal(SIGTSTP,SIG_IGN);	//	can not send SIGTSTP
+				signal(SIGINT,SIG_IGN);		//	can not send SIGINT		
+			
+			}
 			exec(vector_param,size);	//	do execvp with vector param
+		}
 		else if(child_pid > 0)
 		{
 			
 			free_arr(vector_param,size);
 			if(!multi_task)				//	if not multi task process
 			{
+			
 				if(backgrdnd == 0)		//	check if dont have process
-				{						//	in background
+										//	in background
 					stoped_id = child_pid;	//	set global pid
-					setHandler();			//	reset handlers
-				}
-				else
-					signal(SIGTSTP,SIG_IGN);//	can not send SIGTSTP
-					
+		
 				wait3(&status, WUNTRACED,&u_rusage);
 				
 			}
-
+			
 		}		
 	}	
 
