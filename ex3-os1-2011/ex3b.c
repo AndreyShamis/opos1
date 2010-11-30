@@ -103,7 +103,7 @@ void cycle()
 				wait3(&status, WUNTRACED,&u_rusage);	//	wait him
 				//setHandler();				//	reset handler by default
 			}
-			
+
 			continue;						//	contunue by while
 			
 		}
@@ -141,7 +141,7 @@ void cycle()
 			if(!multi_task)				//	if not multi task process
 			{
 			
-				if(backgrdnd == 0)		//	check if dont have process
+				if(backgrdnd == 0 )		//	check if dont have process
 										//	in background
 					stoped_id = child_pid;	//	set global pid
 		
