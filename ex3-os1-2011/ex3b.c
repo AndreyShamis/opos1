@@ -18,11 +18,14 @@ int main()
 //	handler function to know when child is exited
 void catch_chld(pid_t num)
 {
+	setHendlerOptions();				//	reset handler
+	
+	wait3(&status,WNOHANG,&u_rusage);	//	waiting for data
 
-	if(!WEXITSTATUS(status) && !WIFSTOPPED(status)) 
+	if(!WEXITSTATUS(status) && !WIFSTOPPED(status) && status>-1) 
 	{
-		wait3(&status,WNOHANG,&u_rusage) ;
 		
+	
 		//	variable help to know times 
 		//	like user time and sys time
 		long sys_time 	= 	u_rusage.ru_stime.tv_sec;
@@ -30,12 +33,12 @@ void catch_chld(pid_t num)
 		long usr_time 	= 	u_rusage.ru_utime.tv_sec;
 		long usr_timeu 	=  	u_rusage.ru_utime.tv_usec;
 		int exit_stat	= 	status;   // exit status
-	
-		//	print needed information
+
+		status = -1;					//	to know if it is exited
+		//	print needed information	
 		printf("%ld.%06ld ,%ld.%06ld ,%d \
-		\n",sys_time,sys_timeu,usr_time,usr_timeu,exit_stat);
+		\n",sys_time,sys_timeu,usr_time,usr_timeu,exit_stat);		
 	
-		status = 0;
 	}
 
 }
@@ -85,9 +88,10 @@ void cycle()
 	int 	multi_task 			= 	0;		//	have multi task process now
 	pid_t 	child_pid;						//	child process id
 	
+	status = 0;
 	while(getstring(input,MAX_INPUT_LEN))
 	{
-	
+		
 		if(!strcmp(input,"exit"))
 			break;							//	exit from while
 		else if(!strcmp(input,"\n"))
@@ -150,7 +154,10 @@ void cycle()
 				wait3(&status, WUNTRACED,&u_rusage);
 				
 			}
-			
+				else
+					status = 0;			//	to give options to print
+										//	exit time for process which was
+										//	run whith &			
 		}		
 	}	
 
