@@ -1,0 +1,49 @@
+/*
+ * EX3:: Simple SHELL (HAVE TWO PROGRAMS)
+ * ===========================================================================
+ * Writen by: Andrey Shamis,  id: 321470882, login: andreysh
+ * and:       Ilia Gaisinsky, id: 309480051, login: iliaga
+ * ===========================================================================
+ *
+ * ===========================================================================
+ *
+ *		to compile : make
+ *		command make know to compile both rpograms
+ *
+ *		to run:	./ex3a  or ./ex3b	
+ *
+ */
+
+============================= EX3A ============================================
+This program is simple shell can run program and when runing program can be
+seted that the program running in multi taks mode.
+For this you need to add after program name &
+Exmple
+	ls &
+or
+	ls -l &
+To exit from program press CTRL+D or write exit.
+
+============================= EX3B ============================================
+This program sismilary to ex3a but:
+
+when you press CTRL+Z   the pragram will go to background
+and for take the program from background write command
+	bg
+if backgrod process exist the will be go to foreground.
+
+In addition if process do some program in foreground you can kill the process
+by pressing CTRL+C. 
+
+//---------------------------------------------------------------------------//
+
+Files used
+
+ex3a.c		-	ex3a.h 				// First program
+ex3b.c 		-	ex3b.h       		// Second Program
+mem.c 		- 	mem.h               // File to work with memory
+shell.c		-	shell.h          	//	Shell main functions
+makefile  							//	makefile
+ReadMe-os1-ex3-2011-andreysh_iliaga	//	readme
+
+===============================================================================
