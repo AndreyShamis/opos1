@@ -86,23 +86,27 @@ void cycle()
 				
 			
 		int i=0;
-		for(i=0;i<2;i++)
+		int fork_size = 0;
+		if(piped_en)
+			fork_size = 2;
+		else
+			fork_size = 1;
+			
+		cont_p = 0;
+		for(i=0;i<fork_size;i++)
 		{
 			if(piped_en)
 			{
-			
+				char *input_h;
 				if(cont_p == 0)
-				{
-					//	covert command line to array
-					vector_param = commandArr(substr(input,0,piped_en-1),&size);
-			
-				}
+					input_h=substr(input,0,piped_en-1);
 				else
-				{
-					vector_param = commandArr(substr(input,piped_en+2,strlen(input)-piped_en-2),&size);
-				}
+					input_h=substr(input,piped_en+2,strlen(input)-piped_en-2);
+				
+				//	covert command line to array
+				vector_param = commandArr(input_h,&size);
+				free(input_h);
 				cont_p++;
-			
 			}
 			else
 			{
@@ -114,21 +118,11 @@ void cycle()
 		
 			child_pid = fork();
 									
-			
 			if(fork <0)
 			{
 				perror("Can not fork()\n");	//	print error
 				exit(EXIT_FAILURE);			//	exit
-			}
-			else if(child_pid > 0)
-			{
-			
-				free_arr(vector_param,size);//	clear memory
-			
-				if(!multi_task && !piped_en)				//	if not multi task
-					wait4(child_pid,&status, 0,&u_rusage);
-				
-			}		
+			}	
 			else if(child_pid == 0)
 			{
 				if(piped_en && cont_p == 1)
@@ -158,9 +152,16 @@ void cycle()
 				
 				
 				exec(vector_param,size);	//	do execvp with vector param
-
-		
 			}
+			else if(child_pid > 0)
+			{
+			
+				free_arr(vector_param,size);//	clear memory
+			
+				if((!multi_task && !piped_en))				//	if not multi task
+					wait4(child_pid,&status, 0,&u_rusage);
+				
+			}	
 		
 		}
 	}	
