@@ -57,47 +57,46 @@ void cycle()
 	int 	multi_task 			= 	0;		//	have multi task process now
 	pid_t 	child_pid;						//	child process id
 	
-	int 	piped_en				=	0;		//	zero if not and some int if yes
-	int pipe_d[2];
 	
+	//========================	NEW BLOCK =========================
+	int 	piped_en				=	0;	//	zero if not and some int if yes
+	int 	pipe_d[2];
+	int 	cont_p 					= 	0;
+	//========================	NEW BLOCK =========================
+
 	while(getstring(input,MAX_INPUT_LEN))
 	{
 	
-		if(!strcmp(input,"exit"))
+		if(!strcmp(input,"exit"))		//	exit from program
 			break;
-		else if(!strcmp(input,"\n"))
+		else if(!strcmp(input,"\n"))	//	ignore enter
 			continue;
 
 		//	check if have & / remove them / set multi task true
 		multi_task = multi_tsk(input);
-		
-		piped_en = piped(input);
 
-		int cont_p = 0;
-					
-		if(piped_en)
+	//========================	NEW BLOCK =========================		
+		piped_en = piped(input);		//	check if it is piped command
+		
+		if(piped_en && pipe(pipe_d) == -1)
 		{
-			cont_p=0;
-			if(pipe(pipe_d) == -1)
-			{
 				perror("Can not open pipe \n");
-			}
-		}			
-				
+				exit(EXIT_FAILURE);
+		}	
 			
-		int i=0;
 		int fork_size = 0;
+		
 		if(piped_en)
 			fork_size = 2;
 		else
 			fork_size = 1;
-			
-		cont_p = 0;
-		for(i=0;i<fork_size;i++)
+		
+		for(cont_p=0;cont_p<fork_size;cont_p++)
 		{
 			if(piped_en)
 			{
-				char *input_h;
+				char *input_h =	NULL;
+				
 				if(cont_p == 0)
 					input_h=substr(input,0,piped_en-1);
 				else
@@ -105,66 +104,45 @@ void cycle()
 				
 				//	covert command line to array
 				vector_param = commandArr(input_h,&size);
+				//	free input_h variable
 				free(input_h);
-				cont_p++;
+				
 			}
+	//========================	NEW BLOCK =========================
 			else
-			{
 				vector_param = commandArr(input,&size);
-			}
+			
 			//	add to array NULL on the end of array
-				
 			vector_param = addTostr(vector_param,&size);		
-		
+			
 			child_pid = fork();
-									
-			if(fork <0)
-			{
-				perror("Can not fork()\n");	//	print error
-				exit(EXIT_FAILURE);			//	exit
-			}	
-			else if(child_pid == 0)
-			{
-				if(piped_en && cont_p == 1)
-				{
-					//dup(STDOUT_FILENO);
-					printf("PIPE OUT\n");
-					// first son only to write
-					close(pipe_d[0]);
-					//close(STDOUT_FILENO);
-					dup2(pipe_d[1],1);
-					//dup2(7,STDOUT_FILENO);
-					
-				}
-				else if(piped_en && cont_p == 2)
-				{
-					printf("PIPE IN\n");
-					//dup2(STDOUT_FILENO,7);
-					//	second son only to read
-					close(pipe_d[1]);
-					//close(STDIN_FILENO);
-					dup2(pipe_d[0],0);
-					//open(STDOUT_FILENO);
-					
-					//dup2(pipe_d[0],STDIN_FILENO);
-
-				}
 				
+			checkForkStatus(child_pid);
+								
+			if(child_pid == 0)
+			{
+				if(piped_en && cont_p == 0)
+					Proc_write(pipe_d);
+				else if(piped_en && cont_p == 1)
+					Proc_read(pipe_d);
 				
 				exec(vector_param,size);	//	do execvp with vector param
 			}
 			else if(child_pid > 0)
 			{
-			
 				free_arr(vector_param,size);//	clear memory
 			
-				if((!multi_task && !piped_en))				//	if not multi task
-					wait4(child_pid,&status, 0,&u_rusage);
-				
+				if(!multi_task &&!piped_en)				//	if not multi task
+					wait4(child_pid,&status, WUNTRACED,&u_rusage);
+		//	HUY ZNAET----->		//wait4(child_pid,&status, WUNTRACED|| WNOHANG,&u_rusage);
+			//	else if(piped_en)
+		//			waitpid(child_pid, &status, WUNTRACED || WNOHANG );			
 			}	
-		
-		}
-	}	
 
+		}
+		if(piped_en)
+			close_pipe(pipe_d);
+
+	}
 }
 //======================= END OF FILE =========================================

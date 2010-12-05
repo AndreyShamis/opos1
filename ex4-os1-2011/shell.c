@@ -2,6 +2,53 @@
 
 
 //=============================================================================
+//	function which check if fork function success
+//	return nothing but if fail exit from program
+void checkForkStatus(const pid_t child_pid)
+{
+	if(child_pid <0)
+	{
+		perror("Can not fork()\n");	//	print error
+		exit(EXIT_FAILURE);			//	exit
+	}	
+
+}
+
+//=============================================================================
+//	function which closed opened pipes
+void close_pipe(const int pipe_desc[])
+{
+	close(pipe_desc[READ]);
+	close(pipe_desc[WRITE]);
+	
+}
+
+//=============================================================================
+//	fucntion which preform the process write to pipe
+//	return : nothing
+void Proc_write(const int pipe_desc[])
+{
+	// first son only to write
+	close(pipe_desc[READ]);
+	dup2(pipe_desc[WRITE],STDOUT_FILENO);	//	
+	close(pipe_desc[WRITE]);				//	close second duplicate
+
+}
+
+//=============================================================================
+//	fucntion which preform the process to read from the pipe
+//	return : nothing
+void Proc_read(const int pipe_desc[])
+{
+	//	second son only to read
+	close(pipe_desc[WRITE]);
+	dup2(pipe_desc[READ],STDIN_FILENO);	//	
+	close(pipe_desc[READ]);					//	close second duplicate
+	//fflush(stdin);
+
+}
+
+//=============================================================================
 //	Function which geting string start position and len
 //	and return the substring by lentgh and start
 char *substr(const char *string, const int start,const int len)
