@@ -21,11 +21,36 @@
 #ifndef SHELL_SEC
 #define SHELL_SEC
 
+#define 	READ 	0
+#define		WRITE 	1
+
+//=============================================================================
+//	function which check if fork function success
+//	return nothing but if fail exit from program
+void checkForkStatus(const pid_t child_pid);
 //=============================================================================
 //	function which get input string check if in string we have | pipe
 //	if yes delete him from string and return space of him
 //	else return false = 0
 int piped(char *input);
+
+
+//=============================================================================
+//	fucntion which preform the process write to pipe
+//	return : nothing
+void Proc_write(const int pipe_desc[]);
+
+
+//=============================================================================
+//	fucntion which preform the process to read from the pipe
+//	return : nothing
+void Proc_read(const int pipe_desc[]);
+
+
+//=============================================================================
+//	function which closed opened pipes
+void close_pipe(const int pipe_desc[]);
+
 
 //=============================================================================
 //	function which getting string and delete the \n ion the of string
