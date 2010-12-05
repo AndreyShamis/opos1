@@ -1,6 +1,49 @@
 #include "shell.h"
 
 
+
+void PipeError()
+{
+	perror("Can not open pipe \n");
+	exit(EXIT_FAILURE);
+}
+
+int preformForkSize(const int piped_en)
+{
+	if(piped_en)
+		return(TWO);
+	else
+		return(ONE);
+
+}
+
+char **PipeSeparation(char **Vector,const int pipe_en,
+						const int cont_p,int *size,char *input)
+{
+	if(pipe_en)
+	{
+		char *input_h =	NULL;
+	
+		if(cont_p == 0)
+			input_h=substr(input,0,pipe_en-1);
+		else
+			input_h=substr(input,pipe_en+2,strlen(input)-pipe_en-2);
+	
+		//	covert command line to array
+		Vector = commandArr(input_h,size);
+		//	free input_h variable
+		free(input_h);
+	
+	}
+	else
+		Vector = commandArr(input,size);
+
+	//	add to array NULL on the end of array
+	Vector = addTostr(Vector,size);
+	
+	return (Vector);
+
+}
 //=============================================================================
 //	function which check if fork function success
 //	return nothing but if fail exit from program
@@ -15,12 +58,14 @@ void checkForkStatus(const pid_t child_pid)
 }
 
 //=============================================================================
-//	function which closed opened pipes
-void close_pipe(const int pipe_desc[])
+//	function which closed opened pipes if piped_en it true
+void close_pipe(const int pipe_desc[],const int piped_en)
 {
-	close(pipe_desc[READ]);
-	close(pipe_desc[WRITE]);
-	
+	if(piped_en)
+	{
+		close(pipe_desc[READ]);
+		close(pipe_desc[WRITE]);
+	}
 }
 
 //=============================================================================
@@ -252,15 +297,15 @@ int piped(char *input)
 //	fucntion which do execvp with parameters geted in array of string
 //	and also get size of this array
 //	nithing be returned
-void exec(char **vector_param,const int size)
+void exec(char **arrv,const int size)
 {
 	int exec_stat = 0;	//	exec status exit parameter
 
 	//	try to do exec with vector param
-	exec_stat = execvp(vector_param[0],vector_param); 
+	exec_stat = execvp(arrv[0],arrv); 
 	
 	//	clean memory
-	free_arr(vector_param,size);
+	free_arr(arrv,size);
 	
 	//	if execvp fail exit whith exit failure
 	if(exec_stat)
