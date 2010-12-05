@@ -133,23 +133,23 @@ void cycle()
 			{
 				if(piped_en && cont_p == 1)
 				{
-					dup(STDOUT_FILENO);
+					//dup(STDOUT_FILENO);
 					printf("PIPE OUT\n");
 					// first son only to write
 					close(pipe_d[0]);
-					close(STDOUT_FILENO);
-					dup(pipe_d[1]);
-					//dup2(pipe_d[1],STDOUT_FILENO);
+					//close(STDOUT_FILENO);
+					dup2(pipe_d[1],1);
+					//dup2(7,STDOUT_FILENO);
 					
 				}
 				else if(piped_en && cont_p == 2)
 				{
 					printf("PIPE IN\n");
-					dup(6);
+					//dup2(STDOUT_FILENO,7);
 					//	second son only to read
 					close(pipe_d[1]);
-					close(STDIN_FILENO);
-					dup(pipe_d[0]);
+					//close(STDIN_FILENO);
+					dup2(pipe_d[0],0);
 					//open(STDOUT_FILENO);
 					
 					//dup2(pipe_d[0],STDIN_FILENO);
