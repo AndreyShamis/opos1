@@ -55,12 +55,11 @@ void cycle()
 	int 	size				=	0;		//	size of string array
 	char 	**vector_param 		= 	NULL;	//	string array
 	int 	multi_task 			= 	0;		//	have multi task process now
-	
-	int 	piped_flags[MAX_INPUT_LEN];
-	
 	pid_t 	child_pid;						//	child process id
 	
-
+	int 	piped_en				=	0;		//	zero if not and some int if yes
+	char 	**vector_param2		=	NULL;
+	int pipe_d[2];
 	
 	while(getstring(input,MAX_INPUT_LEN))
 	{
@@ -72,31 +71,53 @@ void cycle()
 
 		//	check if have & / remove them / set multi task true
 		multi_task = multi_tsk(input);
-
-		memset(piped_flags,0,sizeof(int)*MAX_INPUT_LEN);
-	
-		if(!multi_task)
-		{
-			int counter=0;
-			int flag = 1;
-			for(counter=0;counter<MAX_INPUT_LEN && flag;counter++)
-			{
-				flag = piped(input);
-				if(flag)
-				{
-					piped_flags[counter] = flag;
-					printf("Found p: %d\n",piped_flags[counter]);
-				}
-			
-			}				
-		}		
-		//	covert command line to array
-		vector_param = commandArr(input,&size);
 		
-		//	add to array NULL on the end of array
-		vector_param = addTostr(vector_param,&size);		
+		piped_en = piped(input);
+
+		int cont_p = 0;
+			int size1 = 0;
+			int size2 = 0;
+					
+		if(piped_en)
+		{
+			if(pipe(pipe_d) == -1)
+			{
+				perror("Can not open pipe \n");
+			}
 			
-		child_pid = fork();
+			char *input1 = NULL;
+			char *input2 = NULL;
+			
+			
+			
+			input1 = substr(input,0,piped_en-1);
+			input2 = substr(input,piped_en+1,strlen(input)-piped_en);		
+
+			vector_param = commandArr(input1,&size1);
+			vector_param2 = commandArr(input2,&size2);
+			
+			free(input1);
+			free(input2);
+			child_pid = fork();
+			cont_p++;
+			child_pid = fork();
+		}		
+		else
+		{
+		
+			//	covert command line to array
+			vector_param = commandArr(input,&size);
+			
+
+
+		
+			//	add to array NULL on the end of array
+			vector_param = addTostr(vector_param,&size);		
+			
+			child_pid = fork();
+				
+		}		
+
 		
 		if(fork <0)
 		{
@@ -105,8 +126,22 @@ void cycle()
 		}
 		else if(child_pid == 0)
 		{
-		
-			exec(vector_param,size);	//	do execvp with vector param
+			if(piped_en && cont_p == 0)
+			{
+				// first son only to write
+				close(pipe_d[0]);
+				dup2(STDOUT_FILENO,pipe_d[1]);
+				exec(vector_param,size1);	//	do execvp with vector param
+				
+			}
+			else if(piped_en && cont_p == 1)
+			{
+				//	second son only to read
+				close(pipe_d[1]);
+				dup2(STDIN_FILENO,pipe_d[0]);
+				exec(vector_param2,size2);	//	do execvp with vector param
+
+			}
 		
 		}
 		else if(child_pid > 0)
