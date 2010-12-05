@@ -58,7 +58,6 @@ void cycle()
 	pid_t 	child_pid;						//	child process id
 	
 	int 	piped_en				=	0;		//	zero if not and some int if yes
-	char 	**vector_param2		=	NULL;
 	int pipe_d[2];
 	
 	while(getstring(input,MAX_INPUT_LEN))
@@ -75,84 +74,95 @@ void cycle()
 		piped_en = piped(input);
 
 		int cont_p = 0;
-			int size1 = 0;
-			int size2 = 0;
 					
 		if(piped_en)
 		{
+			cont_p=0;
 			if(pipe(pipe_d) == -1)
 			{
 				perror("Can not open pipe \n");
 			}
+		}			
+				
 			
-			char *input1 = NULL;
-			char *input2 = NULL;
-			
-			
-			
-			input1 = substr(input,0,piped_en-1);
-			input2 = substr(input,piped_en+1,strlen(input)-piped_en);		
-
-			vector_param = commandArr(input1,&size1);
-			vector_param2 = commandArr(input2,&size2);
-			
-			free(input1);
-			free(input2);
-			child_pid = fork();
-			cont_p++;
-			child_pid = fork();
-		}		
-		else
+		int i=0;
+		for(i=0;i<2;i++)
 		{
-		
-			//	covert command line to array
-			vector_param = commandArr(input,&size);
+			if(piped_en)
+			{
 			
-
-
-		
+				if(cont_p == 0)
+				{
+					//	covert command line to array
+					vector_param = commandArr(substr(input,0,piped_en-1),&size);
+			
+				}
+				else
+				{
+					vector_param = commandArr(substr(input,piped_en+2,strlen(input)-piped_en-2),&size);
+				}
+				cont_p++;
+			
+			}
+			else
+			{
+				vector_param = commandArr(input,&size);
+			}
 			//	add to array NULL on the end of array
+				
 			vector_param = addTostr(vector_param,&size);		
-			
+		
 			child_pid = fork();
+									
+			
+			if(fork <0)
+			{
+				perror("Can not fork()\n");	//	print error
+				exit(EXIT_FAILURE);			//	exit
+			}
+			else if(child_pid > 0)
+			{
+			
+				free_arr(vector_param,size);//	clear memory
+			
+				if(!multi_task && !piped_en)				//	if not multi task
+					wait4(child_pid,&status, 0,&u_rusage);
 				
-		}		
+			}		
+			else if(child_pid == 0)
+			{
+				if(piped_en && cont_p == 1)
+				{
+					dup(STDOUT_FILENO);
+					printf("PIPE OUT\n");
+					// first son only to write
+					close(pipe_d[0]);
+					close(STDOUT_FILENO);
+					dup(pipe_d[1]);
+					//dup2(pipe_d[1],STDOUT_FILENO);
+					
+				}
+				else if(piped_en && cont_p == 2)
+				{
+					printf("PIPE IN\n");
+					dup(6);
+					//	second son only to read
+					close(pipe_d[1]);
+					close(STDIN_FILENO);
+					dup(pipe_d[0]);
+					//open(STDOUT_FILENO);
+					
+					//dup2(pipe_d[0],STDIN_FILENO);
+
+				}
+				
+				
+				exec(vector_param,size);	//	do execvp with vector param
 
 		
-		if(fork <0)
-		{
-			perror("Can not fork()\n");	//	print error
-			exit(EXIT_FAILURE);			//	exit
-		}
-		else if(child_pid == 0)
-		{
-			if(piped_en && cont_p == 0)
-			{
-				// first son only to write
-				close(pipe_d[0]);
-				dup2(STDOUT_FILENO,pipe_d[1]);
-				exec(vector_param,size1);	//	do execvp with vector param
-				
-			}
-			else if(piped_en && cont_p == 1)
-			{
-				//	second son only to read
-				close(pipe_d[1]);
-				dup2(STDIN_FILENO,pipe_d[0]);
-				exec(vector_param2,size2);	//	do execvp with vector param
-
 			}
 		
 		}
-		else if(child_pid > 0)
-		{
-			
-			free_arr(vector_param,size);//	clear memory
-			
-			if(!multi_task)				//	if not multi task
-				wait4(child_pid,&status, 0,&u_rusage);
-				
-		}		
 	}	
 
 }
