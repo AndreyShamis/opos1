@@ -53,7 +53,7 @@ void cycle()
 {
 	char 	input[MAX_INPUT_LEN];			//	variable for input
 	int 	size				=	0;		//	size of string array
-	char 	**vector_param 		= 	NULL;	//	string array
+	char 	**arrv 				= 	NULL;	//	string array
 	int 	multi_task 			= 	0;		//	have multi task process now
 	pid_t 	child_pid;						//	child process id
 	
@@ -61,8 +61,8 @@ void cycle()
 	//========================	NEW BLOCK =========================
 	int 	piped_en				=	0;	//	zero if not and some int if yes
 	int 	pipe_d[2];
-	int 	cont_p 					= 	0;
-	//========================	NEW BLOCK =========================
+	int 	cont_p 					= 	0;	//	couner for fork
+	int 	fork_size				=	0;	//	fork size 
 
 	while(getstring(input,MAX_INPUT_LEN))
 	{
@@ -74,46 +74,18 @@ void cycle()
 
 		//	check if have & / remove them / set multi task true
 		multi_task = multi_tsk(input);
-
-	//========================	NEW BLOCK =========================		
+	
 		piped_en = piped(input);		//	check if it is piped command
 		
 		if(piped_en && pipe(pipe_d) == -1)
-		{
-				perror("Can not open pipe \n");
-				exit(EXIT_FAILURE);
-		}	
+			PipeError();
 			
-		int fork_size = 0;
-		
-		if(piped_en)
-			fork_size = 2;
-		else
-			fork_size = 1;
-		
+		fork_size = preformForkSize(piped_en);
+	
 		for(cont_p=0;cont_p<fork_size;cont_p++)
 		{
-			if(piped_en)
-			{
-				char *input_h =	NULL;
-				
-				if(cont_p == 0)
-					input_h=substr(input,0,piped_en-1);
-				else
-					input_h=substr(input,piped_en+2,strlen(input)-piped_en-2);
-				
-				//	covert command line to array
-				vector_param = commandArr(input_h,&size);
-				//	free input_h variable
-				free(input_h);
-				
-			}
-	//========================	NEW BLOCK =========================
-			else
-				vector_param = commandArr(input,&size);
 			
-			//	add to array NULL on the end of array
-			vector_param = addTostr(vector_param,&size);		
+			arrv = PipeSeparation(arrv,piped_en, cont_p,&size,input);
 			
 			child_pid = fork();
 				
@@ -126,22 +98,20 @@ void cycle()
 				else if(piped_en && cont_p == 1)
 					Proc_read(pipe_d);
 				
-				exec(vector_param,size);	//	do execvp with vector param
+				exec(arrv,size);	//	do execvp with vector param
 			}
 			else if(child_pid > 0)
 			{
-				free_arr(vector_param,size);//	clear memory
+				free_arr(arrv,size);//	clear memory
 			
 				if(!multi_task &&!piped_en)				//	if not multi task
-					wait4(child_pid,&status, WUNTRACED,&u_rusage);
-		//	HUY ZNAET----->		//wait4(child_pid,&status, WUNTRACED|| WNOHANG,&u_rusage);
-			//	else if(piped_en)
-		//			waitpid(child_pid, &status, WUNTRACED || WNOHANG );			
+					wait4(child_pid,&status, WUNTRACED,&u_rusage);	
 			}	
 
 		}
-		if(piped_en)
-			close_pipe(pipe_d);
+		
+		
+		close_pipe(pipe_d,piped_en);			//	close pipe if the open
 
 	}
 }

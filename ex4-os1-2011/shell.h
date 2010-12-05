@@ -23,6 +23,16 @@
 
 #define 	READ 	0
 #define		WRITE 	1
+#define		TWO		2
+#define		ONE		1
+
+void PipeError();
+
+int preformForkSize(const int piped_en);
+
+char **PipeSeparation(char **Vector,const int pipe_en,
+						const int cont_p,int *size,char *input);
+
 
 //=============================================================================
 //	function which check if fork function success
@@ -46,10 +56,9 @@ void Proc_write(const int pipe_desc[]);
 //	return : nothing
 void Proc_read(const int pipe_desc[]);
 
-
 //=============================================================================
-//	function which closed opened pipes
-void close_pipe(const int pipe_desc[]);
+//	function which closed opened pipes if piped_en it true
+void close_pipe(const int pipe_desc[],const int piped_en);
 
 
 //=============================================================================
@@ -95,7 +104,7 @@ int getstring(char *input,const int max_size);
 //	fucntion which do execvp with parameters geted in array of string
 //	and also get size of this array
 //	nithing be returned
-void exec(char **vector_param,const int size);
+void exec(char **arrv,const int size);
 
 
 #endif

@@ -84,9 +84,15 @@ void cycle()
 {
 	char 	input[MAX_INPUT_LEN];			//	variable for input
 	int 	size				=	0;		//	size of string array
-	char 	**vector_param 		= 	NULL;	//	string array
+	char 	**arrv 				= 	NULL;	//	string array
 	int 	multi_task 			= 	0;		//	have multi task process now
 	pid_t 	child_pid;						//	child process id
+	
+	//========================	NEW BLOCK =========================
+	int 	piped_en				=	0;	//	zero if not and some int if yes
+	int 	pipe_d[2];
+	int 	cont_p 					= 	0;	//	couner for fork
+	int 	fork_size				=	0;	//	fork size 
 	
 	status = 0;
 	while(getstring(input,MAX_INPUT_LEN))
@@ -113,53 +119,67 @@ void cycle()
 		}
 		//	check if have & / remove them / set multi task true
 		multi_task = multi_tsk(input);
+	
+		piped_en = piped(input);		//	check if it is piped command
+		
+		if(piped_en && pipe(pipe_d) == -1)
+			PipeError();
+			
+		fork_size = preformForkSize(piped_en);
+		
+		for(cont_p=0;cont_p<fork_size;cont_p++)
+		{
+			
+			arrv = PipeSeparation(arrv,piped_en, cont_p,&size,input);
+			
+			child_pid = fork();
+				
+			checkForkStatus(child_pid);
+								
+			if(child_pid == 0)
+			{
+				if(piped_en && cont_p == 0)
+					Proc_write(pipe_d);
+				else if(piped_en && cont_p == 1)
+					Proc_read(pipe_d);
+					
+				status = 0;
+				if(multi_task)
+				{
+					//	if son run whith & set ignore signal
+					signal(SIGTSTP,SIG_IGN);	//	can not send SIGTSTP
+					signal(SIGINT,SIG_IGN);		//	can not send SIGINT		
+			
+				}
+				
+				exec(arrv,size);	//	do execvp with vector param
+			}
+			else if(child_pid > 0)
+			{
+			
+				free_arr(arrv,size);
+				
+				if(!multi_task && !piped_en)//	if not multi task process
+				{
+			
+					if(backgrdnd == 0 )		//	check if dont have process
+											//	in background
+						stoped_id = child_pid;	//	set global pid
+		
+					wait3(&status, WUNTRACED,&u_rusage);
+				
+				}
+					else
+						status = 0;			//	to give options to print
+											//	exit time for process which was
+											//	run whith &			
+			}		
 
-		//	covert command line to array
-		vector_param = commandArr(input,&size);
-		
-		//	add to array NULL on the end of array
-		vector_param = addTostr(vector_param,&size);		
-			
-		child_pid = fork();
-		
-		if(fork <0)
-		{
-			perror("Can not fork()\n");	//	print error
-			exit(EXIT_FAILURE);			//	exit
 		}
-		else if(child_pid == 0)
-		{
-			status = 0;
-			if(multi_task)
-			{
-				//	if son run whith & set ignore signal
-				signal(SIGTSTP,SIG_IGN);	//	can not send SIGTSTP
-				signal(SIGINT,SIG_IGN);		//	can not send SIGINT		
-			
-			}
-				
-			exec(vector_param,size);	//	do execvp with vector param
-		}
-		else if(child_pid > 0)
-		{
-			
-			free_arr(vector_param,size);
-			if(!multi_task)				//	if not multi task process
-			{
-			
-				if(backgrdnd == 0 )		//	check if dont have process
-										//	in background
-					stoped_id = child_pid;	//	set global pid
 		
-				wait3(&status, WUNTRACED,&u_rusage);
-				
-			}
-				else
-					status = 0;			//	to give options to print
-										//	exit time for process which was
-										//	run whith &			
-		}		
-	}	
+		
+		close_pipe(pipe_d,piped_en);			//	close pipe if the open
+	}
 
 }
 //======================= END OF FILE =========================================
