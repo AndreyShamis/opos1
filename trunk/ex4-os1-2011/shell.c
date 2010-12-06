@@ -80,9 +80,9 @@ char **PipeSeparation(char **Vector,const int pipe_en,
 	{
 		char *input_h =	NULL;
 	
-		if(cont_p == 0)
+		if(cont_p == 0)				//	get first helf of string
 			input_h=substr(input,0,pipe_en);
-		else
+		else						//	get second helf of string 
 			input_h=substr(input,pipe_en,strlen(input)-pipe_en);
 	
 		//	covert command line to array
