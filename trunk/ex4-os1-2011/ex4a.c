@@ -79,25 +79,23 @@ void cycle()
 		
 		if(piped_en && pipe(pipe_d) == -1)
 			PipeError();
-			
+		
+		//	get fork size be created
 		fork_size = preformForkSize(piped_en);
 	
 		for(cont_p=0;cont_p<fork_size;cont_p++)
 		{
-			
+		
+			//	convert the string to array of string	
 			arrv = PipeSeparation(arrv,piped_en, cont_p,&size,input);
 			
-			child_pid = fork();
+			child_pid = fork();				//	fork
 				
-			checkForkStatus(child_pid);
+			checkForkStatus(child_pid);		//	check if fork success
 								
 			if(child_pid == 0)
 			{
-				if(piped_en && cont_p == 0)
-					Proc_write(pipe_d);
-				else if(piped_en && cont_p == 1)
-					Proc_read(pipe_d);
-				
+				PreProc_Creation(piped_en,cont_p,pipe_d);
 				exec(arrv,size);	//	do execvp with vector param
 			}
 			else if(child_pid > 0)
@@ -105,11 +103,10 @@ void cycle()
 				free_arr(arrv,size);//	clear memory
 			
 				if(!multi_task &&!piped_en)				//	if not multi task
-					wait4(child_pid,&status, WUNTRACED,&u_rusage);	
+					wait4(child_pid,&status, 0,&u_rusage);	
 			}	
 
 		}
-		
 		
 		close_pipe(pipe_d,piped_en);			//	close pipe if the open
 

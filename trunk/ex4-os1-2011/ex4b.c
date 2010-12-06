@@ -124,25 +124,23 @@ void cycle()
 		
 		if(piped_en && pipe(pipe_d) == -1)
 			PipeError();
-			
+		
+		//	get fork size be created
 		fork_size = preformForkSize(piped_en);
 		
 		for(cont_p=0;cont_p<fork_size;cont_p++)
 		{
-			
+			//	convert the string to array of string	
 			arrv = PipeSeparation(arrv,piped_en, cont_p,&size,input);
 			
-			child_pid = fork();
+			child_pid = fork();					//	do fork
 				
-			checkForkStatus(child_pid);
+			checkForkStatus(child_pid);			//	check if fork success
 								
 			if(child_pid == 0)
 			{
-				if(piped_en && cont_p == 0)
-					Proc_write(pipe_d);
-				else if(piped_en && cont_p == 1)
-					Proc_read(pipe_d);
-					
+				PreProc_Creation(piped_en,cont_p,pipe_d);
+				
 				status = 0;
 				if(multi_task)
 				{
@@ -169,8 +167,8 @@ void cycle()
 					wait3(&status, WUNTRACED,&u_rusage);
 				
 				}
-					else
-						status = 0;			//	to give options to print
+				else
+					status = 0;				//	to give options to print
 											//	exit time for process which was
 											//	run whith &			
 			}		

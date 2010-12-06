@@ -26,6 +26,10 @@
 #define		TWO		2
 #define		ONE		1
 
+
+void PreProc_Creation(const int piped_en,const int cont_p,const int pipe_d[]);
+
+
 void PipeError();
 
 int preformForkSize(const int piped_en);
