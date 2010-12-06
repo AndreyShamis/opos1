@@ -1,5 +1,14 @@
 #include "shell.h"
 
+
+
+void PreProc_Creation(const int piped_en,const int cont_p,const int pipe_d[])
+{
+	if(piped_en && cont_p == 0)
+		Proc_write(pipe_d);
+	else if(piped_en && cont_p == 1)
+		Proc_read(pipe_d);
+}
 //=============================================================================
 //	fucntion which do execvp with parameters geted in array of string
 //	and also get size of this array
