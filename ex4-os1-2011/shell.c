@@ -1,6 +1,53 @@
 #include "shell.h"
 
+//=============================================================================
+//	fucntion which do execvp with parameters geted in array of string
+//	and also get size of this array
+//	nithing be returned
+void exec(char **arrv,const int size)
+{
+	int exec_stat = 0;	//	exec status exit parameter
 
+	//	try to do exec with vector param
+	exec_stat = execvp(arrv[0],arrv); 
+	
+	//	clean memory
+	free_arr(arrv,size);
+	
+	//	if execvp fail exit whith exit failure
+	if(exec_stat)
+	{
+		perror("Can not do execvp()\n");
+		exit(EXIT_FAILURE);
+	}
+		
+	exit(EXIT_SUCCESS);
+
+}
+
+//=============================================================================
+//	function which get input string check if in string we have | pipe
+//	if yes delete him from string and return space of him
+//	else return false = 0
+int piped(char *input)
+{
+    int str_len 	=  	0;			//	helper variable to know string len
+    int counter     =	0;			//	counter of charckter
+      
+    str_len = strlen(input);		//	get len of string
+    
+    for(counter =0;counter< str_len;counter++)
+    {
+        if(input[counter] == '|')
+        {                
+            input[counter] = ' ';	//	put space in &
+            return(counter);				//	return true
+    	}	
+    }
+    
+    return(0);
+
+}
 
 void PipeError()
 {
@@ -18,16 +65,16 @@ int preformForkSize(const int piped_en)
 }
 
 char **PipeSeparation(char **Vector,const int pipe_en,
-						const int cont_p,int *size,char *input)
+						const int cont_p,int *size,const char *input)
 {
 	if(pipe_en)
 	{
 		char *input_h =	NULL;
 	
 		if(cont_p == 0)
-			input_h=substr(input,0,pipe_en-1);
+			input_h=substr(input,0,pipe_en);
 		else
-			input_h=substr(input,pipe_en+2,strlen(input)-pipe_en-2);
+			input_h=substr(input,pipe_en,strlen(input)-pipe_en);
 	
 		//	covert command line to array
 		Vector = commandArr(input_h,size);
@@ -162,7 +209,13 @@ char **commandArr(const char input[], int *size)
 	
 	for(sit=0;sit<MAX_INPUT_LEN;sit++)
 	{
-		if((input[sit] == ' ' || input[sit] == '\0') && prev_char != ' ')
+		
+		if((prev_char == ' ' && prev_char == input[sit])
+		|| (sit == 0 && input[sit] == ' '))
+		{	//	if have space after spce
+			string_start = sit+1;	
+		}
+		else if((input[sit] == ' ' || input[sit] == '\0') && prev_char != ' ')
 		{			
 			//	create string
 			new_string =substr(input,string_start,sit-string_start);
@@ -191,10 +244,7 @@ char **commandArr(const char input[], int *size)
 				return_temp = temp;
 			}			
 		}
-		else if(prev_char == ' ' && prev_char == input[sit])
-		{	//	if have space after spce
-			string_start = sit+1;	
-		}
+		
 		//	set previous char
 		prev_char = input[sit];
 		
@@ -269,52 +319,6 @@ int multi_tsk(char *input)
 }
 
 
-//=============================================================================
-//	function which get input string check if in string we have | pipe
-//	if yes delete him from string and return space of him
-//	else return false = 0
-int piped(char *input)
-{
-    int str_len 	=  	0;			//	helper variable to know string len
-    int counter     =	0;			//	counter of charckter
-      
-    str_len = strlen(input);		//	get len of string
-    
-    for(counter = str_len;counter>0;counter--)
-    {
-        if(input[counter] == '|' && input[counter-1] == ' ')
-        {                
-            input[counter] = ' ';	//	put space in &
-            return(counter);				//	return true
-    	}	
-    }
-    
-    return(0);
 
-}
 
-//=============================================================================
-//	fucntion which do execvp with parameters geted in array of string
-//	and also get size of this array
-//	nithing be returned
-void exec(char **arrv,const int size)
-{
-	int exec_stat = 0;	//	exec status exit parameter
-
-	//	try to do exec with vector param
-	exec_stat = execvp(arrv[0],arrv); 
-	
-	//	clean memory
-	free_arr(arrv,size);
-	
-	//	if execvp fail exit whith exit failure
-	if(exec_stat)
-	{
-		perror("Can not do execvp()\n");
-		exit(EXIT_FAILURE);
-	}
-		
-	exit(EXIT_SUCCESS);
-
-}
 
