@@ -31,7 +31,7 @@ void PipeError();
 int preformForkSize(const int piped_en);
 
 char **PipeSeparation(char **Vector,const int pipe_en,
-						const int cont_p,int *size,char *input);
+						const int cont_p,int *size,const char *input);
 
 
 //=============================================================================
