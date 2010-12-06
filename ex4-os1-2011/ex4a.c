@@ -77,6 +77,7 @@ void cycle()
 	
 		piped_en = piped(input);		//	check if it is piped command
 		
+		//	open pipe if found pipe symbol in input
 		if(piped_en && pipe(pipe_d) == -1)
 			PipeError();
 		
@@ -102,8 +103,9 @@ void cycle()
 			{
 				free_arr(arrv,size);//	clear memory
 			
-				if(!multi_task &&!piped_en)				//	if not multi task
+				if(!multi_task && !piped_en)		//	if not multi task
 					wait4(child_pid,&status, 0,&u_rusage);	
+
 			}	
 
 		}
