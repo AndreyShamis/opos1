@@ -1,12 +1,8 @@
-all:		mem.o ex4a.o ex4b.o shell.o
-			gcc mem.o shell.o ex4a.o -o ex4a
-			gcc mem.o shell.o ex4b.o -o ex4b
+all:		mem.o ex4.o shell.o
+			gcc mem.o shell.o ex4.o -o ex4
 
-ex4a.o:		ex4a.c ex4a.h
-			gcc -Wall -c ex4a.c
-
-ex4b.o:		ex4b.c ex4b.h
-			gcc -Wall -c ex4b.c
+ex4.o:		ex4.c ex4.h
+			gcc -Wall -c ex4.c
 
 shell.o:	shell.c shell.h
 			gcc -Wall -c shell.c
