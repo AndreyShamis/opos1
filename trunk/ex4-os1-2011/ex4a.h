@@ -1,12 +1,11 @@
 #ifndef EX3A_SEC
 #define EX3A_SEC
 
-struct rusage u_rusage;		//	struct used for get times
-int status ;				//	to know which status was exited
+
 
 //================== Catch exit Handler =======================================
 //	handler function to know when child is exited
-void catch_chld(pid_t num);
+void catch_chld(int num);
 
 //=============================================================================
 //	function which seting handler by default
