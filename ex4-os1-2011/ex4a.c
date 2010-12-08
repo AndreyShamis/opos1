@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "shell.h"
-#include "ex4.h"
+#include "ex4a.h"
 
 //=============================================================================
 int main()

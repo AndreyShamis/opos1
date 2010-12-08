@@ -1,5 +1,5 @@
 /*
- * EX4:: Simple SHELL Whith Pipe
+ * EX4:: Simple SHELL (HAVE TWO PROGRAMS)
  * ===========================================================================
  * Writen by: Andrey Shamis,  id: 321470882, login: andreysh
  * and:       Ilia Gaisinsky, id: 309480051, login: iliaga
@@ -10,11 +10,11 @@
  *		to compile : make
  *		command make know to compile both rpograms
  *
- *		to run:	./ex4
+ *		to run:	./ex4a  or ./ex4b	
  *
  */
 
-============================= EX4 ============================================
+============================= EX4A ============================================
 This program is simple shell can run program and when runing program can be
 seted that the program running in multi taks mode.
 For this you need to add after program name &
@@ -24,7 +24,19 @@ or
 	ls -l &
 To exit from program press CTRL+D or write exit.
 
-Pprograms support pipe function for run only two programs
+============================= EX4B ============================================
+This program sismilary to ex4a but:
+
+when you press CTRL+Z   the pragram will go to background
+and for take the program from background write command
+	bg
+if backgrod process exist the will be go to foreground.
+
+In addition if process do some program in foreground you can kill the process
+by pressing CTRL+C. 
+
+=========================== NEW ===============================================
+Both programs support pipe function for run only two programs
 For example
 ls | sort
 	or
@@ -34,10 +46,12 @@ ls -l | sort
 
 Files used
 
-ex4.c		-	ex4.h 				// First program
+ex4a.c		-	ex4a.h 				// First program
+ex4b.c 		-	ex4b.h       		// Second Program
 mem.c 		- 	mem.h               // File to work with memory
 shell.c		-	shell.h          	//	Shell main functions
 makefile  							//	makefile
 ReadMe-os1-ex4-2011-andreysh_iliaga	//	readme
 
 ===============================================================================
+
