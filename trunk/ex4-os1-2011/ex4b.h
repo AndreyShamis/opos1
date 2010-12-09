@@ -1,5 +1,5 @@
-#ifndef EX3B_SEC
-#define EX3B_SEC
+#ifndef EX4B_SEC
+#define EX4B_SEC
 
 					
 struct rusage u_rusage;		//	struct used for get times
