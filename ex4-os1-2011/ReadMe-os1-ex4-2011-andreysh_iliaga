@@ -24,6 +24,12 @@ or
 	ls -l &
 To exit from program press CTRL+D or write exit.
 
+SA_RESTART:
+Using this flag is necessary in order that would in time come to like one or 
+the other signal the continuation of the execution team after handler 
+returned to perform a command on a signal to stop her. That is, if we do not 
+use this flag would begin the following command after the signal has been 
+received and ended hendler.
 ============================= EX4B ============================================
 This program sismilary to ex4a but:
 
@@ -36,7 +42,7 @@ In addition if process do some program in foreground you can kill the process
 by pressing CTRL+C. 
 
 =========================== NEW ===============================================
-Both programs support pipe function for run only two programs
+Second program support pipe function for run only two programs
 For example
 ls | sort
 	or

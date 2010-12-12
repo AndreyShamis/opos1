@@ -1,31 +1,14 @@
 #ifndef EX4B_SEC
 #define EX4B_SEC
 
-					
-struct rusage u_rusage;		//	struct used for get times
-int status ;				//	to know which status was exited
 
-int stoped_id	=	0;		//	to know which preccess is in background
-int backgrdnd 	= 	0;		//	to know if we have some process in back
 
 //================== Catch exit Handler =======================================
 //	handler function to know when child is exited
-void catch_chld(pid_t num);
-
-//=============================================================================
-//	handler for SIGINT
-void catch_int(int num);
-
-//=============================================================================
-//	handler for SIGTSTP
-void catch_stop(int num);
+void catch_chld(int num);
 
 //=============================================================================
 //	function which seting handler by default
-void setHandler();
-
-//=============================================================================
-//	function which seting handler by default but only for SIGCHLD
 void setHendlerOptions();
 
 //=============================================================================
@@ -35,3 +18,4 @@ void setHendlerOptions();
 void cycle();
 
 #endif
+
