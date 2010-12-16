@@ -15,7 +15,7 @@
 
 ============================= EX5 =============================================
 This program is like program ex3a (simple shell) but istead using:
-"execl("/bin/ls","ls......)" like at ex3a, we use: "popen".
+"execl("/bin/ls","ls......)"" like at ex3a, we use: "popen".
 
 To exit from program press CTRL+D or write exit.
 
@@ -24,9 +24,7 @@ To exit from program press CTRL+D or write exit.
 
 Files used
 
-ex3a.c		-	ex5.h 		// First program
-mem.c 		- 	mem.h           // File to work with memory
-shell.c		-	shell.h         // Shell main functions
+ex5.c		-	ex5.h 		// the program
 makefile  				// makefile
 ReadMe-os1-ex5-2011-andreysh_iliaga	// readme
 
