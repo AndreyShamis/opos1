@@ -3,7 +3,7 @@
  * ===========================================================================
  * Writen by: Andrey Shamis,  id: 321470882, login: andreysh
  * and:       Ilia Gaisinsky, id: 309480051, login: iliaga
- * Input:	1: 	SORT TYPE (id/name)  
+ * Input:	1: 	SORT TYPE (id/name)
  *			2:	additional data(<Name><_[space]><id>)
  * Input in parameters:
  *			text file that include names and ids.
@@ -20,7 +20,7 @@
  *		to run:	./ex1 <INPUT FILE> <OUTPUT FILE>
  *		example-1:	./ex1 in2.txt id.txt
  *					id
- *					
+ *
  *		example-2:	./ex1 in2.txt name.txt
  *					name
  *
@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 
 	FILE *fRead		=	NULL;			//	Var for red file.
 	FILE *fWrite	=	NULL;			// 	Var for write file.
-    
+
 	int str_counter	=	0;	// Difine counter of strings at tabel.
 
     // If the user enter nesesery data corect:
@@ -79,12 +79,10 @@ int main(int argc, char *argv[])
 
 		if(ifFileOpen(fRead,fWrite))
 		{
-		    // Read file and transform the data to tabel of strings.
-			dataDB=readLines(fRead,&str_counter);
-			fclose(fRead);						// Close readed file.
+c					// Close readed file.
 
 			sort(dataDB,str_counter,key);		//	SORT
-			
+
 			writeFile(fWrite,str_counter,dataDB);//	write to file sorted data
 			fclose(fWrite);						// Close writed file.
 
@@ -124,7 +122,7 @@ int ifFileOpen(FILE *fRead, FILE *fWrite)
 		printf("Can`t write to file. \n");
 		return(FALSE);
 	}
-	
+
 	return(TRUE);					//	FILES OPEN SUCCESS
 
 }
