@@ -46,6 +46,7 @@ double stodoub(const char *str);
 
 double calcAverage(struct my_msgbuf msgStorge[]);
 
+void printErorr(const char *msg);
 
 
 
@@ -197,35 +198,3 @@ double stodoub(const char *str)
 	//printf("##### = %.10f\n", doub);											//TEST
 	return doub;
 }
-
-
-
-/*
-// A function that
-//-----------------------------------------------------------------------------
-// Input:
-// Return:
-double stodoub(const char *str)
-{
-	int index,		//	counter
-		len		=	0;		//	lentgh of string geted
-	char remainder[MAX_MSG_LEN-2];
-	double doub = str[0] - '0';
-
-
-
-	len = strlen(str);		//	get lentgh of string
-
-
-	for(index = 2; index < len; index ++)
-
-		remainder[index-2] = str[index];
-
-	doub += (atoi(remainder) / MAX_MSG_LEN -1);
-
-	puts(str);
-
-	return(doub);
-
-}
-*/
