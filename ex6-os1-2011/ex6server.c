@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
 		{
 			msgStorge[counter] = my_msg;
 			//puts(msgStorge[counter].mtext);																		//TEST
-			printf("mul = %ld\n", msgStorge[counter].mtype);													//TEST
+			//printf("mul = %ld\n", msgStorge[counter].mtype);													//TEST
 
 
 			counter ++;
@@ -161,15 +161,10 @@ double calcAverage(struct my_msgbuf msgStorge[])
 	{
 		average += (msgStorge[index].mtype) * (stodoub(msgStorge[index].mtext));
 		divides += msgStorge[index].mtype;
-
-		//printf("index = %d\n", index);											//TEST
-		//printf("mul = %ld\n", msgStorge[1].mtype);								//TEST
-
 	}
 
 	if(divides)
 	{
-		printf("av = %.10f\n", average);
 		average = average / divides;
 		return average;
 	}

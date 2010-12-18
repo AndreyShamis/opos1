@@ -70,9 +70,6 @@ int main(int argc, char *argv[])
 		perror("msgget()failed");
 		exit(EXIT_FAILURE);
 	}
-
-	//pai = culcPai(atoi(argv[2]));
-
 	my_msg.mtype = atoi(argv[2]);
 
 
@@ -90,11 +87,6 @@ int main(int argc, char *argv[])
 
 	return(EXIT_SUCCESS);
 }
-
-
-
-
-
 
 
 //                             Function section
@@ -145,11 +137,10 @@ double culcPai(int multiplier)
 
 		if(distance <= 1)
 		{
-			//printf("LALAAALLALALALALALLALALALALALLALA\n");					//TEST
 			pointsIn ++;
 		}
 	}
-	printf("pai777 = %.10f\n", (4 * (pointsIn / totalPoints)));				//TEST
+	//printf("pai777 = %.10f\n", (4 * (pointsIn / totalPoints)));				//TEST##############333
 
 	return (4 * (pointsIn / totalPoints));
 }
