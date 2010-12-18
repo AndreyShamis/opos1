@@ -33,14 +33,6 @@ void incorect_param();
 
 double culcPai(int multiplier);
 
-//void doubtostr(char *str, const double num);
-
-
-
-
-
-
-
 //                                Main section
 //=============================================================================
 int main(int argc, char *argv[])
@@ -83,6 +75,7 @@ int main(int argc, char *argv[])
 		perror("msgsnd()failed");
 		exit(EXIT_FAILURE);
 	}
+
 
 
 	return(EXIT_SUCCESS);
@@ -145,64 +138,12 @@ double culcPai(int multiplier)
 	return (4 * (pointsIn / totalPoints));
 }
 
-/*
-// A function that
-//-----------------------------------------------------------------------------
-// Input:
-// Return:
-void doubtostr(char *str, const double num)
+
+void printErorr(const *char msg)
 {
-	sprintf(str, "%.10f\n", num);
-
-	char string[MAX_MSG_LEN] = "qwertyuiopasd";									//TEST
-
-	puts(string);										//TEST
-
-	puts(str);														//TEST
-
+	perror(msg);
+	exit(EXIT_FAILURE);
 }
-
-
-// A function that
-//-----------------------------------------------------------------------------
-// Input:
-// Return:
-char* doubtostr(const double num)
-{
-	int index, 		//	counter
-		complet;
-
-
-
-	char chr[MAX_MSG_LEN];
-
-	memset(chr,0,sizeof(chr));
-
-	char remainder[MAX_MSG_LEN-2];
-	double doub = num;
-
-	complet = (int)doub
-
-	chr[0] = (char)complet + '0';
-	chr[1] = '.';
-
-	for(index = 2; index < MAX_MSG_LEN -2; index ++)
-
-		chr[index] = (int)doub + '0';
-
-		remainder[index-2] = str[index];
-
-	doub += (atoi(remainder) / MAX_MSG_LEN -1);
-
-
-
-	return(doub);
-
-}
-
-*/
-
-
 
 
 
