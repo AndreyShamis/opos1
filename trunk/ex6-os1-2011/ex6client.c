@@ -12,7 +12,7 @@
 #include <time.h>
 #include <math.h>
 
-#define MAX_MSG_LEN 11
+#define MAX_MSG_LEN 13
 #define MAX_MSG 30
 
 
@@ -33,7 +33,7 @@ void incorect_param();
 
 double culcPai(int multiplier);
 
-void doubtostr(char *str, const double num);
+//void doubtostr(char *str, const double num);
 
 
 
@@ -77,11 +77,9 @@ int main(int argc, char *argv[])
 
 
 
-	 doubtostr(my_msg.mtext, culcPai(atoi(argv[2])));
+	 //doubtostr(my_msg.mtext, culcPai(atoi(argv[2])));
 
-
-
-
+	 sprintf(my_msg.mtext, "%.10f\n", culcPai(atoi(argv[2])));
 
 	if(msgsnd(queue_id, (struct msgbuf*)&my_msg, MAX_MSG_LEN, IPC_NOWAIT))
 	{
@@ -113,7 +111,7 @@ void incorect_param()
 {
 	printf("You need enter 2 parameters:\n");
 	printf("1. queue_id\n");
-	printf("2. multiplier for rand");
+	printf("2. multiplier for rand\n");
 
 }
 
@@ -124,7 +122,7 @@ double culcPai(int multiplier)
 	double xVal,
 		   yVal,
 		   distance,
-		   totalPoints = multiplier * 1000000,
+		   totalPoints = multiplier * 1000,
 		   pointsIn = 0;
 
 	int index;
@@ -140,9 +138,10 @@ double culcPai(int multiplier)
 		//printf("distance = %lf\n",distance);										//TEST
 
 		//distance = sqrt(456);
-		distance = sqrt(distance);
+		//distance = sqrt(distance);												//TODO
+		distance = distance * distance;
 
-		printf("distance = %lf\n",distance);										//TEST
+		//printf("distance = %lf\n", distance);										//TEST
 
 		if(distance <= 1)
 		{
@@ -150,27 +149,29 @@ double culcPai(int multiplier)
 			pointsIn ++;
 		}
 	}
-	printf("pai777 = %lf\n", (4 * (pointsIn / totalPoints)));				//TEST
+	printf("pai777 = %.10f\n", (4 * (pointsIn / totalPoints)));				//TEST
 
 	return (4 * (pointsIn / totalPoints));
 }
 
-
+/*
 // A function that
 //-----------------------------------------------------------------------------
 // Input:
 // Return:
 void doubtostr(char *str, const double num)
 {
-	sprintf(str, "%lf", num);
+	sprintf(str, "%.10f\n", num);
 
-	//printf("pai = %lf\n", num);										//TEST
+	char string[MAX_MSG_LEN] = "qwertyuiopasd";									//TEST
+
+	puts(string);										//TEST
 
 	puts(str);														//TEST
 
 }
 
-/*
+
 // A function that
 //-----------------------------------------------------------------------------
 // Input:
@@ -194,7 +195,7 @@ char* doubtostr(const double num)
 	chr[0] = (char)complet + '0';
 	chr[1] = '.';
 
-	for(index = 2; index <= MAX_MSG_LEN -2; index ++)
+	for(index = 2; index < MAX_MSG_LEN -2; index ++)
 
 		chr[index] = (int)doub + '0';
 
