@@ -139,6 +139,7 @@ double culcPai(int multiplier)
 }
 
 
+/*
 void printErorr(const *char msg)
 {
 	perror(msg);
@@ -148,5 +149,5 @@ void printErorr(const *char msg)
 
 
 
-
+*/
 

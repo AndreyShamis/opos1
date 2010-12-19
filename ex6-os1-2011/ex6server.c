@@ -11,7 +11,7 @@
 #include <signal.h>
 
 #define MAX_MSG_LEN 13
-#define MAX_MSG 30
+#define MAX_MSG 3000
 
 
 
@@ -23,6 +23,12 @@ struct my_msgbuf
 
 int quit = 0;
 
+
+struct Node
+{
+	struct my_msgbuf msgStorge;
+	struct Node *_next;
+};
 
 
 
@@ -44,22 +50,34 @@ void stopServer(int sig_num);
 
 double stodoub(const char *str);
 
-double calcAverage(struct my_msgbuf msgStorge[]);
+double calcAverage(struct Node *nod);
 
 void printErorr(const char *msg);
 
 
 
 
-
+struct Node *Allocate_Node()
+{
+	struct Node *temp = NULL;
+	
+	temp = malloc(sizeof(struct Node));
+	
+	if(temp == NULL)
+		exit(EXIT_FAILURE);
+	
+	temp->_next = NULL;
+	return(temp);
+}
 
 //                                Main section
 //=============================================================================
 int main(int argc, char *argv[])
 {
 	struct my_msgbuf msgStorge[MAX_MSG];
-
+	struct Node *head = NULL;
 	key_t key;
+	struct Node *temp = NULL;
 	int queue_id;
 	struct my_msgbuf my_msg;
 	int status;
@@ -104,12 +122,19 @@ int main(int argc, char *argv[])
 	while(!quit)
 	{
 
-
-
+		if(head == NULL)
+			head = Allocate_Node();
+		else
+		{
+			temp = Allocate_Node();
+			temp->_next = head;
+			head = temp;
+		
+		}
 		status = msgrcv(queue_id,(struct msgbuf*)&my_msg, MAX_MSG_LEN, allowed_type, IPC_NOWAIT);
 		if(status > 0)
 		{
-			msgStorge[counter] = my_msg;
+			head->msgStorge = my_msg;
 			//puts(msgStorge[counter].mtext);																		//TEST
 			//printf("mul = %ld\n", msgStorge[counter].mtype);													//TEST
 
@@ -128,7 +153,7 @@ int main(int argc, char *argv[])
 
 	if(atoi(msgStorge[0].mtext))
 	{
-		pai = calcAverage(msgStorge);
+		pai = calcAverage(head);
 
 		printf("pai = %.10f\n", pai);
 	}
@@ -152,16 +177,20 @@ void stopServer(int sig_num)
 //-----------------------------------------------------------------------------
 // Input:
 // Return:
-double calcAverage(struct my_msgbuf msgStorge[])
+double calcAverage(struct Node *nod)
 {
 	double average = 0;
 	int index;
 	long int divides = 0;
+	struct Node *temp = NULL;
 
-	for(index = 0; msgStorge[index].mtype > 0; index ++)
+	temp = nod;
+	for(index = 0; temp->_next !=NULL; index ++)
 	{
-		average += (msgStorge[index].mtype) * (stodoub(msgStorge[index].mtext));
-		divides += msgStorge[index].mtype;
+		
+		average += (temp->msgStorge.mtype) * (stodoub(temp->msgStorge.mtext));
+		divides += temp->msgStorge.mtype;
+		temp = temp->_next;
 	}
 
 	if(divides)
