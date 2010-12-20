@@ -1,8 +1,9 @@
 /*
  * EX6:: Program to calculate Pi with server and clients
  * ===========================================================================
- * Writen by: Andrey Shamis,  id: 321470882, login: andreysh
- * and:       Ilia Gaisinsky, id: 309480051, login: iliaga
+ * Writen by: Ilia Gaisinsky, id: 309480051, login: iliaga
+	      Andrey Shamis,  id: 321470882, login: andreysh
+ * and:       
  * ===========================================================================
  *
  *		to compile : 
@@ -11,24 +12,32 @@
  *
  *		to run:	
  		
- 		Server:
- 					./ex6_server X Y
-		X			-	TODO
-		Y			-	TODO
+ 			Server:
+ 				./ex6_server X Y
+			X		-  id of internal queue comunication
+			Y		-  working time
 		 		
- 		Client
- 					./ex6_client X Y
- 		X			-	TODO
- 		Y			-	TODO	
+ 			Client
+	 			./ex6_client X Y
+	 		X		-  id of internal queue comunication
+ 			Y		-  multple of pai calculation.	
  *
  */
 
 ============================= ex6_server ======================================
-Client first try to open the msg for send to server the pi which gona be 
-calculated. 
-//TODO
+At first, The server criate queue of messegs, than it retreive from clients pi 
+value and mutple in evry messege he get. the server get number of messege as 
+number of seconds that user give as argument to the server program. each second 
+the chek server if he get messege and if there is - he save it to linked list.
+After that we calculate the everage of all pai value that we get 
+(the calculation include multple value).
+In the end the program we print the evarage pai value and close messege queue. 
 ============================= ex6_client ======================================
-The server retreive from clients pi and then..//TODO
+At first, client open the msg for send to server the pi which gona be 
+calculated. then we calculate the pai value an d send it to server.
+* calcylation of pai: we retrive multiple form user that pultipling number
+1000 and that number randomize to calculate pai thrugh MOTE CARLO method.
+
 //---------------------------------------------------------------------------//
 Files used
 
