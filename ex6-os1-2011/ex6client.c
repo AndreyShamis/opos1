@@ -68,6 +68,8 @@ int main(int argc, char *argv[])
 
 	 //doubtostr(my_msg.mtext, culcPai(atoi(argv[2])));
 	memset(my_msg.mtext,'\0',sizeof(my_msg.mtext));
+	
+	
 	 sprintf(my_msg.mtext, "%.10f\n", culcPai(atoi(argv[2])));
 	
 	if(msgsnd(queue_id, (struct msgbuf*)&my_msg, MAX_MSG_LEN, IPC_NOWAIT))
