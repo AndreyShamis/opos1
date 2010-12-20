@@ -182,7 +182,8 @@ struct Node *retreive_data(const int queue_id)
 	
 	while(!quit)
 	{			
-		status = msgrcv(queue_id,(struct msgbuf*)&my_msg, MAX_MSG_LEN, allowed_type, IPC_NOWAIT);
+		status = msgrcv(queue_id,(struct msgbuf*)&my_msg, 
+						MAX_MSG_LEN, allowed_type, IPC_NOWAIT);
 		if(status > 0)
 		{
 			head= getNextNode(head);		//	manipulation with list
