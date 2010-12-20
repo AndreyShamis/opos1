@@ -1,3 +1,10 @@
+/*
+
+	Provide server for clients which calculated pi
+	and send it to server.
+	Server waiting X second.X mast be provided in argv-2.
+*/
+
 //                               Include section
 //=============================================================================
 #include <stdio.h>

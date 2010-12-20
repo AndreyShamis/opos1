@@ -1,3 +1,8 @@
+/*
+	This file are client which connected to server and send him
+	the pi value are is calculeted in function culcPai.
+
+*/
 //                               Include section
 //=============================================================================
 #include <stdio.h>
