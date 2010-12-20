@@ -102,8 +102,8 @@ void setHandlers();
 //	Main function
 int main(int argc, char **argv)
 {
-	int 			queue_id 	= 	0,			//	difine internal comunication key
-	 				ext_key		=	0;			//	difine external comunication key
+	int 			queue_id 	= 	0,			//	internal comunication key
+	 				ext_key		=	0;			//	external comunication key
 	struct Node 	*head 		= 	NULL;		//	DB of list
 	double 			pai_res		=	0;			//	pi variable
 

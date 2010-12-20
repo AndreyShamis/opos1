@@ -48,9 +48,9 @@ double culcPai(int multiplier);
 int main(int argc, char **argv)
 {
 
-	int 				queue_id		=	0;	//	difine internal comunication key
-	double				pai_calculated	=	0;  //	difine pai value.
-	struct my_msgbuf 	my_msg;					// difine transfer data structur.
+	int 				queue_id		=	0;	// internal comunication key
+	double				pai_calculated	=	0;  // pai value.
+	struct my_msgbuf 	my_msg;					// transfer data structur.
 
 	// If the user enter nesesery data corect:
 	if(argc != 3)
