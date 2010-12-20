@@ -15,9 +15,6 @@
 #define MAX_MSG_LEN 13
 #define MAX_MSG 30
 
-
-
-
 struct my_msgbuf
 {
 	long mtype;
@@ -27,22 +24,34 @@ struct my_msgbuf
 //                             Prototypes section
 //=============================================================================
 
-//------------------------------- Incorrect param------------------------------
+//=============================================================================
 //	print message of incorrect input parameters
 void incorect_param();
+//=============================================================================
+//	function which print error which get in parameter
+//	and exit from the programm
+void errExit(char *msg);
 
+//=============================================================================
+//	Function which start msg
+int init_msg(const int ext_key);
+
+//=============================================================================
+//	function to calculate Pi
+//	geting multiplayer
+//	return claculated value
 double culcPai(int multiplier);
 
+///////////////////////////////////////////////////////////////////////////////
 //                                Main section
 //=============================================================================
-int main(int argc, char *argv[])
+int main(int argc, char **argv)
 {
 
-	key_t key;
-	int queue_id;
-	struct my_msgbuf my_msg;
-
-	//double pai;
+	key_t 				key;
+	int 				queue_id		=	0;
+	double				pai_calculated	=	0;
+	struct my_msgbuf 	my_msg;
 
 	// If the user enter nesesery data corect:
 	if(argc != 3)
@@ -51,48 +60,53 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	if((key = ftok("/tmp", atoi(argv[1]))) == -1)
-	{
-		perror("ftok()failed");
-		exit(EXIT_FAILURE);
-	}
+	queue_id 		= 	init_msg(atoi(argv[1]));//	init msg
+		
+	my_msg.mtype 	= 	atoi(argv[2]);			//put second param to msg type
 
-	if((queue_id = msgget(key,0)) == -1)
-	{
-		perror("msgget()failed");
-		exit(EXIT_FAILURE);
-	}
-	my_msg.mtype = atoi(argv[2]);
-
-
-
-	 //doubtostr(my_msg.mtext, culcPai(atoi(argv[2])));
 	memset(my_msg.mtext,'\0',sizeof(my_msg.mtext));
 	
+	pai_calculated 	=	culcPai(atoi(argv[2]));	
 	
-	 sprintf(my_msg.mtext, "%.10f\n", culcPai(atoi(argv[2])));
-	
+	sprintf(my_msg.mtext, "%.10f\n",pai_calculated);
+
 	if(msgsnd(queue_id, (struct msgbuf*)&my_msg, MAX_MSG_LEN, IPC_NOWAIT))
-	{
-		perror("msgsnd()failed");
-		exit(EXIT_FAILURE);
-	}
-
-
+		errExit("msgsnd()failed\n");
 
 	return(EXIT_SUCCESS);
+	
 }
 
 
 //                             Function section
 //=============================================================================
 
+//=============================================================================
+//	Function which start msg
+int init_msg(const int ext_key)
+{
+	int 			queue_id = 0;		//			msg desc id
+	key_t 			key;				//			ftok key
 
+	if((key = ftok("/tmp", ext_key)) == -1)
+		errExit("ftok()failed\n");		//			Print error and exit
+	if((queue_id = msgget(key,0)) == -1)
+		errExit("msgget()failed\n");	//			Print error and exit
+	
+	return(queue_id);					//			return msg desc id
 
+}
 
+//=============================================================================
+//	function which print error which get in parameter
+//	and exit from the programm
+void errExit(char *msg)
+{
+	perror(msg);						//	Print message
+	exit(EXIT_FAILURE);					//	exit whith failure
+}
 
-
-//------------------------------- Incorrect param------------------------------
+//=============================================================================
 //	print message of incorrect input parameters
 void incorect_param()
 {
@@ -102,10 +116,13 @@ void incorect_param()
 
 }
 
-
+//=============================================================================
+//	function to calculate Pi
+//	geting multiplayer
+//	return claculated value
 double culcPai(int multiplier)
 {
-	srand(time(NULL));
+
 	double xVal,
 		   yVal,
 		   distance,
@@ -114,6 +131,7 @@ double culcPai(int multiplier)
 
 	int index;
 
+	srand(time(NULL));
 
 	for(index = 0; index < totalPoints; index ++)
 	{
@@ -121,35 +139,16 @@ double culcPai(int multiplier)
 		yVal = (double) rand()/RAND_MAX;
 
 		distance = (xVal * xVal) + (yVal * yVal);
-
-		//printf("distance = %lf\n",distance);										//TEST
-
-		//distance = sqrt(456);
-		//distance = sqrt(distance);												//TODO
 		distance = distance * distance;
 
-		//printf("distance = %lf\n", distance);										//TEST
-
 		if(distance <= 1)
-		{
 			pointsIn ++;
-		}
+
 	}
-	//printf("pai777 = %.10f\n", (4 * (pointsIn / totalPoints)));				//TEST##############333
 
 	return (4 * (pointsIn / totalPoints));
 }
 
-
-/*
-void printErorr(const *char msg)
-{
-	perror(msg);
-	exit(EXIT_FAILURE);
-}
-
-
-
-
-*/
-
+//=============================================================================
+//=============================================================================
+//=============================================================================
