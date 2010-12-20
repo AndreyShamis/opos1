@@ -11,7 +11,7 @@
 #include <signal.h>
 
 #define MAX_MSG_LEN 13
-#define MAX_MSG 30
+
 
 #define MSGGET_FLAG		IPC_CREAT | IPC_EXCL | 0600
 
@@ -31,7 +31,7 @@ struct my_msgbuf
 //	struct to save the list of nodes
 struct Node
 {
-	struct my_msgbuf msgStorge;		//	struct my_msgbuf 
+	struct my_msgbuf msgStorge;		//	struct my_msgbuf
 	struct Node *_next;				//	Pointer to next Node in list
 };
 //=============================================================================
@@ -52,7 +52,7 @@ void stopServer(int sig_num);
 double calcAverage(struct Node *nod);
 
 //=============================================================================
-//	function which allocate new cell 
+//	function which allocate new cell
 //	return pointer to new cell
 struct Node *Allocate_Node();
 
@@ -102,8 +102,8 @@ void setHandlers();
 //	Main function
 int main(int argc, char **argv)
 {
-	int 			queue_id 	= 	0,			//	TODO
-	 				ext_key		=	0;			//	TODO
+	int 			queue_id 	= 	0,			//	difine internal comunication key
+	 				ext_key		=	0;			//	difine external comunication key
 	struct Node 	*head 		= 	NULL;		//	DB of list
 	double 			pai_res		=	0;			//	pi variable
 
@@ -113,22 +113,22 @@ int main(int argc, char **argv)
 		incorect_param();						//	print error
 		exit(EXIT_FAILURE);
 	}
-	
+
 	setHandlers();								//	set signal handlers
-	
-	ext_key 	= 	atoi(argv[1]);				//	get external key	
-	alarm(atoi(argv[2]));						//	set alarm 
+
+	ext_key 	= 	atoi(argv[1]);				//	get external key
+	alarm(atoi(argv[2]));						//	set alarm
 
 	queue_id 	= 	init_msg(ext_key);			//	init msg
 	head 		= 	retreive_data(queue_id);	//	retreive msg
 	close_msg(queue_id);						//	close msg
-		
-	//if(head!= NULL)
-	//{
+
+	if(head!= NULL)
+	{
 		pai_res = 	calcAverage(head);			//	get value of pi
 		print_result(pai_res);					//	print reults
 		clear_memory(head);						//	clear memory used
-	//}
+	}
 
 	return(EXIT_SUCCESS);
 
@@ -138,7 +138,7 @@ int main(int argc, char **argv)
 //	Function which set signal handler
 void setHandlers()
 {
-	signal(SIGALRM, stopServer);		//	set signal handler for Alarm 
+	signal(SIGALRM, stopServer);		//	set signal handler for Alarm
 	signal(SIGINT, stopServer);			//	set signal handler for sigInt
 
 }
@@ -149,12 +149,12 @@ int init_msg(const int ext_key)
 {
 	int 			queue_id = 0;		//			msg desc id
 	key_t 			key;				//			ftok key
-	
+
 	if((key = ftok("/tmp", ext_key)) == -1)
 		errExit("ftok()failed\n");		//			Print error and exit
 	if((queue_id = msgget(key,MSGGET_FLAG)) == -1)
 		errExit("msgget()failed\n");	//			Print error and exit
-	
+
 	return(queue_id);					//			return msg desc id
 
 }
@@ -175,21 +175,25 @@ void close_msg(const int queue_id)
 struct Node *retreive_data(const int queue_id)
 {
 
-	struct my_msgbuf 	my_msg;					//TODO
-	int 				status;					//TODO
-	long int 			allowed_type 	= 	0;	//TODO
-	struct Node 		*head 			= 	NULL;// Db list
-	
+	struct my_msgbuf 	my_msg;	// difine transfer data structur.
+	int 				status;	// difine volume of retreive data or failiar.
+
+	// allowed type of information to be retreive from clients
+	// (allowed type of key). equal to 0 because server get any type of data.
+	long int 			allowed_type 	= 	0;
+
+	struct Node 		*head 			= 	NULL;// Db linked list
+
 	while(!quit)
-	{			
-		status = msgrcv(queue_id,(struct msgbuf*)&my_msg, 
+	{
+		status = msgrcv(queue_id,(struct msgbuf*)&my_msg,
 						MAX_MSG_LEN, allowed_type, IPC_NOWAIT);
 		if(status > 0)
 		{
 			head= getNextNode(head);		//	manipulation with list
-			head->msgStorge = my_msg;		//	copy data recived			
+			head->msgStorge = my_msg;		//	copy data recived
 		}
-		
+
 		sleep(1);							//	sleep
 	}
 
@@ -213,9 +217,9 @@ struct Node *getNextNode(struct Node *head)
 		temp->_next = head;				//	new node point to head of list
 		head = temp;					//	new node be head of list
 	}
-	
+
 	return(head);						//	return head of list
-		
+
 }
 
 //=============================================================================
@@ -227,19 +231,19 @@ void print_result(const double pai)
 }
 
 //=============================================================================
-//	function which allocate new cell 
+//	function which allocate new cell
 //	return pointer to new cell
 struct Node *Allocate_Node()
 {
 	struct Node *temp = NULL;			//	temp variable
-	
+
 	temp = malloc(sizeof(struct Node));	//	allocate new node
-	
+
 	if(temp == NULL)	//	if not success allocate new node
 		errExit("Can not allocate memory.\n");
-	
+
 	temp->_next = NULL;	//	set pointer to next be NULL
-	
+
 	return(temp);		//	return new node
 
 }
@@ -249,7 +253,7 @@ struct Node *Allocate_Node()
 //	and exit from the programm
 void errExit(char *msg)
 {
-	perror(msg);					//	print err message 
+	perror(msg);					//	print err message
 	exit(EXIT_FAILURE);				//	exit whith fail
 }
 
@@ -258,14 +262,14 @@ void errExit(char *msg)
 void clear_memory(struct Node *head)
 {
 	struct Node *temp = NULL;		//	temp variable
-	
+
 	while(head != NULL)				//	while the node is not null
 	{
 		temp = head->_next;			//	set temp be next
 		free(head);					//	delete this
 		head= temp;					//	next be this
 	}
-	
+
 }
 
 //=============================================================================
@@ -274,14 +278,14 @@ void clear_memory(struct Node *head)
 // Return:	value of PI
 double calcAverage(struct Node *nod)
 {
-	double 		average 	= 	0;		//	TODO
-	long int 	divides 	= 	0;		//	TODO
+	double 		average 	= 	0;		//	difine average of retreive pais.
+	long int 	divides 	= 	0;		//	difine weight of calculation averag
 	struct Node *temp 		= 	NULL;	//	temp variable
 
 	temp = nod;							//	get head of list
 
-	while(temp!=NULL)
-	{									//	TODO
+	while(temp!=NULL)	// calculation of average.
+	{
 		average += temp->msgStorge.mtype * atof(temp->msgStorge.mtext);
 		divides += temp->msgStorge.mtype;
 		temp = temp->_next;				//	get next node in list
@@ -294,7 +298,7 @@ double calcAverage(struct Node *nod)
 	}
 
 	return (0);							//	return other value
-	
+
 }
 
 //=============================================================================
