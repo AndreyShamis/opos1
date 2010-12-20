@@ -13,6 +13,7 @@
 #define MAX_MSG_LEN 13
 #define MAX_MSG 3000
 
+#define MSGGET_FLAG		IPC_CREAT | IPC_EXCL | 0600
 
 
 struct my_msgbuf
@@ -35,13 +36,6 @@ struct Node
 //                             Prototypes section
 //=============================================================================
 
-
-
-
-
-
-
-
 //------------------------------- Incorrect param------------------------------
 //	print message of incorrect input parameters
 void incorect_param();
@@ -54,43 +48,34 @@ double calcAverage(struct Node *nod);
 
 void printErorr(const char *msg);
 
+struct Node *Allocate_Node();
+
+void errExit(char *msg);
+
+void clear_memory(struct Node *head);
+
+void print_result(struct Node *head);
+
+struct Node *retreive_data(const int queue_id);
+
+struct Node *getNextNode(struct Node *head);
 
 
 
-struct Node *Allocate_Node()
-{
-	struct Node *temp = NULL;
-	
-	temp = malloc(sizeof(struct Node));
-	
-	if(temp == NULL)
-		exit(EXIT_FAILURE);
-	
-	temp->_next = NULL;
-	return(temp);
-}
 
 //                                Main section
 //=============================================================================
 int main(int argc, char *argv[])
 {
-	struct my_msgbuf msgStorge[MAX_MSG];
+	key_t 	key;
+	int 	queue_id;
+	int ext_key	=	0;
 	struct Node *head = NULL;
-	key_t key;
-	struct Node *temp = NULL;
-	int queue_id;
-	struct my_msgbuf my_msg;
-	int status;
-	long int allowed_type = 0;
-
-	double pai;
-
-	memset(msgStorge,0,sizeof(msgStorge));
 
 
+	
 	signal(SIGALRM, stopServer);
 	signal(SIGINT, stopServer);
-
 
 	// If the user enter nesesery data corect:
 	if(argc != 3)
@@ -98,72 +83,134 @@ int main(int argc, char *argv[])
 		incorect_param();						//	print error
 		exit(EXIT_FAILURE);
 	}
+	ext_key = atoi(argv[1]);
 
-
-	if((key = ftok("/tmp", atoi(argv[1]))) == -1)
-	{
-		perror("ftok()failed");
-		exit(EXIT_FAILURE);
-	}
-	if((queue_id = msgget(key,IPC_CREAT | IPC_EXCL | 0600)) == -1)
-	{
-		perror("msgget()failed");
-		exit(EXIT_FAILURE);
-	}
-
-
-	//for(index = 0; index < argv[2] || stopServer; index++)
-
-
-	int counter = 0;
+	if((key = ftok("/tmp", ext_key)) == -1)
+		errExit("ftok()failed\n");
+	if((queue_id = msgget(key,MSGGET_FLAG)) == -1)
+		errExit("msgget()failed\n");
 
 	alarm(atoi(argv[2]));
 
+
+	head = retreive_data(queue_id);
+		
+	print_result(head);
+
+	clear_memory(head);
+
+	return(EXIT_SUCCESS);
+
+}
+
+
+struct Node *retreive_data(const int queue_id)
+{
+
+	struct my_msgbuf 	my_msg;
+	//struct my_msgbuf	msgStorge;
+	int 				status;
+	long int 			allowed_type = 0;
+	struct Node 		*head = NULL;
+	
 	while(!quit)
 	{
-
-		if(head == NULL)
-			head = Allocate_Node();
-		else
-		{
-			temp = Allocate_Node();
-			temp->_next = head;
-			head = temp;
-		
-		}
+		//memset(my_msg.mtext , '\0' ,sizeof(my_msg.mtext));	
+			
 		status = msgrcv(queue_id,(struct msgbuf*)&my_msg, MAX_MSG_LEN, allowed_type, IPC_NOWAIT);
 		if(status > 0)
 		{
+			head= getNextNode(head);
+			//memset(head->msgStorge.mtext , '\0' ,sizeof(head->msgStorge.mtext));	
+			//memset(msgStorge,0,sizeof(msgStorge));
+			//memset((void *)&head->msgStorge,0,sizeof(head->msgStorge));
+			//memset(msgStorge,0,sizeof(msgStorge));
+			//msgStorge = my_msg;
 			head->msgStorge = my_msg;
-			//puts(msgStorge[counter].mtext);																		//TEST
-			//printf("mul = %ld\n", msgStorge[counter].mtype);													//TEST
-
-
-			counter ++;
 		}
 		sleep(1);
 	}
 
 	if(msgctl(queue_id, IPC_RMID, NULL) == -1)
+		errExit("msgctl()failed\n");	
+
+	return(head);
+}
+
+struct Node *getNextNode(struct Node *head)
+{
+	struct Node *temp 	= 	NULL;
+
+	if(head == NULL)
+		head = Allocate_Node();
+	else
 	{
-		perror("msgctl()failed");
-		exit(EXIT_FAILURE);
+		temp = Allocate_Node();
+		temp->_next = head;
+		head = temp;		
+	}
+	
+	return(head);
+		
+}
+
+void print_result(struct Node *head)
+{
+	double 	pai	=	0;					//	pi variable
+
+	if(head!= NULL)
+	{
+		pai = calcAverage(head);		//	get value of pi
+
+		fprintf(stdout,"pai = %.10f\n", pai);	//
 	}
 
+}
+//=============================================================================
+//	function which allocate new cell 
+//	return pointer to new cell
+struct Node *Allocate_Node()
+{
+	struct Node *temp = NULL;
+	
+	temp = malloc(sizeof(struct Node));
+	
+	if(temp == NULL)
+		errExit("Can not allocate memory.\n");
+	
+	temp->_next = NULL;
+	
+	return(temp);
 
-	if(atoi(msgStorge[0].mtext))
-	{
-		pai = calcAverage(head);
-
-		printf("pai = %.10f\n", pai);
-	}
-	return(EXIT_SUCCESS);
 }
 
 
+//=============================================================================
+//	function which print error which get in parameter
+//	and exit from the programm
+void errExit(char *msg)
+{
+	perror(msg);
+	exit(EXIT_FAILURE);
+}
+
+//=============================================================================
+//	function wich clear the memory which was used
+void clear_memory(struct Node *head)
+{
+	struct Node *temp = NULL;
+	
+	while(head != NULL)
+	{
+		temp = head->_next;
+		free(head);
+		head= temp;
+	}
+	
+}
+
 //                             Function section
 //=============================================================================
-
 
 // A function that
 //-----------------------------------------------------------------------------
@@ -175,20 +222,19 @@ void stopServer(int sig_num)
 
 // A function that
 //-----------------------------------------------------------------------------
-// Input:
+// Inpu-t:
 // Return:
 double calcAverage(struct Node *nod)
 {
 	double average = 0;
-	int index;
+	int index = 0;
 	long int divides = 0;
 	struct Node *temp = NULL;
 
 	temp = nod;
 	for(index = 0; temp->_next !=NULL; index ++)
-	{
-		
-		average += (temp->msgStorge.mtype) * (stodoub(temp->msgStorge.mtext));
+	{		
+		average += temp->msgStorge.mtype * stodoub(temp->msgStorge.mtext);
 		divides += temp->msgStorge.mtype;
 		temp = temp->_next;
 	}
@@ -196,7 +242,7 @@ double calcAverage(struct Node *nod)
 	if(divides)
 	{
 		average = average / divides;
-		return average;
+		return (average);
 	}
 
 	return (0);
@@ -221,9 +267,10 @@ void incorect_param()
 double stodoub(const char *str)
 {
 
-	double doub;
-	sscanf (str,"%lf\n",&doub);
-	//puts(str);											//TEST
-	//printf("##### = %.10f\n", doub);											//TEST
+	double doub = 0;
+	//	TODO -sscanf (str,"%lf\n",&doub);
+	//sscanf(str,"%lf",&doub);
+	doub = atof(str);
 	return doub;
+
 }
