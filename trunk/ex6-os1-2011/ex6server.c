@@ -42,8 +42,6 @@ void incorect_param();
 
 void stopServer(int sig_num);
 
-double stodoub(const char *str);
-
 double calcAverage(struct Node *nod);
 
 void printErorr(const char *msg);
@@ -234,7 +232,7 @@ double calcAverage(struct Node *nod)
 	temp = nod;
 	for(index = 0; temp->_next !=NULL; index ++)
 	{		
-		average += temp->msgStorge.mtype * stodoub(temp->msgStorge.mtext);
+		average += temp->msgStorge.mtype * atof(temp->msgStorge.mtext);
 		divides += temp->msgStorge.mtype;
 		temp = temp->_next;
 	}
@@ -259,18 +257,3 @@ void incorect_param()
 
 }
 
-
-// A function that
-//-----------------------------------------------------------------------------
-// Input:
-// Return:
-double stodoub(const char *str)
-{
-
-	double doub = 0;
-	//	TODO -sscanf (str,"%lf\n",&doub);
-	//sscanf(str,"%lf",&doub);
-	doub = atof(str);
-	return doub;
-
-}

@@ -14,7 +14,7 @@ gcc -Wall ex6client.c -o client
 COUNTER=20
 LOL=4
      until [  $COUNTER -lt 10 ]; do
-		./client 0 4
+		valgrind ./client 12 4
 		let LOL-=1
         echo COUNTER $COUNTER
         let COUNTER-=1
