@@ -32,6 +32,9 @@ void cycle()
 			perror("popen _error");	//	print error
 			exit(EXIT_FAILURE);			//	exit
 		}
+		else
+			pclose(pipe_fp);
+			
 	}
 }
 
