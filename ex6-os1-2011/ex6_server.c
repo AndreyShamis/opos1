@@ -102,8 +102,8 @@ void setHandlers();
 //	Main function
 int main(int argc, char **argv)
 {
-	int 			queue_id 	= 	0,
-	 				ext_key		=	0;
+	int 			queue_id 	= 	0,			//	TODO
+	 				ext_key		=	0;			//	TODO
 	struct Node 	*head 		= 	NULL;		//	DB of list
 	double 			pai_res		=	0;			//	pi variable
 
@@ -175,10 +175,10 @@ void close_msg(const int queue_id)
 struct Node *retreive_data(const int queue_id)
 {
 
-	struct my_msgbuf 	my_msg;
-	int 				status;
+	struct my_msgbuf 	my_msg;					//TODO
+	int 				status;					//TODO
 	long int 			allowed_type 	= 	0;	//TODO
-	struct Node 		*head 			= 	NULL;
+	struct Node 		*head 			= 	NULL;// Db list
 	
 	while(!quit)
 	{			
@@ -248,8 +248,8 @@ struct Node *Allocate_Node()
 //	and exit from the programm
 void errExit(char *msg)
 {
-	perror(msg);
-	exit(EXIT_FAILURE);
+	perror(msg);					//	print err message 
+	exit(EXIT_FAILURE);				//	exit whith fail
 }
 
 //=============================================================================
