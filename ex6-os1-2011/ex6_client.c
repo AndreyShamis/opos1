@@ -13,7 +13,7 @@
 #include <math.h>
 
 #define MAX_MSG_LEN 13
-#define MAX_MSG 30
+
 
 struct my_msgbuf
 {
@@ -48,10 +48,9 @@ double culcPai(int multiplier);
 int main(int argc, char **argv)
 {
 
-	key_t 				key;
-	int 				queue_id		=	0;
-	double				pai_calculated	=	0;
-	struct my_msgbuf 	my_msg;
+	int 				queue_id		=	0;	//	difine internal comunication key
+	double				pai_calculated	=	0;  //	difine pai value.
+	struct my_msgbuf 	my_msg;					// difine transfer data structur.
 
 	// If the user enter nesesery data corect:
 	if(argc != 3)
@@ -61,20 +60,21 @@ int main(int argc, char **argv)
 	}
 
 	queue_id 		= 	init_msg(atoi(argv[1]));//	init msg
-		
+
 	my_msg.mtype 	= 	atoi(argv[2]);			//put second param to msg type
 
-	memset(my_msg.mtext,'\0',sizeof(my_msg.mtext));
-	
-	pai_calculated 	=	culcPai(atoi(argv[2]));	
-	
-	sprintf(my_msg.mtext, "%.10f\n",pai_calculated);
+	memset(my_msg.mtext,'\0',sizeof(my_msg.mtext));	// to be shur that clin str
 
+	pai_calculated 	=	culcPai(atoi(argv[2])); // calc pai.
+
+	sprintf(my_msg.mtext, "%.10f\n",pai_calculated); // Print pai.
+
+	// Send messeg to server.
 	if(msgsnd(queue_id, (struct msgbuf*)&my_msg, MAX_MSG_LEN, IPC_NOWAIT))
 		errExit("msgsnd()failed\n");
 
 	return(EXIT_SUCCESS);
-	
+
 }
 
 
@@ -92,7 +92,7 @@ int init_msg(const int ext_key)
 		errExit("ftok()failed\n");		//			Print error and exit
 	if((queue_id = msgget(key,0)) == -1)
 		errExit("msgget()failed\n");	//			Print error and exit
-	
+
 	return(queue_id);					//			return msg desc id
 
 }
@@ -123,21 +123,23 @@ void incorect_param()
 double culcPai(int multiplier)
 {
 
-	double xVal,
-		   yVal,
-		   distance,
-		   totalPoints = multiplier * 1000,
+	double xVal,		// rndom x coordinate value.
+		   yVal,		// rndom y coordinate value.
+		   distance,	// distance of points.
+		   totalPoints = multiplier * 1000,	// difine total points number.
 		   pointsIn = 0;
 
-	int index;
+	int index;	// for Looping.
 
-	srand(time(NULL));
+	srand(time(NULL));	// init random.
 
+	// Loop thrugh all random points, and calculate num of point in the circel.
 	for(index = 0; index < totalPoints; index ++)
 	{
 		xVal = (double) rand()/RAND_MAX;
 		yVal = (double) rand()/RAND_MAX;
 
+		// alculate num of point in the circel
 		distance = (xVal * xVal) + (yVal * yVal);
 		distance = distance * distance;
 
@@ -145,7 +147,7 @@ double culcPai(int multiplier)
 			pointsIn ++;
 
 	}
-
+	// return pai propabilety value.
 	return (4 * (pointsIn / totalPoints));
 }
 
