@@ -11,10 +11,10 @@ echo "###################################################"
 gcc -Wall ex6server.c -o server
 gcc -Wall ex6client.c -o client
 #./server 55 30 & 
-COUNTER=2000
+COUNTER=20
 LOL=4
      until [  $COUNTER -lt 10 ]; do
-		./client 55 4
+		./client 0 4
 		let LOL-=1
         echo COUNTER $COUNTER
         let COUNTER-=1
