@@ -1,0 +1,41 @@
+/*
+ * EX6:: Program to calculate Pi with server and clients
+ * ===========================================================================
+ * Writen by: Andrey Shamis,  id: 321470882, login: andreysh
+ * and:       Ilia Gaisinsky, id: 309480051, login: iliaga
+ * ===========================================================================
+ *
+ *		to compile : 
+ 					gcc -Wall ex6_server.c -o ex6_server
+ 					gcc -Wall ex6_client.c -o ex6_client
+ *
+ *		to run:	
+ 		
+ 		Server:
+ 					./ex6_server X Y
+		X			-	TODO
+		Y			-	TODO
+		 		
+ 		Client
+ 					./ex6_client X Y
+ 		X			-	TODO
+ 		Y			-	TODO	
+ *
+ */
+
+============================= ex6_server ======================================
+Client first try to open the msg for send to server the pi which gona be 
+calculated. 
+//TODO
+============================= ex6_client ======================================
+The server retreive from clients pi and then..//TODO
+//---------------------------------------------------------------------------//
+Files used
+
+ex6_server.c				//	Server file
+ex6_client.c 				//	Client File
+
+ReadMe-os1-ex6-2011-andreysh_iliaga	//	readme
+
+===============================================================================
+
