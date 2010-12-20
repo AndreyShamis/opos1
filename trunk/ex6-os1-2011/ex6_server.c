@@ -11,28 +11,31 @@
 #include <signal.h>
 
 #define MAX_MSG_LEN 13
-#define MAX_MSG 3000
+#define MAX_MSG 30
 
 #define MSGGET_FLAG		IPC_CREAT | IPC_EXCL | 0600
 
 //=============================================================================
-//                             Prototypes section
+//                        Variable and struct section
 
-int quit = 0;
+int quit = 0;	//global variable to get exit status can be updated in handler
 
+//============================ STRUCTS ========================================
+//	struct for retreidev messages
 struct my_msgbuf
 {
 	long mtype;
 	char mtext[MAX_MSG_LEN];
 };
 
+//	struct to save the list of nodes
 struct Node
 {
-	struct my_msgbuf msgStorge;
-	struct Node *_next;
+	struct my_msgbuf msgStorge;		//	struct my_msgbuf 
+	struct Node *_next;				//	Pointer to next Node in list
 };
-
-
+//=============================================================================
+//								Prototypes
 //=============================================================================
 //	print message of incorrect input parameters
 void incorect_param();
