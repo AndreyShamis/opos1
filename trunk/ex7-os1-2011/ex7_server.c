@@ -126,9 +126,10 @@ int main(int argc, char **argv)
 	(*counter) = 0;						// reset counter
 
 	// get pointer to the arr of structs at shered memory
-	data_base = (struct my_msgbuf*)(counter + sizeof(int));
+	data_base = (struct my_msgbuf*)(counter + 1);
 
-	wait_for_data(counter, atoi(argv[2]), shm_id, shm_size);	// waiting for shered memory to be filled.
+	// waiting for shered memory to be filled.
+	wait_for_data(counter, atoi(argv[2]), shm_id, shm_size);
 
 
 	pai_res = calcAverage(data_base, abs(*counter));		//	get value of pi
@@ -181,7 +182,7 @@ void wait_for_data(int *counter, int timer, int shm_id, int shm_size)
 		if((*counter) ==  shm_size)
 		{
 			lock_shm(shm_id);
-			(*counter) = -1 * (*counter);
+			(*counter) = (-1) * (*counter);
 		}
 	}
 }
@@ -216,7 +217,7 @@ int init_shm(const int ext_key, int shm_size)
 
 	if((key = ftok("/tmp", ext_key)) == -1)
 		errExit("ftok()failed\n");		//			Print error and exit
-	if((shm_id = shmget(key, sizeof(int) + sizeof(struct my_msgbuf) * shm_size, MSGGET_FLAG)) == -1)
+	if((shm_id = shmget(key, sizeof(int) + (sizeof(struct my_msgbuf) * shm_size), MSGGET_FLAG)) == -1)
 		errExit("shmget()failed\n");	//			Print error and exit
 
 	return(shm_id);					//			return shm desc id
@@ -257,6 +258,7 @@ double calcAverage(struct my_msgbuf *data_base, int num_of_pais)
 		divides += data_base[index].mtype;
 
 		fprintf(stdout,"##########pai = %.10f\n", data_base[index].mtext);
+		//fprintf(stdout,"mtype = %d\n", data_base[index].mtype);
 
 	}
 
