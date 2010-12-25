@@ -77,28 +77,14 @@ int main(int argc, char **argv)
 
 	shm_id 		= 	init_msg(atoi(argv[1]));	//	init shered memory
 
-	//memset(my_msg.mtext,'\0',sizeof(my_msg.mtext));	// to be shur that clin str
-
-
-
 	counter = get_ptr_to_shm(shm_id);
 
 	shm_ptr = (struct my_msgbuf*)(counter + sizeof(int));
 
-	pai_calculated 	=	culcPai(atoi(argv[2])); // calc pai.
-
 	if((*counter) < 0)
-		return(EXIT_FAILURE);
+		exit(EXIT_FAILURE);
 
-
-
-	//while(shm_ptr[index].mtype != 0) // finde next empty cell at shered memory
-	//{
-		//index ++;
-	//printf("%d\n",shm_ptr[counter].mtype);
-		//printf("tralialia:\n");
-	//}
-
+	pai_calculated 	=	culcPai(atoi(argv[2])); // calc pai.
 
 	shm_ptr[*counter].mtype = atoi(argv[2]);	//put second param to msg type
 	shm_ptr[*counter].pai	 =  pai_calculated; // put pai to shered memory.
