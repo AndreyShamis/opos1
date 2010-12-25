@@ -123,11 +123,13 @@ int main(int argc, char **argv)
 
 	counter = get_ptr_to_shm(shm_id);
 
-	*counter = 0;
+	(*counter) = 0;
 
-	data_base = (struct my_msgbuf*)counter + sizeof(int);
+	data_base = (struct my_msgbuf*)(counter + sizeof(int));
 
 	wait_for_data(counter, atoi(argv[2]), shm_id, shm_size);	// waiting for shered memory to be filled.
+
+
 
 	//lock_shm(shm_id);				// lock shered memory
 
@@ -178,10 +180,12 @@ void wait_for_data(int *counter, int timer, int shm_id, int shm_size)
 
 	while(!quit)
 	{
-		if(*counter <  shm_size)
+		fprintf(stdout,"counter = %d\n", (*counter));
+
+		if((*counter) ==  shm_size)
 		{
 			lock_shm(shm_id);
-			*counter = -1;
+			(*counter) = -1 * (*counter);
 		}
 	}
 }
@@ -249,11 +253,15 @@ double calcAverage(struct my_msgbuf *data_base, int *num_of_pais)
 	double 		average 	= 	0;		//	difine average of retreive pais.
 	long int 	divides 	= 	0;		//	difine weight of calculation averag
 	int 		index		=	0;		// for looping.
+	fprintf(stdout,"num of pai = %d\n", (*num_of_pais));
 
-	for(index = 0; index < *num_of_pais; index++)
+	for(index = 0; index < abs(*num_of_pais); index++)
 	{
 		average += data_base[index].mtype * data_base[index].mtext;
 		divides += data_base[index].mtype;
+
+		fprintf(stdout,"##########pai = %.10f\n", data_base[index].mtext);
+
 	}
 
 	if(divides)							//	check if can devide

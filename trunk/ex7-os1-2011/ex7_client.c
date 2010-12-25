@@ -79,13 +79,15 @@ int main(int argc, char **argv)
 
 	//memset(my_msg.mtext,'\0',sizeof(my_msg.mtext));	// to be shur that clin str
 
-	pai_calculated 	=	culcPai(atoi(argv[2])); // calc pai.
+
 
 	counter = get_ptr_to_shm(shm_id);
 
-	shm_ptr = (struct my_msgbuf*)counter + sizeof(int);
+	shm_ptr = (struct my_msgbuf*)(counter + sizeof(int));
 
-	if(*counter < 0)
+	pai_calculated 	=	culcPai(atoi(argv[2])); // calc pai.
+
+	if((*counter) < 0)
 		return(EXIT_FAILURE);
 
 
@@ -101,7 +103,7 @@ int main(int argc, char **argv)
 	shm_ptr[*counter].mtype = atoi(argv[2]);	//put second param to msg type
 	shm_ptr[*counter].pai	 =  pai_calculated; // put pai to shered memory.
 
-	*counter ++;
+	(*counter) ++;
 
 
 	return(EXIT_SUCCESS);
@@ -191,8 +193,8 @@ double culcPai(int multiplier)
 
 		if(distance <= 1)
 			pointsIn ++;
-
 	}
+	fprintf(stdout,"##########pai = %.10f\n", (4 * (pointsIn / totalPoints)));
 	// return pai propabilety value.
 	return (4 * (pointsIn / totalPoints));
 }
