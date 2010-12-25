@@ -47,7 +47,7 @@ int init_msg(const int ext_key);
 
 //=============================================================================
 //	Function which get pointer to shered memory
-struct my_msgbuf *get_ptr_to_shm(int shm_id);
+int *get_ptr_to_shm(int shm_id);
 
 //=============================================================================
 //	function to calculate Pi
@@ -61,9 +61,11 @@ double culcPai(int multiplier);
 int main(int argc, char **argv)
 {
 
-	int 		shm_id	= 	0,			// internal comunication key
-				index = 0;				// for looping
+	int 		shm_id	= 	0;			// internal comunication key
 	double		pai_calculated	=	0;  // pai value.
+
+	int *counter  = NULL;
+
 	struct my_msgbuf *shm_ptr = NULL;	// pointr to data base in shered memory
 
 	// If the user enter nesesery data corect:
@@ -79,24 +81,28 @@ int main(int argc, char **argv)
 
 	pai_calculated 	=	culcPai(atoi(argv[2])); // calc pai.
 
+	counter = get_ptr_to_shm(shm_id);
 
-	shm_ptr = get_ptr_to_shm(shm_id);
+	shm_ptr = (struct my_msgbuf*)counter + sizeof(int);
 
-	if(!SHM_LOCKED)
-		exit(EXIT_FAILURE);
-
-
-
-	while(shm_ptr[index].mtype != 0) // finde next empty cell at shered memory
-	{
-		index ++;
-		printf("%d\n",shm_ptr[index].mtype);
-		printf("tralialia:\n");
-	}
+	if(*counter < 0)
+		return(EXIT_FAILURE);
 
 
-	shm_ptr[index].mtype = atoi(argv[2]);	//put second param to msg type
-	shm_ptr[index].pai	 =  pai_calculated; // put pai to shered memory.
+
+	//while(shm_ptr[index].mtype != 0) // finde next empty cell at shered memory
+	//{
+		//index ++;
+	//printf("%d\n",shm_ptr[counter].mtype);
+		//printf("tralialia:\n");
+	//}
+
+
+	shm_ptr[*counter].mtype = atoi(argv[2]);	//put second param to msg type
+	shm_ptr[*counter].pai	 =  pai_calculated; // put pai to shered memory.
+
+	*counter ++;
+
 
 	return(EXIT_SUCCESS);
 
@@ -109,15 +115,15 @@ int main(int argc, char **argv)
 
 //=============================================================================
 //	Function which get pointer to shered memory
-struct my_msgbuf *get_ptr_to_shm(int shm_id)
+int *get_ptr_to_shm(int shm_id)
 {
-	struct my_msgbuf *shm_ptr;
+	int *temp;
 
-	shm_ptr = (struct my_msgbuf*)shmat(shm_id, NULL, 0);
-		if(!shm_ptr)
+	temp = (int*)shmat(shm_id, NULL, 0);
+		if(!temp)
 			errExit("shmatt()failed\n");
 
-	return (shm_ptr);
+	return (temp);
 }
 
 

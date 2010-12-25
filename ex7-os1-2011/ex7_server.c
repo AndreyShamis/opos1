@@ -52,7 +52,7 @@ void stopServer(int sig_num);
 //	Function ti calculate Pi over all clients was geted
 // Inpu-t:	pointer to the shered memory, data base size
 // Return:	value of Pai
-double calcAverage(struct my_msgbuf *data_base, int db_size);
+double calcAverage(struct my_msgbuf *data_base, int *num_of_pais);
 
 //=============================================================================
 //	function which print error which get in parameter
@@ -77,12 +77,11 @@ void close_shm(int shm_id);
 
 //=============================================================================
 //	Function which make dilay for witen to data at shered memory.
-void wait_for_data(struct my_msgbuf *data_base, int timer, int shm_id,
-														   int shm_size);
+void wait_for_data(int *counter, int timer, int shm_id, int shm_size);
 
 //=============================================================================
 //	Function which get pointer to shered memory
-struct my_msgbuf *get_ptr_to_shm(int shm_id);
+int *get_ptr_to_shm(int shm_id);
 
 //=============================================================================
 //	Function which lock access to shered memory  ot the claents.
@@ -104,6 +103,8 @@ int main(int argc, char **argv)
 	 				shm_size	=	0;
 	double 			pai_res		=	0;			//	pi variable
 
+	int *counter = NULL;
+
 	struct my_msgbuf *data_base = NULL;	// pointr to data base in shered memory
 
 	// If the user enter nesesery data corect:
@@ -120,13 +121,17 @@ int main(int argc, char **argv)
 
 	shm_id 	= 	init_shm(ext_key, shm_size);			//	init msg
 
-	data_base = get_ptr_to_shm(shm_id);
+	counter = get_ptr_to_shm(shm_id);
 
-	wait_for_data(data_base, atoi(argv[2]), shm_id, shm_size);	// waiting for shered memory to be filled.
+	*counter = 0;
+
+	data_base = (struct my_msgbuf*)counter + sizeof(int);
+
+	wait_for_data(counter, atoi(argv[2]), shm_id, shm_size);	// waiting for shered memory to be filled.
 
 	//lock_shm(shm_id);				// lock shered memory
 
-	pai_res = calcAverage(data_base, shm_size);		//	get value of pi
+	pai_res = calcAverage(data_base, counter);		//	get value of pi
 
 	if(pai_res)
 	{
@@ -153,29 +158,31 @@ void lock_shm(int shm_id)
 
 //=============================================================================
 //	Function which get pointer to shered memory
-struct my_msgbuf *get_ptr_to_shm(int shm_id)
+int *get_ptr_to_shm(int shm_id)
 {
-	struct my_msgbuf *data_base;
+	int *temp;
 
-	data_base = (struct my_msgbuf*)shmat(shm_id, NULL, 0);
-		if(!data_base)
+	temp = (int*)shmat(shm_id, NULL, 0);
+		if(!temp)
 			errExit("shmatt()failed\n");
 
-	return (data_base);
+	return (temp);
 }
 
 
 //=============================================================================
 //	Function which make dilay for witen to data at shered memory.
-void wait_for_data(struct my_msgbuf *data_base, int timer, int shm_id,
-														   int shm_size)
+void wait_for_data(int *counter, int timer, int shm_id, int shm_size)
 {
 	alarm(timer);						//	set alarm
 
 	while(!quit)
 	{
-		if(data_base[shm_size - 1].mtype != 0)
+		if(*counter <  shm_size)
+		{
 			lock_shm(shm_id);
+			*counter = -1;
+		}
 	}
 }
 
@@ -209,7 +216,7 @@ int init_shm(const int ext_key, int shm_size)
 
 	if((key = ftok("/tmp", ext_key)) == -1)
 		errExit("ftok()failed\n");		//			Print error and exit
-	if((shm_id = shmget(key, shm_size, MSGGET_FLAG)) == -1)
+	if((shm_id = shmget(key, sizeof(int) + sizeof(struct my_msgbuf) * shm_size, MSGGET_FLAG)) == -1)
 		errExit("shmget()failed\n");	//			Print error and exit
 
 	return(shm_id);					//			return shm desc id
@@ -237,13 +244,13 @@ void errExit(char *msg)
 //	Function ti calculate Pi over all clients was geted
 // Inpu-t:	pointer to the shered memory, data base size
 // Return:	value of Pai
-double calcAverage(struct my_msgbuf *data_base, int db_size)
+double calcAverage(struct my_msgbuf *data_base, int *num_of_pais)
 {
 	double 		average 	= 	0;		//	difine average of retreive pais.
 	long int 	divides 	= 	0;		//	difine weight of calculation averag
 	int 		index		=	0;		// for looping.
 
-	for(index = 0; index < db_size || data_base[index].mtype == 0; index++)
+	for(index = 0; index < *num_of_pais; index++)
 	{
 		average += data_base[index].mtype * data_base[index].mtext;
 		divides += data_base[index].mtype;
