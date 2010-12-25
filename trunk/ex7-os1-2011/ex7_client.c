@@ -17,8 +17,6 @@
 #include <time.h>
 #include <math.h>
 
-
-
 #define MSGGET_FLAG		0600
 
 
@@ -79,7 +77,7 @@ int main(int argc, char **argv)
 
 	counter = get_ptr_to_shm(shm_id);
 
-	shm_ptr = (struct my_msgbuf*)(counter + sizeof(int));
+	shm_ptr = (struct my_msgbuf*)(counter + 1);
 
 	if((*counter) < 0)
 	{
@@ -160,9 +158,9 @@ void incorect_param()
 double culcPai(int multiplier)
 {
 
-	double xVal,		// rndom x coordinate value.
-		   yVal,		// rndom y coordinate value.
-		   distance,	// distance of points.
+	double xVal,							// rndom x coordinate value.
+		   yVal,							// rndom y coordinate value.
+		   distance,						// distance of points.
 		   totalPoints = multiplier * 1000,	// difine total points number.
 		   pointsIn = 0;
 

@@ -18,10 +18,6 @@
 #include <signal.h>
 
 
-
-
-
-
 #define MSGGET_FLAG		IPC_CREAT | IPC_EXCL | 0600
 
 //=============================================================================
@@ -121,7 +117,7 @@ int main(int argc, char **argv)
 
 	shm_id 	= 	init_shm(ext_key, shm_size);			//	init msg
 
-	counter = get_ptr_to_shm(shm_id);			// get pointer to the shered memoey
+	counter = get_ptr_to_shm(shm_id);	// get pointer to the shered memoey
 
 	(*counter) = 0;						// reset counter
 
@@ -177,8 +173,6 @@ void wait_for_data(int *counter, int timer, int shm_id, int shm_size)
 
 	while(!quit)
 	{
-		fprintf(stdout,"counter = %d\n", (*counter));
-
 		if((*counter) ==  shm_size)
 		{
 			lock_shm(shm_id);
@@ -217,7 +211,8 @@ int init_shm(const int ext_key, int shm_size)
 
 	if((key = ftok("/tmp", ext_key)) == -1)
 		errExit("ftok()failed\n");		//			Print error and exit
-	if((shm_id = shmget(key, sizeof(int) + (sizeof(struct my_msgbuf) * shm_size), MSGGET_FLAG)) == -1)
+	if((shm_id = shmget(key, sizeof(int) +
+	   (sizeof(struct my_msgbuf) * shm_size), MSGGET_FLAG)) == -1)
 		errExit("shmget()failed\n");	//			Print error and exit
 
 	return(shm_id);					//			return shm desc id
