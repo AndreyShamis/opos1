@@ -79,18 +79,21 @@ int main(int argc, char **argv)
 
 	pai_calculated 	=	culcPai(atoi(argv[2])); // calc pai.
 
-	//sprintf(my_msg.mtext, "%.10f\n",pai_calculated); // Print pai.
-
-	// Send messeg to server.
 
 	shm_ptr = get_ptr_to_shm(shm_id);
 
-	if(SHM_LOCKED)
+	if(!SHM_LOCKED)
 		exit(EXIT_FAILURE);
 
 
+
 	while(shm_ptr[index].mtype != 0) // finde next empty cell at shered memory
+	{
 		index ++;
+		printf("%d\n",shm_ptr[index].mtype);
+		printf("tralialia:\n");
+	}
+
 
 	shm_ptr[index].mtype = atoi(argv[2]);	//put second param to msg type
 	shm_ptr[index].pai	 =  pai_calculated; // put pai to shered memory.
