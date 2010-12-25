@@ -246,7 +246,7 @@ double calcAverage(struct my_msgbuf *data_base, int db_size)
 	for(index = 0; index < db_size || data_base[index].mtype == 0; index++)
 	{
 		average += data_base[index].mtype * data_base[index].mtext;
-		divides += data_base[index].mtext;
+		divides += data_base[index].mtype;
 	}
 
 	if(divides)							//	check if can devide
