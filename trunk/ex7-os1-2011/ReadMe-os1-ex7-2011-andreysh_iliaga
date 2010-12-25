@@ -1,0 +1,50 @@
+/*
+ * EX7:: Program to calculate Pi with server and clients
+ * ===========================================================================
+ * Writen by: Ilia Gaisinsky, id: 309480051, login: iliaga
+	      Andrey Shamis,  id: 321470882, login: andreysh
+ * and:       
+ * ===========================================================================
+ *
+ *		to compile : 
+ 					gcc -Wall ex7_server.c -o ex7_server
+ 					gcc -Wall ex7_client.c -o ex7_client
+ *
+ *		to run:	
+ 		
+ 			Server:
+ 				./ex7_server X Y
+			X		-  id of internal queue comunication
+			Y		-  working time
+		 		
+ 			Client
+	 			./ex7_client X Y
+	 		X		-  id of internal queue comunication
+ 			Y		-  multple of pai calculation.	
+ *
+ */
+
+============================= ex7_server ======================================
+At first, The server criate queue of messegs, than it retreive from clients pi 
+value and mutple in evry messege he get. the server get number of messege as 
+number of seconds that user give as argument to the server program. each second 
+the chek server if he get messege and if there is - he save it to linked list.
+After that we calculate the everage of all pai value that we get 
+(the calculation include multple value).
+In the end the program we print the evarage pai value and close messege queue. 
+============================= ex7_client ======================================
+At first, client open the msg for send to server the pi which gona be 
+calculated. then we calculate the pai value an d send it to server.
+* calcylation of pai: we retrive multiple form user that pultipling number
+1000 and that number randomize to calculate pai thrugh MOTE CARLO method.
+
+//---------------------------------------------------------------------------//
+Files used
+
+ex7_server.c				//	Server file
+ex7_client.c 				//	Client File
+
+ReadMe-os1-ex7-2011-andreysh_iliaga	//	readme
+
+===============================================================================
+
