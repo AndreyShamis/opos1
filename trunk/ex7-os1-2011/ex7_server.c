@@ -52,7 +52,7 @@ void stopServer(int sig_num);
 //	Function ti calculate Pi over all clients was geted
 // Inpu-t:	pointer to the shered memory, data base size
 // Return:	value of Pai
-double calcAverage(struct my_msgbuf *data_base, int *num_of_pais);
+double calcAverage(struct my_msgbuf *data_base, int num_of_pais);
 
 //=============================================================================
 //	function which print error which get in parameter
@@ -121,24 +121,20 @@ int main(int argc, char **argv)
 
 	shm_id 	= 	init_shm(ext_key, shm_size);			//	init msg
 
-	counter = get_ptr_to_shm(shm_id);
+	counter = get_ptr_to_shm(shm_id);			// get pointer to the shered memoey
 
-	(*counter) = 0;
+	(*counter) = 0;						// reset counter
 
+	// get pointer to the arr of structs at shered memory
 	data_base = (struct my_msgbuf*)(counter + sizeof(int));
 
 	wait_for_data(counter, atoi(argv[2]), shm_id, shm_size);	// waiting for shered memory to be filled.
 
 
-
-	//lock_shm(shm_id);				// lock shered memory
-
-	pai_res = calcAverage(data_base, counter);		//	get value of pi
+	pai_res = calcAverage(data_base, abs(*counter));		//	get value of pi
 
 	if(pai_res)
-	{
 		print_result(pai_res);						//	print reults
-	}
 
 	close_shm(shm_id);						//	close shered memory
 
@@ -248,14 +244,14 @@ void errExit(char *msg)
 //	Function ti calculate Pi over all clients was geted
 // Inpu-t:	pointer to the shered memory, data base size
 // Return:	value of Pai
-double calcAverage(struct my_msgbuf *data_base, int *num_of_pais)
+double calcAverage(struct my_msgbuf *data_base, int num_of_pais)
 {
 	double 		average 	= 	0;		//	difine average of retreive pais.
 	long int 	divides 	= 	0;		//	difine weight of calculation averag
 	int 		index		=	0;		// for looping.
-	fprintf(stdout,"num of pai = %d\n", (*num_of_pais));
+	fprintf(stdout,"num of pai = %d\n", num_of_pais);
 
-	for(index = 0; index < abs(*num_of_pais); index++)
+	for(index = 0; index < num_of_pais; index++)
 	{
 		average += data_base[index].mtype * data_base[index].mtext;
 		divides += data_base[index].mtype;

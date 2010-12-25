@@ -82,7 +82,10 @@ int main(int argc, char **argv)
 	shm_ptr = (struct my_msgbuf*)(counter + sizeof(int));
 
 	if((*counter) < 0)
-		exit(EXIT_FAILURE);
+	{
+		printf("Shered memory is closed\n");
+		return(EXIT_FAILURE);
+	}
 
 	pai_calculated 	=	culcPai(atoi(argv[2])); // calc pai.
 
