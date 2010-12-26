@@ -79,18 +79,18 @@ int main(int argc, char **argv)
 
 	shm_ptr = (struct my_msgbuf*)(counter + 1);
 
-	if((*counter) < 0)
+	if(!(*counter))
 	{
-		printf("Shered memory is closed\n");
+		printf("Shered memory - Access blocked by server!\n");
 		return(EXIT_FAILURE);
 	}
 
 	pai_calculated 	=	culcPai(atoi(argv[2])); // calc pai.
 
-	shm_ptr[*counter].mtype = atoi(argv[2]);	//put second param to msg type
-	shm_ptr[*counter].pai	 =  pai_calculated; // put pai to shered memory.
+	shm_ptr[(*counter) - 1].mtype = atoi(argv[2]);	//put second param to msg type
+	shm_ptr[(*counter) - 1].pai	 =  pai_calculated; // put pai to shered memory.
 
-	(*counter) ++;
+	(*counter) --;
 
 
 	return(EXIT_SUCCESS);
