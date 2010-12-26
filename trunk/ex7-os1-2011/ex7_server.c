@@ -199,6 +199,8 @@ void setHandlers()
 {
 	signal(SIGALRM, stopServer);		//	set signal handler for Alarm
 	signal(SIGINT, stopServer);			//	set signal handler for sigInt
+	//	this need for clear memsh if we do ^c
+	signal(SIGTSTP, stopServer);		//	set signal handler for sigInt
 
 }
 

@@ -8,13 +8,14 @@ clear
 
 echo "###################################################"
 
-gcc -Wall ex6server.c -o server
-gcc -Wall ex6client.c -o client
+#gcc -Wall ex6server.c -o server
+#gcc -Wall ex6client.c -o client
 #./server 55 30 & 
-COUNTER=20
+COUNTER=2000
 LOL=4
      until [  $COUNTER -lt 10 ]; do
-		valgrind ./client 12 4
+		#valgrind 
+		./client 58 $LOL
 		let LOL-=1
         echo COUNTER $COUNTER
         let COUNTER-=1
