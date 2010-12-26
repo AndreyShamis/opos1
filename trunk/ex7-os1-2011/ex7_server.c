@@ -2,7 +2,7 @@
 
 	Provide server for clients which calculated pi
 	and send it to server.
-	Server waiting X second.X mast be provided in argv-2.
+	Server waiting X second and wait for argv[3] .X mast be provided in argv-2.
 */
 
 //                               Include section
@@ -10,12 +10,12 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <string.h>
-#include <errno.h>
+#include <string.h>			//
+#include <errno.h>			// for perror
 #include <sys/ipc.h>
 #include <sys/types.h>
-#include <sys/shm.h>
-#include <signal.h>
+#include <sys/shm.h>		// for using SHM
+#include <signal.h>			// for using signals
 
 
 #define MSGGET_FLAG		IPC_CREAT | IPC_EXCL | 0600
@@ -48,7 +48,7 @@ void stopServer(int sig_num);
 //	Function ti calculate Pi over all clients was geted
 // Inpu-t:	pointer to the shered memory, data base size
 // Return:	value of Pai
-double calcAverage(struct my_msgbuf *data_base, int num_of_pais);
+double calcAverage(struct my_msgbuf *data_base, int counter, int shm_size);
 
 //=============================================================================
 //	function which print error which get in parameter
@@ -119,7 +119,7 @@ int main(int argc, char **argv)
 
 	counter = get_ptr_to_shm(shm_id);	// get pointer to the shered memoey
 
-	(*counter) = 0;						// reset counter
+	(*counter) = shm_size;						// set counter
 
 	// get pointer to the arr of structs at shered memory
 	data_base = (struct my_msgbuf*)(counter + 1);
@@ -128,7 +128,7 @@ int main(int argc, char **argv)
 	wait_for_data(counter, atoi(argv[2]), shm_id, shm_size);
 
 
-	pai_res = calcAverage(data_base, abs(*counter));		//	get value of pi
+	pai_res = calcAverage(data_base, (*counter), shm_size);		//	get value of pi
 
 	if(pai_res)
 		print_result(pai_res);						//	print reults
@@ -143,10 +143,10 @@ int main(int argc, char **argv)
 //	Function which lock access to shered memory  ot the claents.
 void lock_shm(int shm_id)
 {
-	struct shmid_ds shm_desc;
+	struct shmid_ds shm_desc;			// struct for locking SHM
 
-	if(shmctl(shm_id, SHM_LOCK, &shm_desc) == -1)
-		errExit("shmctl()failed\n");
+	if(shmctl(shm_id, SHM_LOCK, &shm_desc) == -1)	// lock SHM
+		errExit("shmctl()failed\n");				//Print error and exit
 }
 
 
@@ -155,11 +155,11 @@ void lock_shm(int shm_id)
 //	Function which get pointer to shered memory
 int *get_ptr_to_shm(int shm_id)
 {
-	int *temp;
+	int *temp;					// temp pointer to SHM (type int)
 
-	temp = (int*)shmat(shm_id, NULL, 0);
+	temp = (int*)shmat(shm_id, NULL, 0);	// Get pointer to SHM
 		if(!temp)
-			errExit("shmatt()failed\n");
+			errExit("shmatt()failed\n");		//Print error and exit
 
 	return (temp);
 }
@@ -171,23 +171,18 @@ void wait_for_data(int *counter, int timer, int shm_id, int shm_size)
 {
 	alarm(timer);						//	set alarm
 
-	while(!quit)
-	{
-		if((*counter) ==  shm_size)
-		{
+	while(!quit)			 // beasy wait for clients that fill the SHM
+		if((*counter) ==  0) // lock SHM if the clients used all SHM
 			lock_shm(shm_id);
-			(*counter) = (-1) * (*counter);
-		}
-	}
 }
 
 //=============================================================================
 //	Function which colse shered memory
 void close_shm(int shm_id)
 {
-	struct shmid_ds shm_desc;
+	struct shmid_ds shm_desc;	// struct for clousing SHM
 
-	if(shmctl(shm_id, IPC_RMID, &shm_desc) == -1)
+	if(shmctl(shm_id, IPC_RMID, &shm_desc) == -1)	// close SHM
 		errExit("shmctl()failed\n");	//			Print error and exit
 }
 
@@ -199,8 +194,6 @@ void setHandlers()
 {
 	signal(SIGALRM, stopServer);		//	set signal handler for Alarm
 	signal(SIGINT, stopServer);			//	set signal handler for sigInt
-	//	this need for clear memsh if we do ^c
-	signal(SIGTSTP, stopServer);		//	set signal handler for sigInt
 
 }
 
@@ -242,14 +235,14 @@ void errExit(char *msg)
 //	Function ti calculate Pi over all clients was geted
 // Inpu-t:	pointer to the shered memory, data base size
 // Return:	value of Pai
-double calcAverage(struct my_msgbuf *data_base, int num_of_pais)
+double calcAverage(struct my_msgbuf *data_base, int counter, int shm_size)
 {
 	double 		average 	= 	0;		//	difine average of retreive pais.
 	long int 	divides 	= 	0;		//	difine weight of calculation averag
 	int 		index		=	0;		// for looping.
-	fprintf(stdout,"num of pai = %d\n", num_of_pais);
+	fprintf(stdout,"num of pai = %d\n", shm_size - counter);
 
-	for(index = 0; index < num_of_pais; index++)
+	for(index = counter; index < shm_size; index++)
 	{
 		average += data_base[index].mtype * data_base[index].mtext;
 		divides += data_base[index].mtype;
