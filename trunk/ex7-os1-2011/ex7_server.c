@@ -89,6 +89,9 @@ int get_time_correct_period(int input);
 //=============================================================================
 //	Function which lock access to shered memory  ot the claents.
 void lock_shm(const int shm_id);
+//=============================================================================
+//	Get correct memory sizeof
+int getMemoryCorrectSize(const int value);
 
 //*****************************************************************************
 //*****************************************************************************
@@ -101,23 +104,19 @@ int main(int argc, char **argv)
 	 				ext_key		=	0,		//	external comunication key
 	 				shm_size	=	0;		//	size of memory
 	double 			pai_res		=	0;		//	pi variable
-
 	int *counter 	= 	NULL;				//	pointer to counter
 	int time_period	=	0;
 
 	struct my_msgbuf *data_base = NULL;	// pointr to data base in shered memory
-	setHandlers();								//	set signal handlers
+	setHandlers();						//	set signal handlers
 
 	// If the user enter nesesery data corect:
 	if(argc != 4)
-	{
-		incorect_param();						//	print error
-		exit(EXIT_FAILURE);
-	}
+		incorect_param();				//	print error
 
 	time_period = 	get_time_correct_period(atoi(argv[2]));	// working time
-	shm_size 	= 	atoi(argv[3]);				// shered memory size
-	ext_key 	= 	atoi(argv[1]);				//	get external key
+	shm_size 	= 	getMemoryCorrectSize(atoi(argv[3]));// shered memory size
+	ext_key 	= 	atoi(argv[1]);		//	get external key
 	
 
 	print_welcome_message(time_period,shm_size);
@@ -252,6 +251,19 @@ void print_result(const double pai)
 }
 
 //=============================================================================
+//	Get correct memory sizeof
+int getMemoryCorrectSize(const int value)
+{
+	if(value >0)									//	check if value good
+		return(value);								//	return value
+	else
+		errExit("Incorrect memory size value\n");	//	print error
+		
+	return(0);										//	return default
+	
+}
+
+//=============================================================================
 //	function which print error which get in parameter
 //	and exit from the programm
 void errExit(const char *msg)
@@ -294,10 +306,10 @@ double calcAverage(struct my_msgbuf *data_base,const int counter,
 //	print message of incorrect input parameters
 void incorect_param()
 {
-	printf("You need enter 3 parameters:\n");
-	printf("1. shered memory id\n");
-	printf("2. time for timer\n");
-	printf("3. size of data base\n");
+	errExit("You need enter 3 parameters:\n \
+			\r1. shered memory id\n			\
+			\r2. time for timer\n			\
+			\r3. size of data base\n");
 
 }
 
