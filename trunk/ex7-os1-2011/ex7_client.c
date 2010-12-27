@@ -8,24 +8,19 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <string.h>
-#include <errno.h>
 #include <sys/shm.h>
-#include <sys/ipc.h>
 #include <sys/types.h>
 #include <signal.h>
 #include <time.h>
-#include <math.h>
 
 #define MSGGET_FLAG		0600
-
 
 //============================ STRUCTS ========================================
 //	struct for retreidev messages
 struct my_msgbuf
 {
-	short int mtype;
-	double pai;
+	short int mtype;			//	type of msgbuf
+	double pai;					//	pai value
 };
 
 //                             Prototypes section
@@ -62,7 +57,7 @@ int main(int argc, char **argv)
 	int 		shm_id	= 	0;			// internal comunication key
 	double		pai_calculated	=	0;  // pai value.
 
-	int *counter  = NULL;
+	int *counter  = NULL;				// pointer to counter
 
 	struct my_msgbuf *shm_ptr = NULL;	// pointr to data base in shered memory
 
@@ -87,8 +82,8 @@ int main(int argc, char **argv)
 
 	pai_calculated 	=	culcPai(atoi(argv[2])); // calc pai.
 
-	shm_ptr[(*counter) - 1].mtype = atoi(argv[2]);	//put second param to msg type
-	shm_ptr[(*counter) - 1].pai	 =  pai_calculated; // put pai to shered memory.
+	shm_ptr[(*counter) - 1].mtype = atoi(argv[2]);	// sec param to msg type
+	shm_ptr[(*counter) - 1].pai	 =  pai_calculated; // put pi to shered memory
 
 	(*counter) --;
 
@@ -120,7 +115,7 @@ int *get_ptr_to_shm(int shm_id)
 //	Function which create shered memory
 int init_msg(const int ext_key)
 {
-	int 			shm_id = 0;		//			shm desc id
+	int 			shm_id = 0;			//			shm desc id
 	key_t 			key;				//			ftok key
 
 	if((key = ftok("/tmp", ext_key)) == -1)
@@ -128,7 +123,7 @@ int init_msg(const int ext_key)
 	if((shm_id = shmget(key, 0, MSGGET_FLAG)) == -1)
 		errExit("shmget()failed\n");	//			Print error and exit
 
-	return(shm_id);					//			return shm desc id
+	return(shm_id);						//			return shm desc id
 
 }
 
@@ -181,7 +176,7 @@ double culcPai(int multiplier)
 		if(distance <= 1)
 			pointsIn ++;
 	}
-	fprintf(stdout,"##########pai = %.10f\n", (4 * (pointsIn / totalPoints)));
+
 	// return pai propabilety value.
 	return (4 * (pointsIn / totalPoints));
 }
