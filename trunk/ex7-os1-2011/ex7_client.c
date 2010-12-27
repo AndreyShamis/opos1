@@ -32,7 +32,7 @@ void incorect_param();
 //=============================================================================
 //	function which print error which get in parameter
 //	and exit from the programm
-void errExit(char *msg);
+void errExit(const char *msg);
 
 //=============================================================================
 //	Function which create shered memory
@@ -40,13 +40,13 @@ int init_msg(const int ext_key);
 
 //=============================================================================
 //	Function which get pointer to shered memory
-int *get_ptr_to_shm(int shm_id);
+int *get_ptr_to_shm(const int shm_id);
 
 //=============================================================================
 //	function to calculate Pi
 //	geting multiplayer
 //	return claculated value
-double culcPai(int multiplier);
+double culcPai(const int multiplier);
 
 ///////////////////////////////////////////////////////////////////////////////
 //                                Main section
@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 
 //=============================================================================
 //	Function which get pointer to shered memory
-int *get_ptr_to_shm(int shm_id)
+int *get_ptr_to_shm(const int shm_id)
 {
 	int *temp;
 
@@ -130,7 +130,7 @@ int init_msg(const int ext_key)
 //=============================================================================
 //	function which print error which get in parameter
 //	and exit from the programm
-void errExit(char *msg)
+void errExit(const char *msg)
 {
 	perror(msg);						//	Print message
 	exit(EXIT_FAILURE);					//	exit whith failure
@@ -150,7 +150,7 @@ void incorect_param()
 //	function to calculate Pi
 //	geting multiplayer
 //	return claculated value
-double culcPai(int multiplier)
+double culcPai(const int multiplier)
 {
 
 	double xVal,							// rndom x coordinate value.
