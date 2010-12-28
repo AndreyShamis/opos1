@@ -1,9 +1,9 @@
 /*
  * EX7:: Program to calculate Pi with server and clients
  * ===========================================================================
- * Writen by: Ilia Gaisinsky, id: 309480051, login: iliaga
-	      Andrey Shamis,  id: 321470882, login: andreysh
- * and:       
+ * Writen by: Ilia Gaisinsky, 	id: 309480051, login: iliaga
+	      	Andrey Shamis,  	id: 321470882, login: andreysh
+ *      
  * ===========================================================================
  *
  *		to compile : 
@@ -26,15 +26,14 @@
  */
 
 ============================= ex7_server ======================================
-	At first, The server criate queue of messegs, than it retreive 
-from clients pi value and mutple in evry messege he get.
-	The server get number of messege as 
-number of seconds that user give as argument to the server program. 
-	Each second the chek server if he get messege and 
-if there is - he save it to linked list.
+	At first, The server criate shared memory by size calculated as
+argv[3] + 1,where argv[3] is size of blocks which be fulled by clents,
+thats mean the maximum of clients can be argv[3] and one more its for 
+counter which poit out to fulled block (number)
+	Than it retreive from clients pi value and mutple in evry block he get.
 	After that we calculate the everage of all pai value that we get 
 (the calculation include multple value).
-In the end the program we print the evarage pai value and close messege queue. 
+In the end the program we print the evarage pai value . 
 
 //	server for clients which calculated pi
 //	and send it to server.
@@ -43,8 +42,8 @@ In the end the program we print the evarage pai value and close messege queue.
 
 
 ============================= ex7_client ======================================
-	At first, client open the msg for send to server the pi which gona be 
-calculated. 
+	At first, client connect to shared memory for send to server 
+the pi which gona be calculated. 
 	Then we calculate the pai value an d send it to server.
 
 	* calcylation of pai: we retrive multiple form user that pultipling number
