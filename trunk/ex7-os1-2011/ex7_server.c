@@ -118,7 +118,6 @@ int main(int argc, char **argv)
 	shm_size 	= 	getMemoryCorrectSize(atoi(argv[3]));// shered memory size
 	ext_key 	= 	atoi(argv[1]);		//	get external key
 	
-
 	print_welcome_message(time_period,shm_size);
 	
 	shm_id 		= 	init_shm(ext_key, shm_size);//	init msg
