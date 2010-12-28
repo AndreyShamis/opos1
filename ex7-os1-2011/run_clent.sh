@@ -14,7 +14,7 @@ echo "###################################################"
 COUNTER=19
 LOL=4
      until [  $COUNTER -lt 10 ]; do
-		./client 1 $LOL
+		valgrind ./client 1 $LOL
 		let LOL-=1
         echo COUNTER $COUNTER
         let COUNTER-=1
