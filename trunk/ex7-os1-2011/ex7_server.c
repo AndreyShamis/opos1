@@ -10,7 +10,6 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <sys/types.h>
 #include <sys/shm.h>		// for using SHM
 #include <signal.h>			// for using signals
 
@@ -149,8 +148,11 @@ int get_time_correct_period(int input)
 	if(input > 0)
 		return(input);
 	else
-		errExit("Incorrect time, it is must be >0\n");	//Print error and exit
-	
+	{
+		//Print error and exit
+		fprintf(stderr,"Incorrect time, it is must be >0\n");	
+		exit(EXIT_FAILURE);
+	}
 	return(0);
 		
 }
@@ -256,8 +258,11 @@ int getMemoryCorrectSize(const int value)
 	if(value >0)									//	check if value good
 		return(value);								//	return value
 	else
-		errExit("Incorrect memory size value\n");	//	print error
-		
+	{
+		fprintf(stderr,"Incorrect memory size value\n");//	print error
+		exit(EXIT_FAILURE);
+	}	
+	
 	return(0);										//	return default
 	
 }
@@ -300,15 +305,15 @@ double calcAverage(struct my_msgbuf *data_base,const int counter,
 
 }
 
-
 //=============================================================================
 //	print message of incorrect input parameters
 void incorect_param()
 {
-	errExit("You need enter 3 parameters:\n \
+	fprintf(stderr,"You need enter 3 parameters:\n \
 			\r1. shered memory id\n			\
 			\r2. time for timer\n			\
 			\r3. size of data base\n");
+	exit(EXIT_FAILURE);
 
 }
 

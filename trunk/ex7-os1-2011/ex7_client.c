@@ -9,8 +9,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/shm.h>
-#include <sys/types.h>
-#include <signal.h>
 #include <time.h>
 
 #define MSGGET_FLAG		0600
@@ -75,8 +73,11 @@ int main(int argc, char **argv)
 	shm_ptr 	= (struct my_msgbuf*)(counter + 1);//	calc pointer to mem
 
 	if(!(*counter))								//	check if can write to mem
-		errExit("Shered memory - Access blocked by server!\n");
-
+	{	
+		fprintf(stderr,"Shered memory - Access blocked by server!\n");
+		exit(EXIT_FAILURE);
+	}
+	
 	pai_calculated 	=	culcPai(atoi(argv[2])); // calc pai.
 	
 	(*counter) --;								//	decrease counter
@@ -143,10 +144,11 @@ void errExit(const char *msg)
 //	print message of incorrect input parameters
 void incorect_param()
 {
-	errExit("You need enter 2 parameters:\n \
+	fprintf(stderr,"You need enter 2 parameters:\n \
 		\r1. Memory id \n \
 		\r2. Multiplier for rand\n");
-
+	exit(EXIT_FAILURE);
+	
 }
 
 //=============================================================================
