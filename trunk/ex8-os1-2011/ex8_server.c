@@ -110,17 +110,17 @@ int main(int argc, char **argv)
 	setHandlers();						//	set signal handlers
 
 	// If the user enter nesesery data corect:
-	if(argc != 4)
+	if(argc != 3)
 		incorect_param();				//	print error
 
 	time_period = 	get_time_correct_period(atoi(argv[2]));	// working time
 	shm_size 	= 	getMemoryCorrectSize(atoi(argv[3]));// shered memory size
 	ext_key 	= 	atoi(argv[1]);		//	get external key
-	
+
 	print_welcome_message(time_period,shm_size);
-	
+
 	shm_id 		= 	init_shm(ext_key, shm_size);//	init msg
-	
+
 	counter 	= 	get_ptr_to_shm(shm_id);		// pointer to the shered memo
 	(*counter) 	= 	shm_size;					// set counter
 
@@ -139,7 +139,7 @@ int main(int argc, char **argv)
 
 	return(EXIT_SUCCESS);
 
-} 
+}
 
 //=============================================================================
 //	get corrected time which prgram be worked
@@ -150,11 +150,11 @@ int get_time_correct_period(int input)
 	else
 	{
 		//Print error and exit
-		fprintf(stderr,"Incorrect time, it is must be >0\n");	
+		fprintf(stderr,"Incorrect time, it is must be >0\n");
 		exit(EXIT_FAILURE);
 	}
 	return(0);
-		
+
 }
 
 //=============================================================================
@@ -261,10 +261,10 @@ int getMemoryCorrectSize(const int value)
 	{
 		fprintf(stderr,"Incorrect memory size value\n");//	print error
 		exit(EXIT_FAILURE);
-	}	
-	
+	}
+
 	return(0);										//	return default
-	
+
 }
 
 //=============================================================================
@@ -274,7 +274,7 @@ void errExit(const char *msg)
 {
 	perror(msg);					//	print err message
 	exit(EXIT_FAILURE);				//	exit whith fail
-	
+
 }
 
 //=============================================================================
@@ -310,10 +310,11 @@ double calcAverage(struct my_msgbuf *data_base,const int counter,
 void incorect_param()
 {
 	fprintf(stderr,"You need enter 3 parameters:\n \
-			\r1. shered memory id\n			\
-			\r2. time for timer\n			\
-			\r3. size of data base\n");
+			\r1. time for timer\n			\
+			\r2. port number\n");
+
 	exit(EXIT_FAILURE);
+
 
 }
 
