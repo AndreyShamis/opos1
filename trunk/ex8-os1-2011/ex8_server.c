@@ -41,6 +41,11 @@ void incorect_param();
 void stopServer(int sig_num);
 
 //=============================================================================
+//	Function which init socket
+//	return socket file descriptor
+int init_socket();
+
+//=============================================================================
 //	Function ti calculate Pi over all clients was geted
 // Inpu-t:	pointer to the shered memory, data base size
 // Return:	value of Pai
@@ -89,14 +94,16 @@ int main(int argc, char **argv)
 	char	buf[BUF_LEN];							// meseg buffer
 	double 	pai_res	= 0;							// pi variable
 
-	setHandlers();									// set signal handlers
-
 	if(argc != 3)				// If the user enter nesesery data corect:
 		incorect_param();							// print error
 
-	time_period = 	get_time_correct_period(atoi(argv[2]));	// working time
+	time_period = get_time_correct_period(atoi(argv[2]));	// working time
+
+	my_socket = init_socket();						// init socket
 
 	print_welcome_message(time_period);
+
+	setHandlers();									// set signal handlers
 
 	// waiting for shered memory to be filled.
 	wait_for_data(counter,time_period, shm_id, shm_size);
@@ -128,6 +135,21 @@ int get_time_correct_period(int input)
 }
 
 //=============================================================================
+//	Function which init socket
+//	return socket file descriptor
+int init_socket()
+{
+	int my_socket;
+
+	if((my_socket = socket(PF_INET, SOCK_STREAM, 0)) == -1)//allocate socket
+		errExit("socket: allocation failed\n");		//	Print error and exit
+
+	return my_socket;
+}
+
+
+
+//=============================================================================
 //	Printing Starting welcome message
 void print_welcome_message(const int time)
 {
@@ -136,6 +158,8 @@ void print_welcome_message(const int time)
 	printf("\t + Waitng for clients.......\n");
 
 }
+
+
 
 //=============================================================================
 //	Function which make dilay for witen to data at shered memory.
