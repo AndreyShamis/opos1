@@ -8,26 +8,26 @@
 //                               Include section
 //=============================================================================
 #include <stdio.h>
-#include <unistd.h>
+#include <unistd.h>			// for rea/write/close
+#include <string.h>
 #include <stdlib.h>
-#include <sys/shm.h>		// for using SHM
+#include <time.h>
+#include <sys/types.h>
+#include <sys/socket.h>		// for htonl(),....
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 #include <signal.h>			// for using signals
 
+#define HOST_ADDR_LEN 20
+#define BUF_LEN 13
 
-#define MSGGET_FLAG		IPC_CREAT | IPC_EXCL | 0600
 
+
+//                       	  globals section
 //=============================================================================
-//                        Variable and struct section
-
 int quit = 0;	//global variable to get exit status can be updated in handler
 
-//============================ STRUCTS ========================================
-//	struct for retreidev messages
-struct my_msgbuf
-{
-	short int mtype;				//	type of msgbuf
-	double mtext;					//	double value
-};
 
 //=============================================================================
 //								Prototypes
@@ -56,9 +56,6 @@ void errExit(const char *msg);
 //	function which print pi
 void print_result(const double pai);
 
-//=============================================================================
-//	Function which create shered memory
-int init_shm(const int ext_key,const int shm_size);
 
 //=============================================================================
 //	Function which set signal handler
@@ -66,11 +63,8 @@ void setHandlers();
 
 //=============================================================================
 //	Printing Starting welcome message
-void print_welcome_message(const int time,const int mem_size);
+void print_welcome_message(const int time);
 
-//=============================================================================
-//	Function which colse shered memory
-void close_shm(const int shm_id);
 
 //=============================================================================
 //	Function which make dilay for witen to data at shered memory.
@@ -78,19 +72,9 @@ void wait_for_data(int *counter,const int timer,
 				const int shm_id,const int shm_size);
 
 //=============================================================================
-//	Function which get pointer to shered memory
-int *get_ptr_to_shm(const int shm_id);
-
-//=============================================================================
 //	get corrected time which prgram be worked
 int get_time_correct_period(int input);
 
-//=============================================================================
-//	Function which lock access to shered memory  ot the claents.
-void lock_shm(const int shm_id);
-//=============================================================================
-//	Get correct memory sizeof
-int getMemoryCorrectSize(const int value);
 
 //*****************************************************************************
 //*****************************************************************************
@@ -99,33 +83,20 @@ int getMemoryCorrectSize(const int value);
 //	Main function
 int main(int argc, char **argv)
 {
-	int 			shm_id	= 	0,			//	internal comunication key
-	 				ext_key		=	0,		//	external comunication key
-	 				shm_size	=	0;		//	size of memory
-	double 			pai_res		=	0;		//	pi variable
-	int *counter 	= 	NULL;				//	pointer to counter
-	int time_period	=	0;
 
-	struct my_msgbuf *data_base = NULL;	// pointr to data base in shered memory
-	setHandlers();						//	set signal handlers
+	int		my_socket;								// socket file descriptor
+	int 	multiplier = atoi(argv[3]);				// multiply rand size
+	char	buf[BUF_LEN];							// meseg buffer
+	double 	pai_res	= 0;							// pi variable
 
-	// If the user enter nesesery data corect:
-	if(argc != 3)
-		incorect_param();				//	print error
+	setHandlers();									// set signal handlers
+
+	if(argc != 3)				// If the user enter nesesery data corect:
+		incorect_param();							// print error
 
 	time_period = 	get_time_correct_period(atoi(argv[2]));	// working time
-	shm_size 	= 	getMemoryCorrectSize(atoi(argv[3]));// shered memory size
-	ext_key 	= 	atoi(argv[1]);		//	get external key
 
-	print_welcome_message(time_period,shm_size);
-
-	shm_id 		= 	init_shm(ext_key, shm_size);//	init msg
-
-	counter 	= 	get_ptr_to_shm(shm_id);		// pointer to the shered memo
-	(*counter) 	= 	shm_size;					// set counter
-
-	// get pointer to the arr of structs at shered memory
-	data_base 	= (struct my_msgbuf*)(counter + 1);
+	print_welcome_message(time_period);
 
 	// waiting for shered memory to be filled.
 	wait_for_data(counter,time_period, shm_id, shm_size);
@@ -135,7 +106,6 @@ int main(int argc, char **argv)
 	if(pai_res)
 		print_result(pai_res);				//	print reults
 
-	close_shm(shm_id);						//	close shered memory
 
 	return(EXIT_SUCCESS);
 
@@ -158,38 +128,12 @@ int get_time_correct_period(int input)
 }
 
 //=============================================================================
-//	Function which lock access to shered memory  ot the claents.
-void lock_shm(const int shm_id)
-{
-	struct shmid_ds shm_desc;						// struct for locking SHM
-
-	if(shmctl(shm_id, SHM_LOCK, &shm_desc) == -1)	// lock SHM
-		errExit("shmctl()failed\n");				//Print error and exit
-
-}
-
-//=============================================================================
 //	Printing Starting welcome message
-void print_welcome_message(const int time,const int mem_size)
+void print_welcome_message(const int time)
 {
 	printf("\n\n\t-Server started!\n");
 	fprintf(stdout,"\t-\t#\tTime for timer\t:%d\n",time);
-	fprintf(stdout,"\t-\t#\tMemory size   \t:%d\n",mem_size);
 	printf("\t + Waitng for clients.......\n");
-
-}
-
-//=============================================================================
-//	Function which get pointer to shered memory
-int *get_ptr_to_shm(const int shm_id)
-{
-	int *temp;							// temp pointer to SHM (type int)
-
-	temp = (int*)shmat(shm_id, NULL, 0);// Get pointer to SHM
-		if(!temp)
-			errExit("shmatt()failed\n");//Print error and exit
-
-	return (temp);
 
 }
 
@@ -207,17 +151,6 @@ void wait_for_data(int *counter,const int timer,
 }
 
 //=============================================================================
-//	Function which colse shered memory
-void close_shm(const int shm_id)
-{
-	struct shmid_ds shm_desc;	// struct for clousing SHM
-
-	if(shmctl(shm_id, IPC_RMID, &shm_desc) == -1)	// close SHM
-		errExit("shmctl()failed\n");	//			Print error and exit
-
-}
-
-//=============================================================================
 //	Function which set signal handler
 void setHandlers()
 {
@@ -227,43 +160,10 @@ void setHandlers()
 }
 
 //=============================================================================
-//	Function which create shered memory
-int init_shm(const int ext_key,const int shm_size)
-{
-	int 			shm_id = 0;			//			shm desc id
-	key_t 			key;				//			ftok key
-
-	if((key = ftok("/tmp", ext_key)) == -1)
-		errExit("ftok()failed\n");		//			Print error and exit
-	if((shm_id = shmget(key, sizeof(int) +
-	   (sizeof(struct my_msgbuf) * shm_size), MSGGET_FLAG)) == -1)
-		errExit("shmget()failed\n");	//			Print error and exit
-
-	return(shm_id);						//			return shm desc id
-
-}
-
-//=============================================================================
 //	function which print pi
 void print_result(const double pai)
 {
 	fprintf(stdout,"PI(pay) is\t = %.10f\n", pai);	//	print to stdout
-
-}
-
-//=============================================================================
-//	Get correct memory sizeof
-int getMemoryCorrectSize(const int value)
-{
-	if(value >0)									//	check if value good
-		return(value);								//	return value
-	else
-	{
-		fprintf(stderr,"Incorrect memory size value\n");//	print error
-		exit(EXIT_FAILURE);
-	}
-
-	return(0);										//	return default
 
 }
 

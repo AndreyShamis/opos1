@@ -55,6 +55,11 @@ void prep_sock_addr_strac(struct sockaddr_in *dest_addr, char **host_addr,
 double culcPai(const int multiplier);
 
 //=============================================================================
+//	function which pack pai result and multiplier to single string
+// 	getting: meseg bufer, pai result and multiplier.
+void prep_msg_buf(char buf[BUF_LEN], double	pai_calculated, int multiplier);
+
+//=============================================================================
 //	Function which write to socket (send data to server)
 //	getting: socket file descriptor and buffer of  messeg (pai value)
 void write_to_socket(int my_socket, char buf[BUF_LEN]);
@@ -64,9 +69,10 @@ void write_to_socket(int my_socket, char buf[BUF_LEN]);
 //=============================================================================
 int main(int argc, char **argv)
 {
-	int		my_socket;
-	char	buf[BUF_LEN];
-	double	pai_calculated;
+	int		my_socket;								// socket file descriptor
+	int 	multiplier = atoi(argv[3]);				// multiply rand size
+	char	buf[BUF_LEN];							// meseg buffer
+	double	pai_calculated;							// pai result
 
 	if(argc != 4)		// If the user enter nesesery data corect:
 		incorect_param();							//	print error
@@ -76,10 +82,12 @@ int main(int argc, char **argv)
 	// connect socket to server
 	connect_to_server(my_socket, &argv[1], atoi(argv[2]));
 
-	pai_calculated 	=	culcPai(atoi(argv[3]));		// calc pai.
+	pai_calculated 	=	culcPai(multiplier);		// calc pai.
 
-	// convert pai (doubel type) to string type
-	sprintf(buf, "%.10f\n",pai_calculated);
+	// pack pai result and multiplier to single string
+	prep_msg_buf(buf, pai_calculated, multiplier);
+
+	puts(buf);	///////////////TEST//////////////////////////////////
 
 	write_to_socket(my_socket, buf);				// write to socket
 
@@ -92,16 +100,6 @@ int main(int argc, char **argv)
 
 //                             Function section
 //=============================================================================
-
-//=============================================================================
-//	Function which write to socket (send data to server)
-//	getting: socket file descriptor and buffer of  messeg (pai value)
-void write_to_socket(int my_socket, char buf[BUF_LEN])
-{
-	if((write(my_socket, &buf, BUF_LEN)) == -1)
-		errExit("write() to server failed\n");		//	Print error and exit
-
-}
 
 //=============================================================================
 //	Function which init socket
@@ -131,6 +129,7 @@ void connect_to_server(int my_socket, char **host_addr, int dest_port)
 	if((connect(my_socket,(struct sockaddr*)&dest_addr,
 		sizeof(dest_addr))) == -1)
 		errExit("connect()failed\n");		//	Print error and exit
+
 
 }
 
@@ -201,6 +200,28 @@ double culcPai(const int multiplier)
 
 	// return pai propabilety value.
 	return (4 * (pointsIn / totalPoints));
+
+}
+
+//=============================================================================
+//	function which pack pai result and multiplier to single string
+// 	getting: meseg bufer, pai result and multiplier.
+void prep_msg_buf(char buf[BUF_LEN], double	pai_calculated, int multiplier)
+{
+	// convert pai (doubel type) to string type
+	sprintf(buf, "%.10f\n",pai_calculated);
+
+	buf[BUF_LEN -1] = (char)(multiplier + '0');	// put at last sell multiplier value
+
+}
+
+//=============================================================================
+//	Function which write to socket (send data to server)
+//	getting: socket file descriptor and buffer of  messeg (pai value)
+void write_to_socket(int my_socket, char buf[BUF_LEN])
+{
+	if((write(my_socket, &buf, BUF_LEN)) == -1)
+		errExit("write() to server failed\n");		//	Print error and exit
 
 }
 
