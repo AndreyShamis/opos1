@@ -6,20 +6,18 @@
 //                               Include section
 //=============================================================================
 #include <stdio.h>
-#include <unistd.h>
+#include <unistd.h>			// for rea/write/close
+#include <string.h>
 #include <stdlib.h>
-#include <sys/shm.h>
 #include <time.h>
+#include <sys/types.h>
+#include <sys/socket.h>		// for htonl(),....
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 
-#define MSGGET_FLAG		0600
-
-//============================ STRUCTS ========================================
-//	struct for retreidev messages
-struct my_msgbuf
-{
-	short int mtype;			//	type of msgbuf
-	double pai;					//	pai value
-};
+#define HOST_ADDR_LEN 20
+#define BUF_LEN 13
 
 //                             Prototypes section
 //=============================================================================
@@ -33,12 +31,22 @@ void incorect_param();
 void errExit(const char *msg);
 
 //=============================================================================
-//	Function which create shered memory
-int init_msg(const int ext_key);
+//	Function which init socket
+//	return socket file descriptor
+int init_socket();
 
 //=============================================================================
-//	Function which get pointer to shered memory
-int *get_ptr_to_shm(const int shm_id);
+//	function which connect socket to the server
+//	getting socket file descriptor, pointer to host addres string and
+//	destination port number
+void connect_to_server(int my_socket, char **host_addr, int dest_port);
+
+//=============================================================================
+//	function which preper socket adrres structure
+//	getting: pointer to destination adrres stucture, pointer to host addres
+//	string and destination	port number
+void prep_sock_addr_strac(struct sockaddr_in *dest_addr, char **host_addr,
+						  int dest_port);
 
 //=============================================================================
 //	function to calculate Pi
@@ -47,86 +55,97 @@ int *get_ptr_to_shm(const int shm_id);
 double culcPai(const int multiplier);
 
 //=============================================================================
-//	function which witing data into shared memory
-//	getting pointer to memory index in memory and value and type
-//	return : nothing
-void write_to_memory(struct my_msgbuf *shm_ptr,const int msg_type,
-									const double pi_value,const int mem_index);
+//	Function which write to socket (send data to server)
+//	getting: socket file descriptor and buffer of  messeg (pai value)
+void write_to_socket(int my_socket, char buf[BUF_LEN]);
 
 ///////////////////////////////////////////////////////////////////////////////
 //                                Main section
 //=============================================================================
 int main(int argc, char **argv)
 {
+	int		my_socket;
+	char	buf[BUF_LEN];
+	double	pai_calculated;
 
-	int 		shm_id			= 	0;		// internal comunication key
-	double		pai_calculated	=	0;  	// pai value.
-	int 		*counter  		= 	NULL;	// pointer to counter
-	struct my_msgbuf *shm_ptr 	= 	NULL;	// pointer to memory
+	if(argc != 4)		// If the user enter nesesery data corect:
+		incorect_param();							//	print error
 
-	// If the user enter nesesery data corect:
-	if(argc != 3)
-		incorect_param();						//	print error
+	my_socket = init_socket();						// init socket
 
-	shm_id 		= init_msg(atoi(argv[1]));		//	init shered memory
-	counter 	= get_ptr_to_shm(shm_id);		//	get pointer to counter
-	shm_ptr 	= (struct my_msgbuf*)(counter + 1);//	calc pointer to mem
+	// connect socket to server
+	connect_to_server(my_socket, &argv[1], atoi(argv[2]));
 
-	if(!(*counter))								//	check if can write to mem
-	{	
-		fprintf(stderr,"Shered memory - Access blocked by server!\n");
-		exit(EXIT_FAILURE);
-	}
-	
-	pai_calculated 	=	culcPai(atoi(argv[2])); // calc pai.
-	
-	(*counter) --;								//	decrease counter
-	
-	write_to_memory(shm_ptr,atoi(argv[2]),pai_calculated,(*counter));
-	
+	pai_calculated 	=	culcPai(atoi(argv[3]));		// calc pai.
+
+	// convert pai (doubel type) to string type
+	sprintf(buf, "%.10f\n",pai_calculated);
+
+	write_to_socket(my_socket, buf);				// write to socket
+
+	close(my_socket);
+
 	return(EXIT_SUCCESS);
 
 }
 
+
+//                             Function section
 //=============================================================================
-//	function which witing data into shared memory
-//	getting pointer to memory index in memory and value and type
-//	return : nothing
-void write_to_memory(struct my_msgbuf *shm_ptr,const int msg_type,
-									const double pi_value,const int mem_index)
-{
-	shm_ptr[mem_index].mtype 	= msg_type; 	// sec param to msg type
-	shm_ptr[mem_index].pai		= pi_value;		// put pi to shered memory
-	
-}
 
 //=============================================================================
-//	Function which get pointer to shered memory
-int *get_ptr_to_shm(const int shm_id)
+//	Function which write to socket (send data to server)
+//	getting: socket file descriptor and buffer of  messeg (pai value)
+void write_to_socket(int my_socket, char buf[BUF_LEN])
 {
-	int *temp;								//	variable be returned
-
-	temp = (int*)shmat(shm_id, NULL, 0);	//	set pinter
-		if(!temp)							//	check if temp not null
-			errExit("shmatt()failed\n");
-
-	return (temp);							//	return value
+	if((write(my_socket, &buf, BUF_LEN)) == -1)
+		errExit("write() to server failed\n");		//	Print error and exit
 
 }
 
 //=============================================================================
-//	Function which create shered memory
-int init_msg(const int ext_key)
+//	Function which init socket
+//	return socket file descriptor
+int init_socket()
 {
-	int 			shm_id = 0;			//			shm desc id
-	key_t 			key;				//			ftok key
+	int my_socket;
 
-	if((key = ftok("/tmp", ext_key)) == -1)
-		errExit("ftok()failed\n");		//			Print error and exit
-	if((shm_id = shmget(key, 0, MSGGET_FLAG)) == -1)
-		errExit("shmget()failed\n");	//			Print error and exit
+	if((my_socket = socket(AF_INET, SOCK_STREAM, 0)) == -1)//allocate socket
+		errExit("socket: allocation failed\n");		//	Print error and exit
 
-	return(shm_id);						//			return shm desc id
+	return my_socket;
+}
+
+//=============================================================================
+//	function which connect socket to the server
+//	getting: pointer to socket, pointer to host addres string and destination
+//	port number
+void connect_to_server(int my_socket, char **host_addr, int dest_port)
+{
+	struct sockaddr_in dest_addr;	// for creation of conection with server
+
+	// prepare socket addres structur
+	prep_sock_addr_strac(&dest_addr, host_addr, dest_port);
+
+	// connect socket to the server
+	if((connect(my_socket,(struct sockaddr*)&dest_addr,
+		sizeof(dest_addr))) == -1)
+		errExit("connect()failed\n");		//	Print error and exit
+
+}
+
+//=============================================================================
+//	function which preper socket adrres structure
+//	getting: pointer to destination adrres stucture, pointer to host addres
+//	string and destination	port number
+void prep_sock_addr_strac(struct sockaddr_in *dest_addr, char **host_addr,
+						  int dest_port)
+{
+	// preper socket adrres structure
+	(*dest_addr).sin_family 		= AF_INET;
+	(*dest_addr).sin_port			= htons(dest_port);
+	(*dest_addr).sin_addr.s_addr 	= inet_addr(*host_addr);
+	memset((*dest_addr).sin_zero, '\0', sizeof((*dest_addr).sin_zero));
 
 }
 
@@ -145,10 +164,11 @@ void errExit(const char *msg)
 void incorect_param()
 {
 	fprintf(stderr,"You need enter 2 parameters:\n \
-		\r1. Memory id \n \
-		\r2. Multiplier for rand\n");
+		\r1. ip addres or hostname \n \
+		\r2. port number of server  \n \
+		\r3. Multiplier for rand\n");
 	exit(EXIT_FAILURE);
-	
+
 }
 
 //=============================================================================
@@ -159,7 +179,7 @@ double culcPai(const int multiplier)
 	double xVal,							// rndom x coordinate value.
 		   yVal,							// rndom y coordinate value.
 		   distance,						// distance of points.
-		   totalPoints 	= multiplier * 1000,// difine total points number.
+		   totalPoints 	= multiplier * 10000,// difine total points number.
 		   pointsIn 	= 0;
 	int index;	// for Looping.
 
@@ -181,7 +201,7 @@ double culcPai(const int multiplier)
 
 	// return pai propabilety value.
 	return (4 * (pointsIn / totalPoints));
-	
+
 }
 
 //=============================================================================
