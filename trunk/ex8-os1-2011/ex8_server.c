@@ -8,19 +8,20 @@
 //                               Include section
 //=============================================================================
 #include <stdio.h>
-#include <unistd.h>			// for rea/write/close
+#include <unistd.h>				// for rea/write/close
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
 #include <sys/types.h>
-#include <sys/socket.h>		// for htonl(),....
+#include <sys/socket.h>			// for htonl(),....
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <signal.h>			// for using signals
+#include <signal.h>				// for using signals
 
-#define HOST_ADDR_LEN 20
 #define BUF_LEN 13
+#define SIZE_BACKLOG_QUEUE 5	// size of the backlog queue
+
 
 
 
@@ -46,11 +47,21 @@ void stopServer(int sig_num);
 int init_socket();
 
 //=============================================================================
-//	Function ti calculate Pi over all clients was geted
-// Inpu-t:	pointer to the shered memory, data base size
-// Return:	value of Pai
-double calcAverage(struct my_msgbuf *data_base,const int counter,
-												const int shm_size);
+//	function which reteive data from clients
+//	getting main socket file descriptor and number of port
+double retreive_data(int main_socket, int port);
+
+//=============================================================================
+//	function which init the server to listen to clients.
+//	getting: pointer to destination adrres stucture, main socket file
+//	descriptorand and port number.
+void start_to_listen(struct sockaddr_in *my_address, int main_socket,
+					 int port);
+
+//=============================================================================
+//	function which preper main socket adrres structure
+//	getting: pointer to destination adrres stucture and port number
+void prep_main_sock_addr_strac(struct sockaddr_in *dest_addr, int port);
 
 //=============================================================================
 //	function which print error which get in parameter
@@ -70,15 +81,24 @@ void setHandlers();
 //	Printing Starting welcome message
 void print_welcome_message(const int time);
 
+//=============================================================================
+//	function cheking if the user gave a ligal time for timer.
+//	retur: timer value if avry thing ok, othewise exiteng program.
+int chek_time(int input);
 
 //=============================================================================
-//	Function which make dilay for witen to data at shered memory.
-void wait_for_data(int *counter,const int timer,
-				const int shm_id,const int shm_size);
+//	Function which read from socket (resive data from client)
+//	getting: socket file descriptor and buffer of  messeg (pai value)
+void read_from_socket(int serving_socket,
+					  double *pai_integrator,
+					  int *pai_divides);
 
 //=============================================================================
-//	get corrected time which prgram be worked
-int get_time_correct_period(int input);
+//	function which unpack pai result and multiplier to to double and int
+// 	getting: meseg bufer, pai integrator and pai divides.
+void unpack_msg_buf(char msg_buf[BUF_LEN],
+					double *pai_integrator,
+					int *pai_divides);
 
 
 //*****************************************************************************
@@ -89,38 +109,159 @@ int get_time_correct_period(int input);
 int main(int argc, char **argv)
 {
 
-	int		my_socket;								// socket file descriptor
-	int 	multiplier = atoi(argv[3]);				// multiply rand size
-	char	buf[BUF_LEN];							// meseg buffer
+	int		main_socket	= 0;   //socket file descriptor for receive applicatoin
+	int		time_period = 0;						// timer of working time
 	double 	pai_res	= 0;							// pi variable
 
-	if(argc != 3)				// If the user enter nesesery data corect:
-		incorect_param();							// print error
+	if(argc != 3)			  // If the user enter nesesery data corect:
+		incorect_param();									// print error
 
-	time_period = get_time_correct_period(atoi(argv[2]));	// working time
+	time_period = chek_time(atoi(argv[1]));					// working time
 
-	my_socket = init_socket();						// init socket
+	main_socket = init_socket();							// init socket
 
 	print_welcome_message(time_period);
 
 	setHandlers();									// set signal handlers
 
-	// waiting for shered memory to be filled.
-	wait_for_data(counter,time_period, shm_id, shm_size);
+	alarm(time_period);							//	set alarm
 
-	pai_res = calcAverage(data_base, (*counter), shm_size);	//	get value of pi
+	pai_res = retreive_data(main_socket, atoi(argv[2]));	// get data from clients
 
 	if(pai_res)
-		print_result(pai_res);				//	print reults
+		print_result(pai_res);								//	print reults
 
 
 	return(EXIT_SUCCESS);
 
 }
 
+
+//                             Function section
 //=============================================================================
-//	get corrected time which prgram be worked
-int get_time_correct_period(int input)
+
+//=============================================================================
+//	Function which init socket
+//	return socket file descriptor
+int init_socket()
+{
+	int my_socket;
+
+	if((my_socket = socket(AF_INET, SOCK_STREAM, 0)) == -1)//allocate socket
+		errExit("socket: allocation failed\n");		//	Print error and exit
+
+	return my_socket;
+}
+
+//=============================================================================
+//	function which reteive data from clients
+//	getting main socket file descriptor and number of port
+double retreive_data(int main_socket, int port)
+{
+	double	pai_integrator	= 0;		// integrated pai result from clients
+	int 	pai_divides		= 0;		// sum of multipls for calculation of
+										// avarage
+
+	struct sockaddr_in my_address;		// server address (for bing())
+	struct sockaddr_in client_address;	// client address (for accept()
+	socklen_t size_cliet_addr = sizeof(client_address);
+	int	serving_socket;   	// socket file descriptor for serving applicatoin
+
+	// start listen to clients
+	start_to_listen(&my_address, main_socket, port);
+
+	while(!quit)
+	{
+		// get new application and redirect it to seperated socket
+		if((serving_socket = accept(main_socket,
+			(struct sockaddr*)&client_address, &size_cliet_addr)) < 0)
+			continue;
+
+		//read from serving socked (recive data from client)
+		read_from_socket(serving_socket, &pai_integrator, &pai_divides);
+
+		close(serving_socket);			// close serving_socket
+	}
+	if(pai_divides)						//	check if can devide
+		return (pai_integrator / pai_divides);
+
+	else
+		return (0);
+
+}
+
+//=============================================================================
+//	function which init the server to listen to clients.
+//	getting: pointer to destination adrres stucture, main socket file
+//	descriptorand and port number.
+void start_to_listen(struct sockaddr_in *my_address, int main_socket, int port)
+{
+	// prepare main socket addres structur
+	prep_main_sock_addr_strac(my_address, port);
+
+	// conect between main socket and address
+	if((bind(main_socket, (struct sockaddr*)my_address,
+		sizeof(*my_address))) == -1)
+		errExit("bind()failed\n");			//	Print error and exit
+
+	if((listen(main_socket,SIZE_BACKLOG_QUEUE)) == -1)
+		errExit("listen()failed\n");		//	Print error and exit
+
+}
+
+//=============================================================================
+//	function which preper main socket adrres structure
+//	getting: pointer to destination adrres stucture and port number
+void prep_main_sock_addr_strac(struct sockaddr_in *my_address, int port)
+{
+	// preper socket adrres structure
+	(*my_address).sin_family 		= AF_INET;
+	(*my_address).sin_port			= htons(port);
+	(*my_address).sin_addr.s_addr 	= htonl(INADDR_ANY);
+	memset((*my_address).sin_zero, '\0', sizeof((*my_address).sin_zero));
+
+}
+
+//=============================================================================
+//	Function which read from socket (resive data from client)
+//	getting: socket file descriptor and buffer of  messeg (pai value)
+void read_from_socket(int serving_socket,
+					  double *pai_integrator,
+					  int *pai_divides)
+{
+	char msg_buf[BUF_LEN];							// meseg buffer
+
+	if((read(serving_socket, &msg_buf, BUF_LEN)) == -1)
+		errExit("read() from client failed\n");		//	Print error and exit
+
+	unpack_msg_buf(msg_buf, pai_integrator, pai_divides);
+
+}
+
+//=============================================================================
+//	function which unpack pai result and multiplier to to double and int
+// 	getting: meseg bufer, pai integrator and pai divides.
+void unpack_msg_buf(char msg_buf[BUF_LEN],
+					double *pai_integrator,
+					int *pai_divides)
+{
+	puts(msg_buf);	///////////////TEST//////////////////////////////////
+
+	// convert last char at string to int that  temprorary save divides value
+	int temp_divides = (int)msg_buf[BUF_LEN -1] - '0';
+
+	msg_buf[BUF_LEN - 1] = '\0';	// remove last char from pai value
+
+	(*pai_integrator) += atof(msg_buf) * temp_divides;	// update pai integrtor
+
+	(*pai_divides) += temp_divides;						// update pai divides
+
+}
+
+//=============================================================================
+//	function cheking if the user gave a ligal time for timer.
+//	retur: timer value if avry thing ok, othewise exiteng program.
+int chek_time(int input)
 {
 	if(input > 0)
 		return(input);
@@ -135,42 +276,12 @@ int get_time_correct_period(int input)
 }
 
 //=============================================================================
-//	Function which init socket
-//	return socket file descriptor
-int init_socket()
-{
-	int my_socket;
-
-	if((my_socket = socket(PF_INET, SOCK_STREAM, 0)) == -1)//allocate socket
-		errExit("socket: allocation failed\n");		//	Print error and exit
-
-	return my_socket;
-}
-
-
-
-//=============================================================================
 //	Printing Starting welcome message
 void print_welcome_message(const int time)
 {
 	printf("\n\n\t-Server started!\n");
 	fprintf(stdout,"\t-\t#\tTime for timer\t:%d\n",time);
 	printf("\t + Waitng for clients.......\n");
-
-}
-
-
-
-//=============================================================================
-//	Function which make dilay for witen to data at shered memory.
-void wait_for_data(int *counter,const int timer,
-				const int shm_id,const int shm_size)
-{
-	alarm(timer);						//	set alarm
-
-	while(!quit)			 // beasy wait for clients that fill the SHM
-		if((*counter) ==  0) // lock SHM if the clients used all SHM
-			lock_shm(shm_id);
 
 }
 
@@ -198,34 +309,6 @@ void errExit(const char *msg)
 {
 	perror(msg);					//	print err message
 	exit(EXIT_FAILURE);				//	exit whith fail
-
-}
-
-//=============================================================================
-//	Function ti calculate Pi over all clients was geted
-// Inpu-t:	pointer to the shered memory, data base size
-// Return:	value of Pai
-double calcAverage(struct my_msgbuf *data_base,const int counter,
-										const int shm_size)
-{
-	double 		average 	= 	0;		//	difine average of retreive pais.
-	long int 	divides 	= 	0;		//	difine weight of calculation averag
-	int 		index		=	0;		// for looping.
-	fprintf(stdout,"Number of clients sended pi:%d\n", shm_size - counter);
-
-	for(index = counter; index < shm_size; index++)
-	{
-		average += data_base[index].mtype * data_base[index].mtext;
-		divides += data_base[index].mtype;
-	}
-
-	if(divides)							//	check if can devide
-	{
-		average = average / divides;	//	deviding
-		return (average);				//	return value
-	}
-
-	return (0);							//	return other value
 
 }
 
