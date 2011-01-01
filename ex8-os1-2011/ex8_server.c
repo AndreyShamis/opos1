@@ -217,7 +217,7 @@ void prep_main_sock_addr_strac(struct sockaddr_in *my_address, int port)
 	// preper socket adrres structure
 	(*my_address).sin_family 		= AF_INET;
 	(*my_address).sin_port			= htons(port);
-	(*my_address).sin_addr.s_addr 	= htonl(INADDR_ANY);
+	(*my_address).sin_addr.s_addr 	= htonl(INADDR_ANY);  //inet_addr("10.2.10.25");//
 	memset((*my_address).sin_zero, '\0', sizeof((*my_address).sin_zero));
 
 }
