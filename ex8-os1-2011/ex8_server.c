@@ -61,7 +61,7 @@ void start_to_listen(struct sockaddr_in *my_address, int main_socket,
 //=============================================================================
 //	function which preper main socket adrres structure
 //	getting: pointer to destination adrres stucture and port number
-void prep_main_sock_addr_strac(struct sockaddr_in *dest_addr, int port);
+struct sockaddr_in *prep_main_sock_addr_strac(struct sockaddr_in *my_address,int port);
 
 //=============================================================================
 //	function which print error which get in parameter
@@ -96,11 +96,11 @@ void read_from_socket(int serving_socket,
 //=============================================================================
 //	function which unpack pai result and multiplier to to double and int
 // 	getting: meseg bufer, pai integrator and pai divides.
-void unpack_msg_buf(char msg_buf[BUF_LEN],
+void unpack_msg_buf(char msg_buf[],
 					double *pai_integrator,
 					int *pai_divides);
 
-
+	int		main_socket	= 0;   //socket file descriptor for receive applicatoin
 //*****************************************************************************
 //*****************************************************************************
 
@@ -109,7 +109,7 @@ void unpack_msg_buf(char msg_buf[BUF_LEN],
 int main(int argc, char **argv)
 {
 
-	int		main_socket	= 0;   //socket file descriptor for receive applicatoin
+
 	int		time_period = 0;						// timer of working time
 	double 	pai_res	= 0;							// pi variable
 
@@ -118,19 +118,22 @@ int main(int argc, char **argv)
 
 	time_period = chek_time(atoi(argv[1]));					// working time
 
+	printf("Time is %d\n",time_period);
+
 	main_socket = init_socket();							// init socket
 
 	print_welcome_message(time_period);
 
 	setHandlers();									// set signal handlers
 
-	alarm(time_period);							//	set alarm
+	alarm(time_period);								//	set alarm
 
-	pai_res = retreive_data(main_socket, atoi(argv[2]));	// get data from clients
+	pai_res = retreive_data(main_socket, atoi(argv[2]));// get data from clients
 
 	if(pai_res)
-		print_result(pai_res);								//	print reults
+		print_result(pai_res);							//	print reults
 
+	close(main_socket);			// close serving_socket
 
 	return(EXIT_SUCCESS);
 
@@ -173,15 +176,17 @@ double retreive_data(int main_socket, int port)
 	while(!quit)
 	{
 		// get new application and redirect it to seperated socket
-		if((serving_socket = accept(main_socket,
-			(struct sockaddr*)&client_address, &size_cliet_addr)) < 0)
+	printf("PYO\n");
+		if((serving_socket = accept(main_socket,(struct sockaddr*)&client_address, &size_cliet_addr))< 0)
 			continue;
-
+	printf("PYO2\n");
 		//read from serving socked (recive data from client)
 		read_from_socket(serving_socket, &pai_integrator, &pai_divides);
 
 		close(serving_socket);			// close serving_socket
+
 	}
+
 	if(pai_divides)						//	check if can devide
 		return (pai_integrator / pai_divides);
 
@@ -197,7 +202,7 @@ double retreive_data(int main_socket, int port)
 void start_to_listen(struct sockaddr_in *my_address, int main_socket, int port)
 {
 	// prepare main socket addres structur
-	prep_main_sock_addr_strac(my_address, port);
+	my_address = prep_main_sock_addr_strac(my_address,port);
 
 	// conect between main socket and address
 	if((bind(main_socket, (struct sockaddr*)my_address,
@@ -212,14 +217,15 @@ void start_to_listen(struct sockaddr_in *my_address, int main_socket, int port)
 //=============================================================================
 //	function which preper main socket adrres structure
 //	getting: pointer to destination adrres stucture and port number
-void prep_main_sock_addr_strac(struct sockaddr_in *my_address, int port)
+struct sockaddr_in *prep_main_sock_addr_strac(struct sockaddr_in *my_address,int port)
 {
 	// preper socket adrres structure
-	(*my_address).sin_family 		= AF_INET;
-	(*my_address).sin_port			= htons(port);
-	(*my_address).sin_addr.s_addr 	= htonl(INADDR_ANY);  //inet_addr("10.2.10.25");//
+	(*my_address).sin_family 	= AF_INET;
+	(*my_address).sin_port		= htons(port);
+	(*my_address).sin_addr.s_addr = htonl(INADDR_ANY);//inet_addr("10.2.10.25")
 	memset((*my_address).sin_zero, '\0', sizeof((*my_address).sin_zero));
 
+	return(my_address);
 }
 
 //=============================================================================
@@ -231,8 +237,9 @@ void read_from_socket(int serving_socket,
 {
 	char msg_buf[BUF_LEN];							// meseg buffer
 
-	if((read(serving_socket, &msg_buf, BUF_LEN)) == -1)
+	if((read(serving_socket, msg_buf, BUF_LEN)) == -1)
 		errExit("read() from client failed\n");		//	Print error and exit
+
 
 	unpack_msg_buf(msg_buf, pai_integrator, pai_divides);
 
@@ -241,17 +248,19 @@ void read_from_socket(int serving_socket,
 //=============================================================================
 //	function which unpack pai result and multiplier to to double and int
 // 	getting: meseg bufer, pai integrator and pai divides.
-void unpack_msg_buf(char msg_buf[BUF_LEN],
+void unpack_msg_buf(char msg_buf[],
 					double *pai_integrator,
 					int *pai_divides)
 {
-	puts(msg_buf);	///////////////TEST//////////////////////////////////
 
 	// convert last char at string to int that  temprorary save divides value
-	int temp_divides = (int)msg_buf[BUF_LEN -1] - '0';
+	int temp_divides = msg_buf[BUF_LEN -1] - '0';
 
-	msg_buf[BUF_LEN - 1] = '\0';	// remove last char from pai value
+	msg_buf[BUF_LEN-1] = '\0';	// remove last char from pai value
+	
+	//printf("divider %d\n",temp_divides);
 
+	//printf("int: %f \n",atof(msg_buf));
 	(*pai_integrator) += atof(msg_buf) * temp_divides;	// update pai integrtor
 
 	(*pai_divides) += temp_divides;						// update pai divides
@@ -330,6 +339,8 @@ void incorect_param()
 //	Updating gloabal to exit from program
 void stopServer(int sig_num)
 {
+	printf("SIG\n");
+	close(main_socket);
 	quit = 1;							//	exit status from program
 
 }

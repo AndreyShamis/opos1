@@ -57,12 +57,12 @@ double culcPai(const int multiplier);
 //=============================================================================
 //	function which pack pai result and multiplier to single string
 // 	getting: meseg bufer, pai result and multiplier.
-void prep_msg_buf(char buf[BUF_LEN], double	pai_calculated, int multiplier);
+void prep_msg_buf(char buf[], double	pai_calculated, int multiplier);
 
 //=============================================================================
 //	Function which write to socket (send data to server)
 //	getting: socket file descriptor and buffer of  messeg (pai value)
-void write_to_socket(int my_socket, char buf[BUF_LEN]);
+void write_to_socket(int my_socket, char buf[]);
 
 ///////////////////////////////////////////////////////////////////////////////
 //                                Main section
@@ -206,21 +206,21 @@ double culcPai(const int multiplier)
 //=============================================================================
 //	function which pack pai result and multiplier to single string
 // 	getting: meseg bufer, pai result and multiplier.
-void prep_msg_buf(char buf[BUF_LEN], double	pai_calculated, int multiplier)
+void prep_msg_buf(char buf[], double	pai_calculated, int multiplier)
 {
 	// convert pai (doubel type) to string type
 	sprintf(buf, "%.10f\n",pai_calculated);
 
-	buf[BUF_LEN -1] = (char)(multiplier + '0');	// put at last sell multiplier value
+	buf[BUF_LEN -1] = (multiplier + '0');	// put at last sell multiplier value
 
 }
 
 //=============================================================================
 //	Function which write to socket (send data to server)
 //	getting: socket file descriptor and buffer of  messeg (pai value)
-void write_to_socket(int my_socket, char buf[BUF_LEN])
+void write_to_socket(int my_socket, char buf[])
 {
-	if((write(my_socket, &buf, BUF_LEN)) == -1)
+	if((write(my_socket, buf, BUF_LEN)) == -1)
 		errExit("write() to server failed\n");		//	Print error and exit
 
 }
