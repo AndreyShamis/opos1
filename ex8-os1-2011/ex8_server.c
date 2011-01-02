@@ -1,22 +1,21 @@
 /*
 
 	Provide server for clients which calculated pi
-	and send it to server.
-	Server waiting X second and wait for argv[3] .X mast be provided in argv-2.
+	Server waiting X=argv[1] seconds and waiting for connections on port
+	Y=argv[2]
+	Handling connection happens immediately, and then counted for 
+	the math task. After a timeout the server receives the signal and 
+	then used it closes out the connection.
 */
 
 //                               Include section
 //=============================================================================
 #include <stdio.h>
-#include <unistd.h>				// for rea/write/close
-#include <string.h>
+#include <unistd.h>				// for read/write/close/alarm
+#include <string.h>				//	using in memset
 #include <stdlib.h>
-#include <time.h>
-#include <sys/types.h>
 #include <sys/socket.h>			// for htonl(),....
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
+#include <netinet/in.h>			//	for net
 #include <signal.h>				// for using signals
 
 #define BUF_LEN 13
@@ -27,8 +26,9 @@
 
 //                       	  globals section
 //=============================================================================
-int quit = 0;	//global variable to get exit status can be updated in handler
-
+int	serving_socket;   	// 	socket file descriptor for serving applicatoin
+int	main_socket;   	//	socket file descriptor for receive applicatoin
+int quit = 0;		//	global exit variable
 
 //=============================================================================
 //								Prototypes
@@ -49,19 +49,19 @@ int init_socket();
 //=============================================================================
 //	function which reteive data from clients
 //	getting main socket file descriptor and number of port
-double retreive_data(int main_socket, int port);
+double retreive_data(const int port);
 
 //=============================================================================
 //	function which init the server to listen to clients.
 //	getting: pointer to destination adrres stucture, main socket file
 //	descriptorand and port number.
-void start_to_listen(struct sockaddr_in *my_address, int main_socket,
-					 int port);
+void start_to_listen(struct sockaddr_in *my_address,const int port);
 
 //=============================================================================
 //	function which preper main socket adrres structure
 //	getting: pointer to destination adrres stucture and port number
-struct sockaddr_in *prep_main_sock_addr_strac(struct sockaddr_in *my_address,int port);
+struct sockaddr_in *prep_main_sock_addr_strac(struct sockaddr_in *my_address,
+									const int port);
 
 //=============================================================================
 //	function which print error which get in parameter
@@ -89,18 +89,13 @@ int chek_time(int input);
 //=============================================================================
 //	Function which read from socket (resive data from client)
 //	getting: socket file descriptor and buffer of  messeg (pai value)
-void read_from_socket(int serving_socket,
-					  double *pai_integrator,
-					  int *pai_divides);
+void read_from_socket(double *pai_integrator,int *pai_divides);
 
 //=============================================================================
 //	function which unpack pai result and multiplier to to double and int
 // 	getting: meseg bufer, pai integrator and pai divides.
-void unpack_msg_buf(char msg_buf[],
-					double *pai_integrator,
+void unpack_msg_buf(char msg_buf[],	double *pai_integrator,
 					int *pai_divides);
-
-	int		main_socket	= 0;   //socket file descriptor for receive applicatoin
 //*****************************************************************************
 //*****************************************************************************
 
@@ -109,31 +104,24 @@ void unpack_msg_buf(char msg_buf[],
 int main(int argc, char **argv)
 {
 
-
 	int		time_period = 0;						// timer of working time
 	double 	pai_res	= 0;							// pi variable
 
 	if(argc != 3)			  // If the user enter nesesery data corect:
-		incorect_param();									// print error
+		incorect_param();							// print error
 
-	time_period = chek_time(atoi(argv[1]));					// working time
-
-	printf("Time is %d\n",time_period);
-
-	main_socket = init_socket();							// init socket
-
+	time_period = chek_time(atoi(argv[1]));			// working time
 	print_welcome_message(time_period);
-
 	setHandlers();									// set signal handlers
-
 	alarm(time_period);								//	set alarm
-
-	pai_res = retreive_data(main_socket, atoi(argv[2]));// get data from clients
+	
+	main_socket 	= init_socket();				// init socket
+	pai_res 		= retreive_data(atoi(argv[2]));	// get data from clients
 
 	if(pai_res)
-		print_result(pai_res);							//	print reults
+		print_result(pai_res);						//	print reults
 
-	close(main_socket);			// close serving_socket
+	close(main_socket);								// close serving_socket
 
 	return(EXIT_SUCCESS);
 
@@ -159,7 +147,7 @@ int init_socket()
 //=============================================================================
 //	function which reteive data from clients
 //	getting main socket file descriptor and number of port
-double retreive_data(int main_socket, int port)
+double retreive_data(const int port)
 {
 	double	pai_integrator	= 0;		// integrated pai result from clients
 	int 	pai_divides		= 0;		// sum of multipls for calculation of
@@ -168,28 +156,24 @@ double retreive_data(int main_socket, int port)
 	struct sockaddr_in my_address;		// server address (for bing())
 	struct sockaddr_in client_address;	// client address (for accept()
 	socklen_t size_cliet_addr = sizeof(client_address);
-	int	serving_socket;   	// socket file descriptor for serving applicatoin
 
 	// start listen to clients
-	start_to_listen(&my_address, main_socket, port);
+	start_to_listen(&my_address, port);
 
 	while(!quit)
 	{
 		// get new application and redirect it to seperated socket
-	printf("PYO\n");
-		if((serving_socket = accept(main_socket,(struct sockaddr*)&client_address, &size_cliet_addr))< 0)
+		if((serving_socket = accept(main_socket,
+		  (struct sockaddr*)&client_address, &size_cliet_addr))< 0)
 			continue;
-	printf("PYO2\n");
-		//read from serving socked (recive data from client)
-		read_from_socket(serving_socket, &pai_integrator, &pai_divides);
 
-		close(serving_socket);			// close serving_socket
+		//read from serving socked (recive data from client)
+		read_from_socket(&pai_integrator, &pai_divides);
 
 	}
 
 	if(pai_divides)						//	check if can devide
 		return (pai_integrator / pai_divides);
-
 	else
 		return (0);
 
@@ -199,7 +183,7 @@ double retreive_data(int main_socket, int port)
 //	function which init the server to listen to clients.
 //	getting: pointer to destination adrres stucture, main socket file
 //	descriptorand and port number.
-void start_to_listen(struct sockaddr_in *my_address, int main_socket, int port)
+void start_to_listen(struct sockaddr_in *my_address, const int port)
 {
 	// prepare main socket addres structur
 	my_address = prep_main_sock_addr_strac(my_address,port);
@@ -217,30 +201,31 @@ void start_to_listen(struct sockaddr_in *my_address, int main_socket, int port)
 //=============================================================================
 //	function which preper main socket adrres structure
 //	getting: pointer to destination adrres stucture and port number
-struct sockaddr_in *prep_main_sock_addr_strac(struct sockaddr_in *my_address,int port)
+struct sockaddr_in *prep_main_sock_addr_strac(struct sockaddr_in *my_address,
+										const int port)
 {
 	// preper socket adrres structure
 	(*my_address).sin_family 	= AF_INET;
 	(*my_address).sin_port		= htons(port);
-	(*my_address).sin_addr.s_addr = htonl(INADDR_ANY);//inet_addr("10.2.10.25")
+	(*my_address).sin_addr.s_addr = htonl(INADDR_ANY);
 	memset((*my_address).sin_zero, '\0', sizeof((*my_address).sin_zero));
 
 	return(my_address);
+	
 }
 
 //=============================================================================
 //	Function which read from socket (resive data from client)
-//	getting: socket file descriptor and buffer of  messeg (pai value)
-void read_from_socket(int serving_socket,
-					  double *pai_integrator,
-					  int *pai_divides)
+//	getting: buffer of  messeg (pai value)
+void read_from_socket(double *pai_integrator,int *pai_divides)
 {
 	char msg_buf[BUF_LEN];							// meseg buffer
 
-	if((read(serving_socket, msg_buf, BUF_LEN)) == -1)
+	if(!quit &&(read(serving_socket, msg_buf, BUF_LEN)) == -1)
 		errExit("read() from client failed\n");		//	Print error and exit
 
-
+	close(serving_socket);			// close serving_socket
+	
 	unpack_msg_buf(msg_buf, pai_integrator, pai_divides);
 
 }
@@ -248,19 +233,14 @@ void read_from_socket(int serving_socket,
 //=============================================================================
 //	function which unpack pai result and multiplier to to double and int
 // 	getting: meseg bufer, pai integrator and pai divides.
-void unpack_msg_buf(char msg_buf[],
-					double *pai_integrator,
-					int *pai_divides)
+void unpack_msg_buf(char msg_buf[],double *pai_integrator,int *pai_divides)
 {
 
 	// convert last char at string to int that  temprorary save divides value
 	int temp_divides = msg_buf[BUF_LEN -1] - '0';
 
 	msg_buf[BUF_LEN-1] = '\0';	// remove last char from pai value
-	
-	//printf("divider %d\n",temp_divides);
 
-	//printf("int: %f \n",atof(msg_buf));
 	(*pai_integrator) += atof(msg_buf) * temp_divides;	// update pai integrtor
 
 	(*pai_divides) += temp_divides;						// update pai divides
@@ -270,7 +250,7 @@ void unpack_msg_buf(char msg_buf[],
 //=============================================================================
 //	function cheking if the user gave a ligal time for timer.
 //	retur: timer value if avry thing ok, othewise exiteng program.
-int chek_time(int input)
+int chek_time(const int input)
 {
 	if(input > 0)
 		return(input);
@@ -331,7 +311,6 @@ void incorect_param()
 
 	exit(EXIT_FAILURE);
 
-
 }
 
 //=============================================================================
@@ -339,9 +318,9 @@ void incorect_param()
 //	Updating gloabal to exit from program
 void stopServer(int sig_num)
 {
-	printf("SIG\n");
-	close(main_socket);
-	quit = 1;							//	exit status from program
+	quit = 1;
+	close(main_socket);				//	close opened sockets
+	close(serving_socket);			//	close opened sockets
 
 }
 
