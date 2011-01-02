@@ -1,5 +1,5 @@
 /*
- * EX7:: Program to calculate Pi with server and clients
+ * EX8:: Program to calculate Pi with server and clients
  * ===========================================================================
  * Writen by: Ilia Gaisinsky, 	id: 309480051, login: iliaga
 	      	Andrey Shamis,  	id: 321470882, login: andreysh
@@ -7,47 +7,48 @@
  * ===========================================================================
  *
  *		to compile : 
- 					gcc -Wall ex7_server.c -o ex7_server
- 					gcc -Wall ex7_client.c -o ex7_client
+ 					gcc -Wall ex8_server.c -o ex8_server
+ 					gcc -Wall ex8_client.c -o ex8_client
  *
  *		to run:	
  		
  			Server:
- 				./ex7_server X Y Z
-			X		-  id of internal queue comunication
-			Y		-  working time
-			Z		-  memory size be used in server
+ 				./ex7_server X Y
+			X		-  working time
+			Y		-  port for connection
 		 		
  			Client
-	 			./ex7_client X Y
-	 		X		-  id of internal queue comunication
- 			Y		-  multple of pai calculation.	
+	 			./ex7_client X Y Z
+	 		X		-  hostname or ip adress
+ 			Y		-  port of server
+ 			Z		-  multiplier (1,5)	
  *
  */
 
-============================= ex7_server ======================================
-	At first, The server criate shared memory by size calculated as
-argv[3] + 1,where argv[3] is size of blocks which be fulled by clents,
-thats mean the maximum of clients can be argv[3] and one more its for 
-counter which poit out to fulled block (number)
-	Than it retreive from clients pi value and mutple in evry block he get.
-	After that we calculate the everage of all pai value that we get 
-(the calculation include multple value).
-In the end the program we print the evarage pai value . 
+============================= ex8_server ======================================
+Provide server for clients which calculated pi
+Server waiting X=argv[1] seconds and waiting for connections on port
+Y=argv[2]
+Handling connection happens immediately, and then counted for 
+the math task. After a timeout the server receives the signal and 
+then used it closes out the connection.
 
-//	server for clients which calculated pi
-//	and send it to server.
-//	Server waiting X second and wait for argv[3] .X mast be provided in argv-2.
+For exit can press ^C
 
 
+============================= ex8_client ======================================
+This program is calculated pi and send him to server.
+The connect with using tcp/ip
+The client can get two tipes of adress
+First is simple ip address	
+Second is domain name.
 
-============================= ex7_client ======================================
-	At first, client connect to shared memory for send to server 
-the pi which gona be calculated. 
-	Then we calculate the pai value an d send it to server.
+	- First Parameter which client get is ip adress or host name of serever
+	- Second is port
+	- Third is multiplier used in monte carlo method which can be between 1-5
 
 	* calcylation of pai: we retrive multiple form user that pultipling number
-1000 and that number randomize to calculate pai thrugh MOTE CARLO method.
+10000 and that number randomize to calculate pai thrugh MONTE CARLO method.
 
 /*
 	client which connected to server and send him
@@ -60,10 +61,10 @@ the pi which gona be calculated.
 //---------------------------------------------------------------------------//
 Files used
 
-ex7_server.c				//	Server file
-ex7_client.c 				//	Client File
+ex8_server.c				//	Server file
+ex8_client.c 				//	Client File
 
-ReadMe-os1-ex7-2011-andreysh_iliaga	//	readme
+ReadMe-os1-ex8-2011-andreysh_iliaga	//	readme
 
 ===============================================================================
 

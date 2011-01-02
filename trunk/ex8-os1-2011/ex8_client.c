@@ -1,23 +1,31 @@
 /*
 	This file are client which connected to server and send him
 	the pi value are is calculeted in function culcPai by MonteCarlo method.
-
+	The connect with using tcp/ip
+	The client can get two tipes of adress
+	First is simple ip address	
+	Second is domain name.
+	First Parameter which client get is ip adress or host name of serever
+	Second is port
+	Third is multiplier used in monte carlo method which can be between 1-5
+	
 */
 //                               Include section
 //=============================================================================
 #include <stdio.h>
 #include <unistd.h>			// for rea/write/close
-#include <string.h>
+#include <string.h>			//	need for do memset
 #include <stdlib.h>
-#include <time.h>
-#include <sys/types.h>
+#include <time.h>			//	used in rand and geted time
 #include <sys/socket.h>		// for htonl(),....
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
+#include <arpa/inet.h>		//	for inet_pton
+#include <netdb.h>			//	for gethostbyname
 
 #define HOST_ADDR_LEN 20
 #define BUF_LEN 13
+
+#define MIN_MULTIPLIER 1		//	Multiplier minimal value
+#define MAX_MULTIPLIER 5		//	Multiplier maximal value
 
 //                             Prototypes section
 //=============================================================================
@@ -39,14 +47,19 @@ int init_socket();
 //	function which connect socket to the server
 //	getting socket file descriptor, pointer to host addres string and
 //	destination port number
-void connect_to_server(int my_socket, char **host_addr, int dest_port);
+void connect_to_server(const int my_socket, char **host_addr, 
+									const int dest_port);
 
 //=============================================================================
 //	function which preper socket adrres structure
 //	getting: pointer to destination adrres stucture, pointer to host addres
 //	string and destination	port number
 void prep_sock_addr_strac(struct sockaddr_in *dest_addr, char **host_addr,
-						  int dest_port);
+						  const int dest_port);
+//=============================================================================
+//	function wich get input for multiplayer end check if its corretc
+//	if yes return the real value else print error and exit
+int checkMultiPlaier(const int input);
 
 //=============================================================================
 //	function to calculate Pi
@@ -57,12 +70,18 @@ double culcPai(const int multiplier);
 //=============================================================================
 //	function which pack pai result and multiplier to single string
 // 	getting: meseg bufer, pai result and multiplier.
-void prep_msg_buf(char buf[], double	pai_calculated, int multiplier);
+void prep_msg_buf(char buf[], double pai_calculated, int multiplier);
 
 //=============================================================================
 //	Function which write to socket (send data to server)
 //	getting: socket file descriptor and buffer of  messeg (pai value)
-void write_to_socket(int my_socket, char buf[]);
+void write_to_socket(const int my_socket,const char buf[]);
+
+//=============================================================================
+//	function wich get some string and trying to checl if this 
+//	is correct ipAddress
+//	return 0 if not else some int if yes
+int isValidIpAddress(const char *ipAddress);
 
 ///////////////////////////////////////////////////////////////////////////////
 //                                Main section
@@ -70,14 +89,14 @@ void write_to_socket(int my_socket, char buf[]);
 int main(int argc, char **argv)
 {
 	int		my_socket;								// socket file descriptor
-	int 	multiplier = atoi(argv[3]);				// multiply rand size
+	int 	multiplier ;							// multiply rand size
 	char	buf[BUF_LEN];							// meseg buffer
 	double	pai_calculated;							// pai result
 
 	if(argc != 4)		// If the user enter nesesery data corect:
 		incorect_param();							//	print error
-
-	my_socket = init_socket();						// init socket
+	multiplier 	= checkMultiPlaier(atoi(argv[3]));	//	get multiplier
+	my_socket 	= init_socket();					// init socket
 
 	// connect socket to server
 	connect_to_server(my_socket, &argv[1], atoi(argv[2]));
@@ -86,8 +105,6 @@ int main(int argc, char **argv)
 
 	// pack pai result and multiplier to single string
 	prep_msg_buf(buf, pai_calculated, multiplier);
-
-	puts(buf);	///////////////TEST//////////////////////////////////
 
 	write_to_socket(my_socket, buf);				// write to socket
 
@@ -100,25 +117,53 @@ int main(int argc, char **argv)
 
 //                             Function section
 //=============================================================================
+//	function wich get input for multiplayer end check if its corretc
+//	if yes return the real value else print error and exit
+int checkMultiPlaier(const int input)
+{
+	if(input >= MIN_MULTIPLIER && input <=MAX_MULTIPLIER)
+		return(input);
+	else
+	{
+		fprintf(stderr,"Incorect paramter for miltiplaier\n");
+		exit(EXIT_FAILURE);
+	
+	}
+}
+
+//=============================================================================
+//	function wich get some string and trying to checl if this 
+//	is correct ipAddress
+//	return 0 if not else some int if yes
+int isValidIpAddress(const char *ipAddress)
+{
+
+    struct sockaddr_in sa;		//	struct for inetpton use
+    int result = inet_pton(AF_INET, ipAddress, &(sa.sin_addr));
+		
+    return result != 0;			//	return value
+
+}
 
 //=============================================================================
 //	Function which init socket
 //	return socket file descriptor
 int init_socket()
 {
-	int my_socket;
+	int my_socket;					//	my socket int
 
 	if((my_socket = socket(AF_INET, SOCK_STREAM, 0)) == -1)//allocate socket
 		errExit("socket: allocation failed\n");		//	Print error and exit
 
-	return my_socket;
+	return my_socket;				//	return value
 }
 
 //=============================================================================
 //	function which connect socket to the server
 //	getting: pointer to socket, pointer to host addres string and destination
 //	port number
-void connect_to_server(int my_socket, char **host_addr, int dest_port)
+void connect_to_server(const int my_socket, char **host_addr, 
+									const int dest_port)
 {
 	struct sockaddr_in dest_addr;	// for creation of conection with server
 
@@ -138,12 +183,24 @@ void connect_to_server(int my_socket, char **host_addr, int dest_port)
 //	getting: pointer to destination adrres stucture, pointer to host addres
 //	string and destination	port number
 void prep_sock_addr_strac(struct sockaddr_in *dest_addr, char **host_addr,
-						  int dest_port)
+						 const int dest_port)
 {
+
 	// preper socket adrres structure
 	(*dest_addr).sin_family 		= AF_INET;
 	(*dest_addr).sin_port			= htons(dest_port);
-	(*dest_addr).sin_addr.s_addr 	= inet_addr(*host_addr);
+	
+	//	ip or hostname manipulation
+	if(isValidIpAddress(*host_addr))	//	in case with ip
+		(*dest_addr).sin_addr.s_addr 	= inet_addr(*host_addr);
+	else
+	{									//	in case with host name
+		struct hostent *he;				//	hostname struct
+		if((he = gethostbyname(*host_addr)) != NULL)	//	get hostbyname
+			(*dest_addr).sin_addr	= *((struct in_addr *)he->h_addr);
+		else
+			errExit("Can not get host by name\n");
+	}
 	memset((*dest_addr).sin_zero, '\0', sizeof((*dest_addr).sin_zero));
 
 }
@@ -218,7 +275,7 @@ void prep_msg_buf(char buf[], double	pai_calculated, int multiplier)
 //=============================================================================
 //	Function which write to socket (send data to server)
 //	getting: socket file descriptor and buffer of  messeg (pai value)
-void write_to_socket(int my_socket, char buf[])
+void write_to_socket(const int my_socket,const char buf[])
 {
 	if((write(my_socket, buf, BUF_LEN)) == -1)
 		errExit("write() to server failed\n");		//	Print error and exit
