@@ -63,9 +63,9 @@ void Check_Id(CLIENT *cl,char *server)
 	}
 
 	if(*result != 0)
-		printf("The id is correct\n");
+		printf("(%d)The id is correct\n",*result);
 	else
-		printf("The id is INCORRECT\n");
+		printf("(%d)The id is INCORRECT\n",*result);
 
 }
 
