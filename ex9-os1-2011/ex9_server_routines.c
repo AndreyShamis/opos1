@@ -1,5 +1,5 @@
 #include <stdio.h>
-
+#include <ctype.h>
 #include <string.h> 				//	need for strlen
 #include "/usr/include/rpc/rpc.h"
 #include <time.h>					//	need for srand time
@@ -10,36 +10,29 @@ int *is_valid_id_1(char **str,CLIENT *cl)
 	static int result;
 	
 	int str_len = strlen(*str);
-	
-	if(str_len != 9)
+	int i = 0;
+	int sum = 0;
+	int res = 0;	
+	if(str_len != 9 && isdigit((*str)[8]))
 		result = 0;
 	else
 	{
-		
-		int i = 0;
-		int sum = 0;
-		int res = 0;
-		for(i=0;i<str_len-1;i++)
+		for(i=0;i<str_len;i++)
 		{
 			int zz = i%2 + 1;
 			int digit = (int)((*str)[i]) - '0';
 			res=zz*digit;
 			if(res>9)
-			{
 				res-=9;
-			}
 			sum+=res;
 		
 		}
-		int last_digit = (int)((*str)[8]) - '0';
-		sum +=last_digit;
-	
 		if(sum % 10 == 0)
 			result = 1;	
 		else
 			result = 0;
 	}
-		
+	
 	return(&result);
 }
 
