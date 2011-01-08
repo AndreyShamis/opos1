@@ -2,16 +2,17 @@
 #include "/usr/include/rpc/rpc.h"
 #include "ex9_server.h"
 
-#define MAX_CYCLES 4
-#define MAX_ID_LEN 10
+#define MAX_CYCLES 4				//	number of cicles
+#define MAX_ID_LEN 10				//	size of string for id
 
-#define NUMBER_OF_PARAM 2
-#define CHECK_ID 1
-#define GET_PI 2
-#define MIN_MULTIPLIER 1
-#define MAX_MULTIPLIER 6
+#define NUMBER_OF_PARAM 2			//	number of parameter needed
+#define CHECK_ID 1					//	define for check ID
+#define GET_PI 2					//	define for get Pi
+#define MIN_MULTIPLIER 1			//	Minimal Pi divider
+#define MAX_MULTIPLIER 6			//	Maximal Pi Divider
 
 //=============================================================================
+//	Function which printing user menu
 void print_menu()
 {
 	fprintf(stdout,"\n \
@@ -21,14 +22,20 @@ void print_menu()
 }
 
 //=============================================================================
+//	Function which check if numer of parameters which get program is correct
+//	Return 1 if correct 
+//	else print error end exit from pragram
 int check_correct_start(const int argc)
 {
+	//	check if number of parameter eqivalent to number needed
 	if(argc == NUMBER_OF_PARAM)
 		return(1);
 
+	//	number of paramter bad, print error message and exit
 	fprintf(stderr,"Incorrect number of parameters\n");
 	exit(EXIT_FAILURE);
 	
+	return(0);
 
 }
 
