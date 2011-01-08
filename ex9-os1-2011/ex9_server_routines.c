@@ -1,33 +1,46 @@
 #include <stdio.h>
-#include <ctype.h>
 #include <string.h> 				//	need for strlen
 #include "/usr/include/rpc/rpc.h"
 #include <time.h>					//	need for srand time
 #include "ex9_server.h"
 
+#define ID_CORRECT_LEN 9				//	corretc len of id
+#define INFLUENCE_DIVIDER 2				//	to set nfluense
+#define NUMBER_OF_POINTS 10000			//	total number of points
+#define QUARTER_OF_CIRCLE 4				//	quarter of circle
+#define DECIMAL_DEVIDER 10				//	didvider in id check
+
+
+//=============================================================================
+//	Function which get string and it is must be id wich gonna be checked if
+//	it is correct id by checking CHECK DIGIT
+//	return 1 if the string is correct id
+//	and return 0 if incorrect id
 int *is_valid_id_1(char **str,CLIENT *cl)
 {
-	static int result;
+	static int result;					//	result be retuned
 	
-	int str_len = strlen(*str);
-	int i = 0;
-	int sum = 0;
-	int res = 0;	
-	if(str_len != 9 && isdigit((*str)[8]))
+	int str_len = strlen(*str);			//	lentgh of string
+	int counter = 0;					//	counter for for
+	int sum = 0;						//	sum of all digits
+	int res = 0;						//	for inside result
+	int influence=0;					//	influence on digit
+		
+	if(str_len != ID_CORRECT_LEN)
 		result = 0;
 	else
 	{
-		for(i=0;i<str_len;i++)
+		for(counter=0;counter<str_len;counter++)
 		{
-			int zz = i%2 + 1;
-			int digit = (int)((*str)[i]) - '0';
-			res=zz*digit;
-			if(res>9)
-				res-=9;
+			influence = counter%INFLUENCE_DIVIDER + 1;
+			int digit = (int)((*str)[counter]) - '0';
+			res=int influence*digit;
+			if(res>ID_CORRECT_LEN)
+				res-=ID_CORRECT_LEN;
 			sum+=res;
 		
 		}
-		if(sum % 10 == 0)
+		if(sum % DECIMAL_DEVIDER == 0)
 			result = 1;	
 		else
 			result = 0;
@@ -36,6 +49,9 @@ int *is_valid_id_1(char **str,CLIENT *cl)
 	return(&result);
 }
 
+//=============================================================================
+//	function to calculate Pi .geting multiplayer
+//	return claculated value
 double *estimate_pi_1(int *input,CLIENT *cl)
 {
 	static double result;					// value be returned
@@ -43,7 +59,7 @@ double *estimate_pi_1(int *input,CLIENT *cl)
 	double xVal,							// rndom x coordinate value.
 		   yVal,							// rndom y coordinate value.
 		   distance,						// distance of points.
-		   totalPoints 	= multiplier * 10000,// difine total points number.
+		   totalPoints = multiplier * NUMBER_OF_POINTS,//total points number.
 		   pointsIn 	= 0;
 	int index;	// for Looping.
 
@@ -64,7 +80,7 @@ double *estimate_pi_1(int *input,CLIENT *cl)
 	}
 
 	// return pai propabilety value.
-	result = 4 * (pointsIn / totalPoints);
+	result = QUARTER_OF_CIRCLE * (pointsIn / totalPoints);
 	
 	return(&result);
 }
