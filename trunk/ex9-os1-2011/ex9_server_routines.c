@@ -34,7 +34,7 @@ int *is_valid_id_1(char **str,CLIENT *cl)
 		{
 			influence = counter%INFLUENCE_DIVIDER + 1;
 			int digit = (int)((*str)[counter]) - '0';
-			res=int influence*digit;
+			res= influence*digit;
 			if(res>ID_CORRECT_LEN)
 				res-=ID_CORRECT_LEN;
 			sum+=res;
