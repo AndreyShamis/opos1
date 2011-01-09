@@ -13,11 +13,147 @@
 
 //=============================================================================
 //	Function which printing user menu
-void print_menu()
+void print_menu();
+
+//=============================================================================
+//	Function which check if numer of parameters which get program is correct
+//	Return 1 if correct 
+//	else print error end exit from pragram
+int check_correct_start(const int argc);
+
+//=============================================================================
+//	Function which check if client creation success
+//	if not report about error and exit from programm
+void checl_client_creation(CLIENT *cl,char *server);
+
+//=============================================================================
+//	Function which get client and server then geting from the user
+//	the string which gona be checking by server to ID
+//	Printing the result to screen
+void Check_Id(CLIENT *cl,char *server);
+
+//=============================================================================
+//	Function which check if multiplier is good thats mean not biger or small
+//	Return 1 if good and 0 if not good
+int check_multiplier(const int multi_p);
+
+//=============================================================================
+//	Function which getint the client and server char then getting multiplier
+//	from user and sending it to server. After retreiving data(result) from
+//	server put-out is to the screen
+void getPi(CLIENT *cl,char *server);
+
+//=============================================================================
+int main(int argc,char **argv)
 {
-	fprintf(stdout,"\n \
-	\t# 1 - Write 1 for check ID \n \
-	\t# 2 - Write 2 for get pi by Monte Carlo\n");
+	CLIENT 		*cl;				//	client variable
+	char 		*server;			//	server using variable
+	int 		counter = 0;		//	for variable
+	short int 	input	= 0;		//	menu variable
+	char 		hren;				//	help variable
+
+	check_correct_start(argc);		//	check if number of param correct
+	server 	= 	argv[1];			//	get the server host
+		
+	//	creating connection
+	cl = clnt_create(server,REMOTE_PROG_SKELETON,MESSAGEVERS,"tcp");
+	
+	//	while counter < cycles need 
+	for(counter=0;counter< MAX_CYCLES;counter++)
+	{
+		print_menu();						//	print indication menu
+		fscanf(stdin,"%hd%c",&input,&hren);	//	get menu option
+		
+		if(input == CHECK_ID)					
+			Check_Id(cl,server);			//	check id
+		else if(input == GET_PI)
+			getPi(cl,server);				//	get pi
+		else								//	print correction to user
+			fprintf(stdout,"You mast select or 1 or 2 only\n");
+				
+	}
+
+	clnt_destroy(cl);				//	destroy connection
+	
+	return(EXIT_SUCCESS);			//	exit from program
+}
+
+//=============================================================================
+//	Function which getint the client and server char then getting multiplier
+//	from user and sending it to server. After retreiving data(result) from
+//	server put-out is to the screen
+void getPi(CLIENT *cl,char *server)
+{
+	int 	multiplier=0;	//	value be sended to server multiplier
+	double 	*val;			//	value retuned from server
+	char 	hren;			//	help varibale used in fscanf
+	
+	//	indicaton to user what need to do
+	fprintf(stdout,"\nPlease write digit [1-6]:\t");
+	//	get multiplier from user
+	fscanf(stdin,"%d%c",&multiplier,&hren);
+	//	check if the multiplier value is good
+	if(check_multiplier(multiplier))
+	{
+		//	send it to server and retrive result
+		val = estimate_pi_1(&multiplier,cl);	
+		//	check if result not null
+		if(val == NULL)
+		{	
+			clnt_perror(cl,server);
+			exit(EXIT_FAILURE);
+		}
+		//	print result
+		printf("The pi is %1.10lf\n",*val);
+	}
+
+}
+
+//=============================================================================
+//	Function which check if multiplier is good thats mean not biger or small
+//	Return 1 if good and 0 if not good
+int check_multiplier(const int multi_p)
+{
+	//	checking
+	if(multi_p<MIN_MULTIPLIER || multi_p > MAX_MULTIPLIER)
+	{
+		//	Print error return 0
+		fprintf(stderr,"Bad multiplier!\n");
+		return(0);
+	}
+	
+	return(1);			//	if good return 1
+	
+}
+
+//=============================================================================
+//	Function which get client and server then geting from the user
+//	the string which gona be checking by server to ID
+//	Printing the result to screen
+void Check_Id(CLIENT *cl,char *server)
+{
+
+	int *result;					//	pointer to result	
+	char *message;					//	pointer to message
+	char id_str[MAX_ID_LEN];		//	string for ID input
+		
+	//	Indication to user what need to do
+	fprintf(stdout,"\nPlease write ID which you want to check:\t");	
+	fgets(id_str,MAX_ID_LEN,stdin);	//	get from the user ID
+
+	message = id_str;				//	set pointer
+	result = is_valid_id_1(&message,cl);	//	send question get result
+	
+	if(result == NULL)
+	{	
+		clnt_perror(cl,server);
+		exit(EXIT_FAILURE);
+	}
+
+	if(*result != 0)
+		printf("(%d)The id is correct\n",*result);
+	else
+		printf("(%d)The id is INCORRECT\n",*result);
 
 }
 
@@ -40,10 +176,14 @@ int check_correct_start(const int argc)
 }
 
 //=============================================================================
+//	Function which check if client creation success
+//	if not report about error and exit from programm
 void checl_client_creation(CLIENT *cl,char *server)
 {
+	//	check if client is null
 	if(cl == NULL)
-	{
+	{	
+		//	then report error and exit from the program
 		clnt_pcreateerror(server);
 		exit(EXIT_FAILURE);
 	}
@@ -51,97 +191,15 @@ void checl_client_creation(CLIENT *cl,char *server)
 }
 
 //=============================================================================
-void Check_Id(CLIENT *cl,char *server)
+//	Function which printing user menu
+void print_menu()
 {
-
-	int *result;
-	char *message;
-	char id_str[MAX_ID_LEN];
-		
-	fprintf(stdout,"\nPlease write ID which you want to check:\t");	
-	fgets(id_str,MAX_ID_LEN,stdin);
-
-	message = id_str;
-	result = is_valid_id_1(&message,cl);	
-	if(result == NULL)
-	{	
-		clnt_perror(cl,server);
-		exit(EXIT_FAILURE);
-	}
-
-	if(*result != 0)
-		printf("(%d)The id is correct\n",*result);
-	else
-		printf("(%d)The id is INCORRECT\n",*result);
+	fprintf(stdout,"\n \
+	\t# 1 - Write 1 for check ID \n \
+	\t# 2 - Write 2 for get pi by Monte Carlo\n");
 
 }
-
 //=============================================================================
-int check_multiplier(const int multi_p)
-{
-	if(multi_p<MIN_MULTIPLIER || multi_p > MAX_MULTIPLIER)
-	{
-		fprintf(stderr,"Bad multiplier!\n");
-		return(0);
-	}
-	
-	return(1);
-	
-}
-
 //=============================================================================
-void getPi(CLIENT *cl,char *server)
-{
-	int multiplier=0;
-	double 	*val;
-	char hren;
-	
-	fprintf(stdout,"\nPlease write digit [1-6]:\t");
-	fscanf(stdin,"%d%c",&multiplier,&hren);
-
-	if(check_multiplier(multiplier))
-	{
-		val = estimate_pi_1(&multiplier,cl);	
-	
-		if(val == NULL)
-		{	
-			clnt_perror(cl,server);
-			exit(EXIT_FAILURE);
-		}
-		printf("The pi is %1.10lf\n",*val);
-	}
-
-}
-
 //=============================================================================
-int main(int argc,char **argv)
-{
-	CLIENT 		*cl;
-	char 		*server;
-	int 		counter = 0;
-	short int 	input	= 0;
-	char 		hren;
 
-	check_correct_start(argc);
-	server 	= 	argv[1];
-		
-	cl = clnt_create(server,REMOTE_PROG_SKELETON,MESSAGEVERS,"tcp");
-		
-	for(counter=0;counter< MAX_CYCLES;counter++)
-	{
-		print_menu();
-		fscanf(stdin,"%hd%c",&input,&hren);
-		
-		if(input == CHECK_ID)
-			Check_Id(cl,server);
-		else if(input == GET_PI)
-			getPi(cl,server);
-		else
-			fprintf(stdout,"You mast select or 1 or 2 only\n");
-				
-	}
-
-	clnt_destroy(cl);
-	
-	return(EXIT_SUCCESS);	
-}
