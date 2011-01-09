@@ -1,4 +1,22 @@
+/*
 
+	* Provide tools which can get options to check some string which posible be
+
+id, and can be checked if this id is correct id.
+
+If the ID is correct the checking function return 1 and if its not correct id
+
+the function return 0. Correct id must include 9 digits.
+
+	
+	* Another function which provide server its math Pi by Monte Cralo Method.
+
+Fucntion of MonteCarlo method geting the natural number between 1 to 6
+
+and calculate the Pi value which be returned to client who ask for this action.
+
+*/
+//=============================================================================
 #include <stdio.h>						//	stdio include
 #include <string.h> 					//	need for strlen
 #include "/usr/include/rpc/rpc.h"		//	rpc include

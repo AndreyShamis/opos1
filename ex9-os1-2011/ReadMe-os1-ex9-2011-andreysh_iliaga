@@ -12,20 +12,17 @@
  *		to compile : 
 						./make_reg.sh
  *
- *		to run:	
- 		
+ *		to run:	 		
  			Server:
-
  				./server
 
  			Client
-
 	 			./client X
-
 	 			X	-	host 	
+	 		example ./client localhost
+	 				./client 127.0.0.1
  *
  */
-
 ================================= server ======================================
 	* Provide tools which can get options to check some string which posible be
 
@@ -76,4 +73,9 @@ Files used
 	
 ReadMe-os1-ex9-2011-andreysh_iliaga		//	readme
 
+//=============================================================================
+
+Known bugs:
+
+	No bugs
 ===============================================================================
