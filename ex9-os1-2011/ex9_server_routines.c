@@ -1,15 +1,18 @@
-#include <stdio.h>
-#include <string.h> 				//	need for strlen
-#include "/usr/include/rpc/rpc.h"
-#include <time.h>					//	need for srand time
-#include "ex9_server.h"
 
+#include <stdio.h>						//	stdio include
+#include <string.h> 					//	need for strlen
+#include "/usr/include/rpc/rpc.h"		//	rpc include
+#include <time.h>						//	need for srand time
+#include "ex9_server.h"					//	server include
+
+//=============================================================================
 #define ID_CORRECT_LEN 9				//	corretc len of id
 #define INFLUENCE_DIVIDER 2				//	to set nfluense
 #define NUMBER_OF_POINTS 10000			//	total number of points
 #define QUARTER_OF_CIRCLE 4				//	quarter of circle
 #define DECIMAL_DEVIDER 10				//	didvider in id check
-
+#define SMAL_DIGIT 0					//	smallest digit in id
+#define BIG_DIGIT 9						//	biger digit in id
 
 //=============================================================================
 //	Function which get string and it is must be id wich gonna be checked if
@@ -25,35 +28,41 @@ int *is_valid_id_1(char **str,CLIENT *cl)
 	int sum = 0;						//	sum of all digits
 	int res = 0;						//	for inside result
 	int influence=0;					//	influence on digit
-		
-	if(str_len != ID_CORRECT_LEN)
-		result = 0;
-	else
+	int digit=0;						//	temporary digit
+	
+	result = 0;
+	
+	if(str_len == ID_CORRECT_LEN)
 	{
+		//	for all digit in string
 		for(counter=0;counter<str_len;counter++)
 		{
+			//	math influence for digit
 			influence = counter%INFLUENCE_DIVIDER + 1;
-			int digit = (int)((*str)[counter]) - '0';
+			//	get special digit
+			digit = (int)((*str)[counter]) - '0';
 			
-			if(digit <0 || digit >9)
-			{
-				result = 0;
+			//	check if the digit in [0-9]
+			if(digit < SMAL_DIGIT || digit > BIG_DIGIT)				
 				break;
-			}
-
+	
+			//	multiplie the digit value in influence
 			res= influence*digit;
+			
+			//	check if the value bigger than 9
 			if(res>ID_CORRECT_LEN)
 				res-=ID_CORRECT_LEN;
-			sum+=res;
+			
+			sum+=res;							//	add to total sum
 		
 		}
+		//	check if sum is good by checking check digit
 		if(sum % DECIMAL_DEVIDER == 0)
-			result = 1;	
-		else
-			result = 0;
+			result = 1;							//	thats good id
+		
 	}
 	
-	return(&result);
+	return(&result);							//	return value
 }
 
 //=============================================================================

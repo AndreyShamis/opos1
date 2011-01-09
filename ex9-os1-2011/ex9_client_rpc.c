@@ -1,10 +1,10 @@
-#include <stdio.h>
-#include "/usr/include/rpc/rpc.h"
-#include "ex9_server.h"
+#include <stdio.h>					//	stdio include
+#include "/usr/include/rpc/rpc.h"	//	rpc include
+#include "ex9_server.h"				//	server include
 
+//=============================================================================
 #define MAX_CYCLES 4				//	number of cicles
 #define MAX_ID_LEN 10				//	size of string for id
-
 #define NUMBER_OF_PARAM 2			//	number of parameter needed
 #define CHECK_ID 1					//	define for check ID
 #define GET_PI 2					//	define for get Pi
@@ -168,7 +168,8 @@ int check_correct_start(const int argc)
 		return(1);
 
 	//	number of paramter bad, print error message and exit
-	fprintf(stderr,"Incorrect number of parameters\n");
+	fprintf(stderr,"Incorrect number of parameters\n \
+	\rYou need provide server host name or server ip\n");
 	exit(EXIT_FAILURE);
 	
 	return(0);
