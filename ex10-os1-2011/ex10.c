@@ -4,13 +4,26 @@
 //                               Include section
 //=============================================================================
 #include <stdio.h>
-#include <stdlib.h> // for EXIT_SUCCESS
-#include <ctype.h>	// for fuction isdigit
+#include <stdlib.h> 	// for EXIT_SUCCESS
+#include <ctype.h>		// for fuction isdigit
+#include <pthread.h>	// for thread using
+
+
 
 
 
 #define MAX_ROW 3	// difine number of max rows
 #define MAX_COL 3	// difine number of max cols
+
+
+
+
+// data base to send to tread to wark on it
+struct db{
+	int _matrix[MAX_ROW][MAX_COL];	// matrix strutur
+	int _vector[MAX_COL];			// vector structur
+	int _mat_row;					// on wich row of matrix need to work
+};
 
 
 //=============================================================================
@@ -80,8 +93,10 @@ int main()
 // A function that manage the program
 void manage_program()
 {
-	int matrix[MAX_ROW][MAX_COL];	// matrix strutur
-	int vector[MAX_COL];			// vector structur
+	//int matrix[MAX_ROW][MAX_COL];	// matrix strutur
+	//int vector[MAX_COL];			// vector structur
+
+	struct db data_base;
 	short int 	input	= 0;		// menu variable
 	int		    exit 	= 0;		// exit difinder
 
@@ -93,21 +108,21 @@ void manage_program()
 
 		switch(input)
 		{
-			case 1:	fill_matrix(matrix); // fill matrix with values from user
-					print_matrix(matrix); // Print the obtained matrix
+			case 1:	fill_matrix(data_base._matrix); // fill matrix with values from user
+					print_matrix(data_base._matrix); // Print the obtained matrix
 					break;
 
-			case 2:	fill_vector(vector); // fill vector with values from user
-					print_vector(vector); // Print the obtained vector
+			case 2:	fill_vector(data_base._vector); // fill vector with values from user
+					print_vector(data_base._vector); // Print the obtained vector
 					break;
 
-			//case 3:	thread_join(&matrix, &vector)	//
+			//case 3:	culc_join(&matrix, &vector)	//
 					break;
 
-			//case 4:	thread_detach(&matrix, &vector)
+			//case 4:	culc_detach(&matrix, &vector)
 					break;
 
-			//case 5:	thread_key(&matrix, &vector)
+			//case 5:	culc_key(&matrix, &vector)
 					break;
 
 			case 6: exit = 1;	// exit program
@@ -205,6 +220,20 @@ void print_vector(int vector[MAX_COL])
 
 	fprintf(stdout,"\n");
 }
+
+//=============================================================================
+//	Function which
+//void culc_join(int &matrix, &vector)
+
+
+
+
+
+
+
+
+
+
 
 
 
