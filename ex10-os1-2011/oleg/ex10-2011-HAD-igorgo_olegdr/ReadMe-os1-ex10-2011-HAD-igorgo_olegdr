@@ -1,0 +1,30 @@
+	OS1 - 2011 - Ex #10
+Threads -  Matrix and vector multiplying.
+--------------------------------
+
+Written by: Igor Govorov, 	Oleg Ruchlis 
+ID:         317362812, 		310140629
+Login:      igorgo, 		olegdr
+
+
+Programs description:
+---------------------
+1. ex10.c:
+ * The program does multplication of matrix and a vector
+ * using threads in few diffrent manners.
+
+   compile with 'make' command from the shell when in the ex10 folder after
+   untaring the file.
+   or compile with: gcc -Wall -o ex10 -l pthread ex10.c
+   
+   run with: ./ex10
+   
+   follow the instructions of the menu.
+
+Things worth notice:
+--------------------
+a. can handle larger numbers then a single char (0 - 9).
+
+Known Issues:
+-------------
+a. NONE.
