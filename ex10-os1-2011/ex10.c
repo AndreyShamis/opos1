@@ -39,6 +39,24 @@ void print_menu();
 void manage_program();
 
 //=============================================================================
+//	Function which multiplying matrix by vector, using 3 tread.
+//  get pointer to data base that includ matrix and vector.
+void culc_join(struct db *data_base);
+
+//=============================================================================
+//	Function which
+//  get pointer to data base that includ matrix and vector.
+void *thr_join(void *arg);
+
+
+//=============================================================================
+//	Function which
+//  get
+void cleanup_msg(void* id);
+
+
+
+//=============================================================================
 //	Function which get input from std input and return int value of input
 //  the ufctiont check if the input is corect (is digits)
 int get_input_int();
@@ -62,6 +80,11 @@ void print_matrix(int matrix[][MAX_COL]);
 //	Function which print obtained vector.
 // 	The function get vector (1D array).
 void print_vector(int vector[MAX_COL]);
+
+//=============================================================================
+//	function which print error which get in parameter
+//	and exit from the programm
+void errExit(char *msg);
 
 
 
@@ -116,7 +139,7 @@ void manage_program()
 					print_vector(data_base._vector); // Print the obtained vector
 					break;
 
-			//case 3:	culc_join(&matrix, &vector)	//
+			case 3:	culc_join(&data_base);	//
 					break;
 
 			//case 4:	culc_detach(&matrix, &vector)
@@ -222,8 +245,90 @@ void print_vector(int vector[MAX_COL])
 }
 
 //=============================================================================
+//	Function which multiplying matrix by vector, using 3 tread.
+//  get pointer to data base that includ matrix and vector.
+void culc_join(struct db *data_base)
+{
+	int r_vec[MAX_COL];  // result vector
+
+	int *ret_val = NULL;			// single multiply result from tread
+
+	int index = 0;			// for loop
+
+	pthread_t t_vec[MAX_COL]; // vector for treads
+
+	for(index = 0; index < MAX_COL; index++)
+	{
+		data_base->_mat_row = index;	// set wich matrix row will be multiply
+
+		// if tread creation faild - print error ,leav the program.
+		if ((pthread_create(&t_vec[index], NULL, thr_join,
+			(void *)data_base)) != 0)
+			errExit("pthread_create()failed\n");
+
+		// if waiting for current tread failed - print error ,leav the program.
+		if((pthread_join(t_vec[index], (void *)&ret_val)) != 0)
+			errExit("pthread_join()failed\n");
+
+			//fputs("pthread_join()failed", stderr);
+			//exit(EXIT_FAILURE);
+
+		r_vec[index] = *ret_val;	// get multipy result from current tread.
+		free(ret_val);				// free allocated memory.
+	}
+	// print multiply result
+	fprintf(stdout,"After multiplying calculation, ");
+	print_vector(r_vec); // Print the obtained (multiplying result) vector
+
+	fprintf(stdout,"Bye Bye\n");
+
+	exit(EXIT_SUCCESS);
+}
+
+//=============================================================================
 //	Function which
-//void culc_join(int &matrix, &vector)
+//  get pointer to data base that includ matrix and vector.
+void *thr_join(void *arg)
+{
+	int index;
+	struct db* data_base = (struct db*)arg;			// get access to data base
+	int *ret_val = NULL;						// vaireble for returning data
+
+	// set tread cancelation mod.
+	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+	pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
+
+	pthread_t id = pthread_self();					// get current tread id
+	pthread_cleanup_push(cleanup_msg, (void *)&id);	// set cleanup of tread
+
+	// allocate memory for returning of multilying result. -if fail print error
+	if((ret_val = (int *)malloc(sizeof(int))) == NULL)
+		errExit("malloc()failed\n");
+
+	(*ret_val) = 0;
+
+	// calculation:
+	for (index = 0 ; index < MAX_COL ; index++)
+		(*ret_val) += data_base->_matrix[data_base->_mat_row][index] *
+					  data_base->_vector[index];
+
+	pthread_exit((void *)ret_val);	// set tread to exit with return value
+
+	// activate tread distructor
+	pthread_cleanup_pop(0);
+}
+
+//=============================================================================
+//	Function which
+//  get
+void cleanup_msg(void* id)
+{
+
+	fprintf(stdout,"pthread_cleanup: ptread %d finished\n", *((unsigned int*)id));
+	//unsigned int *tread_id = (unsigned int*)id;
+	//fprintf(stdout,"pthread_cleanup: ptread %d finished\n", *tread_id);
+
+}
 
 
 
@@ -236,10 +341,14 @@ void print_vector(int vector[MAX_COL])
 
 
 
-
-
-
-
+//=============================================================================
+//	function which print error which get in parameter
+//	and exit from the programm
+void errExit(char *msg)
+{
+	perror(msg);						//	Print message
+	exit(EXIT_FAILURE);					//	exit whith failure
+}
 
 //=============================================================================
 //	Function which printing user menu
