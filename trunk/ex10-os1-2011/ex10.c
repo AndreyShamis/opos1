@@ -1,6 +1,7 @@
 // ex10
-// A frogram that multiplying matrix 3x3 by vecto 1x3.
-// The can od it through 3 difrent methods.
+// A Program that multiplying matrix 3x3 by vecto 1x3, and print the result
+// vectorto the screen.
+// The program can do it through 3 difrent methods.
 // all 3 methods use 3 thread that multiply each row of matrix by vector.
 // the user have 6 options: #1:	fiil matrix with values.
 //							#2:	fill vector with values.
