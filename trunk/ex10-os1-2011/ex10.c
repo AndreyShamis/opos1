@@ -35,8 +35,8 @@ struct db{
 
 
 
-pthread_key_t key[MAX_COL];
-pthread_once_t threads_init[MAX_COL];
+pthread_key_t key;
+pthread_once_t threads_init = PTHREAD_ONCE_INIT;
 
 
 
@@ -135,7 +135,7 @@ void free_alloc_mem(void* mem);
 
 //=============================================================================
 //	Function which print specific thread result of multiplying vectors.
-void print_mul_result(pthread_key_t key);
+void print_mul_result();
 
 //=============================================================================
 //	Function which fill matrix with default value .
@@ -502,8 +502,6 @@ void culc_vec_key(struct db *data_base)
 
 	for(index = 0; index < MAX_COL; index++)
 	{
-		threads_init[index] = PTHREAD_ONCE_INIT;
-
 		data_base->_mat_row = index;	// set wich matrix row will be multiply
 
 		// if tread creation faild - print error ,leav the program.
@@ -546,7 +544,7 @@ void *thr_key(void *arg)
 	pthread_cleanup_push(free_alloc_mem, result);	// at the cleanup - free
 													//allocated memory
 	// the key is created only once
-	pthread_once(&threads_init[data_base->_mat_row], init_key);
+	pthread_once(&threads_init, init_key);
 
 	// allocate memory for saving of multilying result. -if fail print error
 	if((result = (int *)malloc(sizeof(int))) == NULL)
@@ -558,11 +556,11 @@ void *thr_key(void *arg)
 					  data_base->_vector[index];
 
 	// Saving result for specific tread	- if faild exit and notify
-	if(pthread_setspecific(key[data_base->_mat_row], result))
+	if(pthread_setspecific(key, result))
 		errExit("pthread_setspecific()failed\n");
 
 	// print the result through specific thread key.
-	print_mul_result(key[data_base->_mat_row]);
+	print_mul_result();
 
 	pthread_exit(EXIT_SUCCESS);	// exit thread
 
@@ -585,7 +583,7 @@ void free_alloc_mem(void* mem)
 
 //=============================================================================
 //	Function which print specific thread result of multiplying vectors.
-void print_mul_result(pthread_key_t key)
+void print_mul_result()
 {
 	int *result = NULL;
 
@@ -606,14 +604,14 @@ void print_mul_result(pthread_key_t key)
 //	Function which init key memoery
 void init_key()
 {
-	int index = 0; 	// var for loop.
+	//int index = 0, 	// var for loop.
 	int temp_key = 0;	// numer of key
 
-	for(index = 0; index < MAX_COL; index++)	// loop key creation
-	{
-		if((temp_key = pthread_key_create(&key[index], free_alloc_mem)) != 0)
+	//for(index = 0; index < MAX_COL; index++)	// loop key creation
+	//{
+		if((temp_key = pthread_key_create(&key, free_alloc_mem)) != 0)
 			errExit("Pthread_key_create()failed\n");
-	}
+	//}
 }
 
 //=============================================================================
