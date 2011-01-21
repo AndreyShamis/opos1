@@ -35,8 +35,8 @@ struct db{
 
 
 
-pthread_key_t key ;
-pthread_once_t threads_init;
+pthread_key_t key[MAX_COL];
+pthread_once_t threads_init[MAX_COL];
 
 
 
@@ -92,7 +92,7 @@ void *thr_key(void *arg);
 
 //=============================================================================
 //	Function which
-//  get 
+//  get
 void cleanup_msg(void* id);
 
 //=============================================================================
@@ -135,7 +135,7 @@ void free_alloc_mem(void* mem);
 
 //=============================================================================
 //	Function which print specific thread result of multiplying vectors.
-void print_mul_result();
+void print_mul_result(pthread_key_t key);
 
 //=============================================================================
 //	Function which fill matrix with default value .
@@ -173,7 +173,7 @@ void manage_program()
 	//int vector[MAX_COL];			// vector structur
 
 	struct db data_base;
-	
+
 	//memset(data_base._matrix,0,sizeof(data_base._matrix));
 	//memset(data_base._vector,0,sizeof(data_base._vector));
 	fill_matrix_default(data_base._matrix);
@@ -187,11 +187,11 @@ void manage_program()
 
 		input = get_input_int();	// get chois of of manu from user
 
-		switch(input)
+		switch(input)				// switch user choises
 		{
-					
+
 			case MENU_OPT_1:
-				// fill matrix with values from user	
+				// fill matrix with values from user
 				fill_matrix(data_base._matrix);
 				// Print the obtained matrix
 				print_matrix(data_base._matrix);
@@ -207,18 +207,18 @@ void manage_program()
 				// resut by main thread
 				culc_vec_join(&data_base);
 				break;
-			case MENU_OPT_4:	
+			case MENU_OPT_4:
 				// calculate multiplying of matrix by vector - the result
 				// will print by the threads.
 				culc_vec_detach(&data_base);
 				break;
-			case MENU_OPT_5:	
+			case MENU_OPT_5:
 				// calculate multiplying of matrix by vector - the result
 				// will print by the threads. and each thread save it data
 				// at it oun global virebal.
 				culc_vec_key(&data_base);
 				break;
-			case MENU_OPT_6: 
+			case MENU_OPT_6:
 				exit = 1;	// exit program
 				break;
 		}
@@ -366,9 +366,6 @@ void culc_vec_join(struct db *data_base)
 		if((pthread_join(t_vec[index], (void *)&ret_val)) != 0)
 			errExit("pthread_join()failed\n");
 
-			//fputs("pthread_join()failed", stderr);
-			//exit(EXIT_FAILURE);
-
 		r_vec[index] = *ret_val;	// get multipy result from current tread.
 		free(ret_val);				// free allocated memory.
 	}
@@ -505,6 +502,8 @@ void culc_vec_key(struct db *data_base)
 
 	for(index = 0; index < MAX_COL; index++)
 	{
+		threads_init[index] = PTHREAD_ONCE_INIT;
+
 		data_base->_mat_row = index;	// set wich matrix row will be multiply
 
 		// if tread creation faild - print error ,leav the program.
@@ -546,13 +545,12 @@ void *thr_key(void *arg)
 	pthread_cleanup_push(cleanup_msg, (void *)&id);	// set cleanup of thread
 	pthread_cleanup_push(free_alloc_mem, result);	// at the cleanup - free
 													//allocated memory
+	// the key is created only once
+	pthread_once(&threads_init[data_base->_mat_row], init_key);
 
 	// allocate memory for saving of multilying result. -if fail print error
 	if((result = (int *)malloc(sizeof(int))) == NULL)
 		errExit("malloc()failed\n");
-
-	// the key is created only once
-	pthread_once(&threads_init, init_key);
 
 	// calculation of multiplying:
 	for (index = 0 ; index < MAX_COL ; index++)
@@ -560,14 +558,14 @@ void *thr_key(void *arg)
 					  data_base->_vector[index];
 
 	// Saving result for specific tread	- if faild exit and notify
-	if(pthread_setspecific(key, result))
+	if(pthread_setspecific(key[data_base->_mat_row], result))
 		errExit("pthread_setspecific()failed\n");
 
 	// print the result through specific thread key.
-	print_mul_result();
-	
+	print_mul_result(key[data_base->_mat_row]);
+
 	pthread_exit(EXIT_SUCCESS);	// exit thread
-	
+
 	// for nice looking output - let pthread_join function error print first
 	sleep(2);
 
@@ -587,20 +585,20 @@ void free_alloc_mem(void* mem)
 
 //=============================================================================
 //	Function which print specific thread result of multiplying vectors.
-void print_mul_result()
+void print_mul_result(pthread_key_t key)
 {
+	int *result = NULL;
+
 	// in the other function we use result
 	// the key enable the func to retrive the wanted data as opposed to another
 	// data, storted using other keys
-	
-	int result = 0;
-	
-	result = *((int *)pthread_getspecific(key));
+	result = ((int *)pthread_getspecific(key));
 
 	// print the result
 	fprintf(stdout,"\nVector argument that thread %u,",
-						(unsigned int)pthread_self()); 
-	fprintf(stdout,"calculate is: %d\n", result);
+						(unsigned int)pthread_self());
+	fprintf(stdout,"calculate is: %d\n", (*result));
+
 }
 
 
@@ -608,14 +606,14 @@ void print_mul_result()
 //	Function which init key memoery
 void init_key()
 {
-	//int index = 0, 	// var for loop.
+	int index = 0; 	// var for loop.
 	int temp_key = 0;	// numer of key
 
-	//for(index = 0; index < MAX_COL; index++)	// loop key creation
-	//{
-		if((temp_key = pthread_key_create(&key, NULL)) != 0)
+	for(index = 0; index < MAX_COL; index++)	// loop key creation
+	{
+		if((temp_key = pthread_key_create(&key[index], free_alloc_mem)) != 0)
 			errExit("Pthread_key_create()failed\n");
-	//}
+	}
 }
 
 //=============================================================================
