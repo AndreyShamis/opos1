@@ -10,9 +10,13 @@
 #include <unistd.h>		// for function sleep
 
 
-
-
-
+//	Menu options
+#define MENU_OPT_1	1
+#define MENU_OPT_2	2
+#define MENU_OPT_3	3
+#define MENU_OPT_4	4
+#define MENU_OPT_5	5
+#define MENU_OPT_6	6
 
 
 #define MAX_ROW 3	// difine number of max rows
@@ -31,7 +35,7 @@ struct db{
 
 
 
-pthread_key_t key;
+pthread_key_t key ;
 pthread_once_t threads_init;
 
 
@@ -86,17 +90,9 @@ void culc_vec_key(struct db *data_base);
 //  get pointer to data base that includ matrix and vector.
 void *thr_key(void *arg);
 
-
-
-
-
-
-
-
-
 //=============================================================================
 //	Function which
-//  get
+//  get 
 void cleanup_msg(void* id);
 
 //=============================================================================
@@ -141,9 +137,13 @@ void free_alloc_mem(void* mem);
 //	Function which print specific thread result of multiplying vectors.
 void print_mul_result();
 
+//=============================================================================
+//	Function which fill matrix with default value .
+void fill_matrix_default(int matrix[][MAX_COL]);
 
-
-
+//=============================================================================
+//	Function which fill vector with default value.
+void fill_vector_default(int vector[MAX_COL]);
 
 //*****************************************************************************
 //*****************************************************************************
@@ -173,6 +173,11 @@ void manage_program()
 	//int vector[MAX_COL];			// vector structur
 
 	struct db data_base;
+	
+	//memset(data_base._matrix,0,sizeof(data_base._matrix));
+	//memset(data_base._vector,0,sizeof(data_base._vector));
+	fill_matrix_default(data_base._matrix);
+	fill_vector_default(data_base._vector);
 	short int 	input	= 0;		// menu variable
 	int		    exit 	= 0;		// exit difinder
 
@@ -184,38 +189,38 @@ void manage_program()
 
 		switch(input)
 		{
-					// fill matrix with values from user
-			case 1:	fill_matrix(data_base._matrix);
-
-					// Print the obtained matrix
-					print_matrix(data_base._matrix);
-					break;
-
-					// fill vector with values from user
-			case 2:	fill_vector(data_base._vector);
-
-					// Print the obtained vector
-					print_vector(data_base._vector);
-					break;
-
-					// calculate multiplying of matrix by vector and print the
-					// resut by main thread
-			case 3:	culc_vec_join(&data_base);
-					break;
-
-					// calculate multiplying of matrix by vector - the result
-					// will print by the threads.
-			case 4:	culc_vec_detach(&data_base);
-					break;
-
-					// calculate multiplying of matrix by vector - the result
-					// will print by the threads. and each thread save it data
-					// at it oun global virebal.
-			case 5:	culc_vec_key(&data_base);
-					break;
-
-			case 6: exit = 1;	// exit program
-					break;
+					
+			case MENU_OPT_1:
+				// fill matrix with values from user	
+				fill_matrix(data_base._matrix);
+				// Print the obtained matrix
+				print_matrix(data_base._matrix);
+				break;
+			case MENU_OPT_2:
+				// fill vector with values from user
+				fill_vector(data_base._vector);
+				// Print the obtained vector
+				print_vector(data_base._vector);
+				break;
+			case MENU_OPT_3:
+				// calculate multiplying of matrix by vector and print the
+				// resut by main thread
+				culc_vec_join(&data_base);
+				break;
+			case MENU_OPT_4:	
+				// calculate multiplying of matrix by vector - the result
+				// will print by the threads.
+				culc_vec_detach(&data_base);
+				break;
+			case MENU_OPT_5:	
+				// calculate multiplying of matrix by vector - the result
+				// will print by the threads. and each thread save it data
+				// at it oun global virebal.
+				culc_vec_key(&data_base);
+				break;
+			case MENU_OPT_6: 
+				exit = 1;	// exit program
+				break;
 		}
 	}
 }
@@ -239,6 +244,30 @@ int get_input_int()
 		exit(EXIT_FAILURE);
 	}
 	return input;	// return input
+}
+
+
+//=============================================================================
+//	Function which fill matrix with default value .
+void fill_matrix_default(int matrix[][MAX_COL])
+{
+	short int index_row = 0;
+	short int index_col = 0;
+
+	for(index_row = 0; index_row < MAX_ROW; index_row ++)
+		for(index_col = 0; index_col < MAX_COL; index_col ++)
+			matrix[index_row][index_col] = 0;
+
+}
+
+//=============================================================================
+//	Function which fill vector with default value.
+void fill_vector_default(int vector[MAX_COL])
+{
+	short int index_col = 0;
+
+	for(index_col = 0; index_col < MAX_COL; index_col ++)
+		vector[index_col] = 0;
 }
 
 //=============================================================================
@@ -397,7 +426,8 @@ void culc_vec_detach(struct db *data_base)
 	pthread_t t_vec[MAX_COL];	// threads id's vector
 
 	// print mesege abuote result
-	fprintf(stdout, "After multiplying calculation, The obtained vector arguments is:\n");
+	fprintf(stdout, "After multiplying calculation, \
+	The obtained vector arguments is:\n");
 
 	for(index = 0; index < MAX_COL; index++)
 	{
@@ -458,9 +488,6 @@ void *thr_detach(void *arg)
 	pthread_cleanup_pop(0);
 }
 
-
-
-
 //=============================================================================
 //	Function which multiplying matrix by vector, using 3 tread
 //	print them self the risult of multiplying and the using pthred key to save
@@ -473,7 +500,8 @@ void culc_vec_key(struct db *data_base)
 	pthread_t t_vec[MAX_COL];	// threads id's vector
 
 	// print mesege abuote result
-	fprintf(stdout, "After multiplying calculation, The obtained vector arguments is:\n");
+	fprintf(stdout, "After multiplying calculation, \
+	The obtained vector arguments is:\n");
 
 	for(index = 0; index < MAX_COL; index++)
 	{
@@ -537,9 +565,9 @@ void *thr_key(void *arg)
 
 	// print the result through specific thread key.
 	print_mul_result();
-
+	
 	pthread_exit(EXIT_SUCCESS);	// exit thread
-
+	
 	// for nice looking output - let pthread_join function error print first
 	sleep(2);
 
@@ -564,13 +592,15 @@ void print_mul_result()
 	// in the other function we use result
 	// the key enable the func to retrive the wanted data as opposed to another
 	// data, storted using other keys
-
-
-	int result = *((int *)pthread_getspecific(key));
+	
+	int result = 0;
+	
+	result = *((int *)pthread_getspecific(key));
 
 	// print the result
-	fprintf(stdout,"\nvector argument that thread %u, calculate is: %d\n",
-					(unsigned int)pthread_self(), result);
+	fprintf(stdout,"\nVector argument that thread %u,",
+						(unsigned int)pthread_self()); 
+	fprintf(stdout,"calculate is: %d\n", result);
 }
 
 
