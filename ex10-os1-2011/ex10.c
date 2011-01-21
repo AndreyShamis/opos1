@@ -1,5 +1,16 @@
 // ex10
+// A frogram that multiplying matrix 3x3 by vecto 1x3.
+// The can od it through 3 difrent methods.
+// all 3 methods use 3 thread that multiply each row of matrix by vector.
+// the user have 6 options: #1:	fiil matrix with values.
+//							#2:	fill vector with values.
+//							#3:	multiply using join function (threads function)
+//							#4:	multiply using detach function (threads functi)
+//							#5:	multiply using key option (threads option)
+//							#6:	exit program.
 
+// Input:	user chois.
+// Output:	vector - result of multiplying.
 
 //                               Include section
 //=============================================================================
@@ -34,7 +45,7 @@ struct db{
 };
 
 
-
+// globals for key (threads)
 pthread_key_t key;
 pthread_once_t threads_init = PTHREAD_ONCE_INIT;
 
@@ -456,7 +467,7 @@ void culc_vec_detach(struct db *data_base)
 //  get pointer to data base that includ matrix and vector.
 void *thr_detach(void *arg)
 {
-	int index;
+	int index;									// for loop
 	struct db* data_base = (struct db*)arg;		// get access to data base
 	int result = 0;								//result of multiplying virebel
 
@@ -543,6 +554,7 @@ void *thr_key(void *arg)
 	pthread_cleanup_push(cleanup_msg, (void *)&id);	// set cleanup of thread
 	pthread_cleanup_push(free_alloc_mem, result);	// at the cleanup - free
 													//allocated memory
+
 	// the key is created only once
 	pthread_once(&threads_init, init_key);
 
@@ -585,12 +597,10 @@ void free_alloc_mem(void* mem)
 //	Function which print specific thread result of multiplying vectors.
 void print_mul_result()
 {
-	int *result = NULL;
-
 	// in the other function we use result
 	// the key enable the func to retrive the wanted data as opposed to another
 	// data, storted using other keys
-	result = ((int *)pthread_getspecific(key));
+	int *result = (int *)pthread_getspecific(key);
 
 	// print the result
 	fprintf(stdout,"\nVector argument that thread %u,",
@@ -604,14 +614,11 @@ void print_mul_result()
 //	Function which init key memoery
 void init_key()
 {
-	//int index = 0, 	// var for loop.
 	int temp_key = 0;	// numer of key
 
-	//for(index = 0; index < MAX_COL; index++)	// loop key creation
-	//{
 		if((temp_key = pthread_key_create(&key, free_alloc_mem)) != 0)
 			errExit("Pthread_key_create()failed\n");
-	//}
+
 }
 
 //=============================================================================
@@ -622,9 +629,6 @@ void cleanup_msg(void* id)
 
 	fprintf(stdout,"\npthread_cleanup: ptread %u finished\n",
 	*((unsigned int*)id));
-	//unsigned int *tread_id = (unsigned int*)id;
-	//fprintf(stdout,"pthread_cleanup: ptread %d finished\n", *tread_id);
-
 }
 
 //=============================================================================
